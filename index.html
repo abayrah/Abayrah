@@ -1200,7 +1200,7 @@
         }
 
         function runAutoRotationPipeline() { showTargetSlide(currentSlideIndex + 1); }
-        function startSliderInterval() { if(slides.length) carouselIntervalId = setInterval(runAutoRotationPipeline, 5000); }
+        function startSliderInterval() { if(slides.length) carouselIntervalId = setInterval(runAutoRotationPipeline, 3000); }
 
         dots.forEach(dot => {
             dot.addEventListener('click', (e) => {
