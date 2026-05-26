@@ -433,18 +433,151 @@
             color: var(--muted-gray);
             font-weight: 300;
         }
+
+        /* 🔥 DEDICATED VAULT SALE BANNER 🔥 */
+        .vault-sale-section {
+            max-width: 1480px;
+            margin: 80px auto 0 auto;
+            padding: 0 40px;
+        }
+
+        .vault-sale-banner {
+            position: relative;
+            width: 100%;
+            background-color: #121110;
+            border: 1px solid #2A2826;
+            border-radius: 2px;
+            padding: 60px 40px;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            text-align: center;
+            cursor: pointer;
+            overflow: hidden;
+            transition: all 0.7s cubic-bezier(0.16, 1, 0.3, 1);
+        }
+
+        .vault-sale-banner:hover {
+            border-color: var(--accent-gold);
+            box-shadow: 0 25px 50px rgba(197, 168, 128, 0.15);
+            transform: translate3d(0, -5px, 0);
+        }
         
-        /* --- Premium Store Collections System --- */
+        .vault-ambient-light {
+            position: absolute;
+            top: 50%; left: 50%;
+            width: 100%; height: 200%;
+            background: radial-gradient(ellipse at center, rgba(197,168,128,0.15) 0%, transparent 60%);
+            transform: translate(-50%, -50%);
+            animation: pulseSaleLight 5s ease-in-out infinite alternate;
+            z-index: 1;
+            pointer-events: none;
+        }
+
+        @keyframes pulseSaleLight {
+            0% { opacity: 0.5; transform: translate(-50%, -50%) scale(0.95); }
+            100% { opacity: 1; transform: translate(-50%, -50%) scale(1.05); }
+        }
+
+        .vault-promo-content {
+            position: relative;
+            z-index: 2;
+            width: 100%;
+            border: 1px solid rgba(197, 168, 128, 0.2);
+            padding: 40px 20px;
+            transition: all 0.6s cubic-bezier(0.16, 1, 0.3, 1);
+        }
+
+        .vault-sale-banner:hover .vault-promo-content {
+            border-color: rgba(197, 168, 128, 0.5);
+            background-color: rgba(197, 168, 128, 0.02);
+        }
+
+        .vault-subtitle {
+            font-size: 11px;
+            letter-spacing: 6px;
+            text-transform: uppercase;
+            color: #ECEAE6;
+            margin-bottom: 15px;
+            display: block;
+        }
+
+        .vault-value-wrapper {
+            display: flex;
+            align-items: baseline;
+            justify-content: center;
+            gap: 15px;
+            margin-bottom: 10px;
+            transform: scale(1);
+            transition: transform 0.6s cubic-bezier(0.16, 1, 0.3, 1);
+        }
+
+        .vault-sale-banner:hover .vault-value-wrapper {
+            transform: scale(1.05);
+        }
+
+        .vault-value {
+            font-family: var(--font-serif);
+            font-size: 100px;
+            color: var(--accent-gold);
+            line-height: 0.9;
+            font-weight: 300;
+            text-shadow: 0 0 40px rgba(197, 168, 128, 0.5);
+        }
+
+        .vault-value-symbol {
+            font-size: 50px;
+            vertical-align: text-top;
+        }
+
+        .vault-value-text {
+            font-family: var(--font-serif);
+            font-size: 40px;
+            color: var(--accent-gold);
+            letter-spacing: 8px;
+            font-weight: 300;
+        }
+
+        .vault-desc {
+            font-size: 14px;
+            font-weight: 300;
+            color: #B5B0AA;
+            letter-spacing: 2px;
+            font-style: italic;
+            font-family: var(--font-serif);
+            margin-top: 15px;
+        }
+
+        .vault-cta {
+            display: inline-block;
+            margin-top: 30px;
+            font-size: 11px;
+            letter-spacing: 3px;
+            text-transform: uppercase;
+            color: #FFFFFF;
+            border-bottom: 1px solid #FFFFFF;
+            padding-bottom: 4px;
+            transition: all 0.4s ease;
+        }
+
+        .vault-sale-banner:hover .vault-cta {
+            color: var(--accent-gold);
+            border-color: var(--accent-gold);
+            letter-spacing: 5px;
+        }
+        
+        /* --- Premium Store Collections System (5 Cards in 1 Row) --- */
         .collections-section {
             max-width: 1560px;
-            margin: 100px auto;
+            margin: 80px auto 100px auto;
             padding: 0 40px;
             contain: content;
         }
 
         .section-header {
             text-align: center;
-            margin-bottom: 70px;
+            margin-bottom: 60px;
         }
 
         .section-header h2 {
@@ -467,8 +600,8 @@
 
         .category-grid {
             display: grid;
-            grid-template-columns: repeat(5, 1fr);
-            gap: 28px;
+            grid-template-columns: repeat(5, 1fr); /* Fixed: 5 cards in one row */
+            gap: 24px;
             width: 100%;
             max-width: 1480px; 
             margin: 0 auto;
@@ -520,7 +653,7 @@
         }
 
         .category-content {
-            padding: 28px 10px 15px 10px;
+            padding: 24px 8px 12px 8px;
             text-align: center;
             display: flex;
             flex-direction: column;
@@ -531,18 +664,18 @@
 
         .category-name {
             font-family: var(--font-serif);
-            font-size: 20px;
+            font-size: 18px;
             font-weight: 400;
-            margin-bottom: 12px;
+            margin-bottom: 10px;
             text-transform: uppercase;
-            letter-spacing: 2px;
+            letter-spacing: 1.5px;
             color: var(--dark-text);
             transition: color 0.4s ease;
         }
 
         .category-link {
-            font-size: 10px; 
-            letter-spacing: 3px;
+            font-size: 9px; 
+            letter-spacing: 2px;
             text-transform: uppercase;
             font-weight: 500;
             color: var(--muted-gray);
@@ -577,6 +710,10 @@
 
         @media (max-width: 1024px) {
             .category-grid { grid-template-columns: repeat(3, 1fr); }
+            .vault-value-wrapper { flex-direction: column; align-items: center; gap: 5px; }
+            .vault-value { font-size: 80px; }
+            .vault-value-symbol { font-size: 40px; }
+            .vault-value-text { font-size: 30px; }
         }
 
         @media (max-width: 768px) {
@@ -588,6 +725,11 @@
             .brand-logo-img { height: 110px; }
             .hero-section { aspect-ratio: 4 / 3; }
             .footer-grid { grid-template-columns: 1fr; gap: 40px; }
+            .vault-sale-banner { padding: 40px 20px; }
+            .vault-promo-content { padding: 30px 10px; }
+            .vault-value { font-size: 60px; }
+            .vault-value-symbol { font-size: 30px; }
+            .vault-value-text { font-size: 24px; letter-spacing: 4px; }
         }
 
         /* --- Editorial Footer --- */
@@ -786,6 +928,23 @@
                     <h3>Bespoke Guest Experience</h3>
                     <p>From your initial scroll to seamless secure delivery, our concierge accompanies your journey.</p>
                 </div>
+            </div>
+        </div>
+    </section>
+
+    <section class="vault-sale-section" id="shop-sale">
+        <div class="vault-sale-banner" onclick="location.href='#vault-offers'">
+            <div class="vault-ambient-light"></div>
+            <div class="vault-promo-content">
+                <span class="vault-subtitle">The Archive Event</span>
+                
+                <div class="vault-value-wrapper">
+                    <div class="vault-value">50<span class="vault-value-symbol">%</span></div>
+                    <div class="vault-value-text">OFF</div>
+                </div>
+                
+                <p class="vault-desc">Unlock exceptional savings on our most sought-after silhouettes.</p>
+                <span class="vault-cta">Shop The Sale</span>
             </div>
         </div>
     </section>
