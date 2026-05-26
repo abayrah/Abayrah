@@ -1703,7 +1703,7 @@
         }
 
         if(toRegister) toRegister.addEventListener('click', (e) => { e.preventDefault(); switchAuthView('registerPanel'); });
-        if(toForgot) toForgot.addEventListener('click', (e) => { e.preventDefault(); switchAuthView('forgotPanel'); });
+       if(toForgot) toForgot.addEventListener('click', (e) => { switchAuthView('forgotPanel'); });
         if(regToSignIn) regToSignIn.addEventListener('click', (e) => { e.preventDefault(); switchAuthView('signInPanel'); });
         if(forgotToSignIn) forgotToSignIn.addEventListener('click', (e) => { e.preventDefault(); switchAuthView('signInPanel'); });
 
@@ -1730,10 +1730,10 @@
                 return;
             }
             try {
-                await signInWithEmailAndPassword(auth, email, password);
-            } catch (error) {
-                alert("Invalid boutique profile credentials framework mapping.");
-            }
+    await signInWithEmailAndPassword(auth, email, password);
+} catch (error) {
+    console.error("Auth Exception Frame: Authentication rejected framework metrics mapping.");
+}
         });
 
         document.getElementById('manualRegisterSubmitTrigger').addEventListener('click', async (e) => {
