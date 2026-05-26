@@ -197,7 +197,6 @@
             transform: translate3d(0, -3px, 0);
         }
 
-        /* 🌟 DYNAMIC AVATAR WRAPPER 🌟 */
         .user-avatar-node {
             width: 24px;
             height: 24px;
@@ -245,12 +244,12 @@
             color: var(--accent-gold);
         }
         
-        /* --- 🌟 LUXURY 16:5 PANORAMA CAROUSEL HERO SECTION 🌟 --- */
+        /* --- 🌟 LUXURY 16:5 PANORAMA CAROUSEL HERO SECTION (CENTERED BUTTON CONFIG) 🌟 --- */
         .hero-section {
             position: relative;
             width: 100%;
             max-width: 100%;
-            aspect-ratio: 16 / 5; /* 🌟 OPTIMIZED: Ultra-sleek premium 16:5 digital storefront ratio frame */
+            aspect-ratio: 16 / 5; 
             height: auto;
             overflow: hidden;
             background-color: #0D0C0B; 
@@ -312,32 +311,8 @@
             transition: transform 0.2s cubic-bezier(0.25, 1, 0.5, 1);
             display: flex;
             flex-direction: column;
-            justify-content: space-between;
+            justify-content: center;
             align-items: center;
-        }
-
-        .hero-trust-badges {
-            display: flex;
-            align-items: center;
-            gap: 15px;
-            font-size: 11px;
-            text-transform: uppercase;
-            letter-spacing: 2.5px;
-            color: rgba(255, 255, 255, 0.85);
-            font-weight: 300;
-            text-shadow: 0 2px 8px rgba(0, 0, 0, 0.4);
-        }
-
-        .hero-trust-badges svg {
-            width: 10px;
-            height: 10px;
-            fill: var(--accent-gold);
-            margin-right: 4px;
-        }
-
-        .badge-divider {
-            color: var(--accent-gold);
-            opacity: 0.5;
         }
 
         .hero-action-row {
@@ -351,7 +326,7 @@
         .hero-btn {
             background-color: transparent;
             color: #FFFFFF;
-            padding: 14px 40px; /* Slimmer high-end luxury bounding margins */
+            padding: 14px 40px; 
             font-size: 11px;
             font-weight: 400;
             text-transform: uppercase;
@@ -383,27 +358,6 @@
 
         .hero-btn:hover::before { left: 0; }
 
-        .hero-btn.secondary-action {
-            display: inline-flex;
-            align-items: center;
-            gap: 10px;
-            background-color: rgba(255, 255, 255, 0.05);
-            backdrop-filter: blur(8px);
-            -webkit-backdrop-filter: blur(8px);
-            border: 1px solid rgba(255, 255, 255, 0.2);
-        }
-
-        .hero-btn.secondary-action svg {
-            width: 11px;
-            height: 11px;
-            fill: currentColor;
-            transition: var(--transition-smooth);
-        }
-
-        .hero-btn.secondary-action:hover svg {
-            transform: translate3d(3px, -2px, 0);
-        }
-
         .carousel-indicator-dots {
             position: absolute;
             right: 40px;
@@ -430,12 +384,36 @@
             box-shadow: 0 0 8px var(--accent-gold);
         }
 
-        /* --- 🌟 BRAND VALUE INFRASTRUCTURE RIBBON 🌟 --- */
+        /* --- 🌟 PREMIUM BRAND MANIFEST VALUES SECTION 🌟 --- */
         .brand-manifest-section {
             background-color: #FFFFFF;
             border-bottom: 1px solid var(--border-color);
-            padding: 35px 4%;
+            padding: 50px 4% 45px 4%;
             contain: content;
+        }
+
+        /* Elegant Section Header for Why Abayrah */
+        .manifest-section-header {
+            text-align: center;
+            margin-bottom: 40px;
+        }
+
+        .manifest-section-header h2 {
+            font-family: var(--font-serif);
+            font-size: 32px;
+            font-weight: 300;
+            letter-spacing: 4px;
+            text-transform: uppercase;
+            color: var(--dark-text);
+        }
+
+        .manifest-section-header::after {
+            content: '';
+            display: block;
+            width: 40px;
+            height: 1px;
+            background-color: var(--accent-gold);
+            margin: 12px auto 0 auto;
         }
 
         .value-pillars-ribbon-row {
@@ -1233,7 +1211,7 @@
                     <img id="headerUserAvatarImg" class="user-avatar-node" src="" alt="Google Profile Profile Frame">
                 </a>
                 <a href="#cart" class="cart-icon" aria-label="Open Luxury Shopping Bag Cart View">
-                    <svg viewBox="0 0 24 24"><path d="M7 18c-1.1 0-1.99.9-1.99 2S5.9 22 7 22s2-.9 2-2-.9-2-2-2zm10 0c-1.1 0-1.99.9-1.99 2s.9 2 1.99 2 2-.9 2-2-.9-2-2-2zm-9.83-3.25l.03-.12 drive M1 2h3.27l3.6 7.59-1.35 2.45c-.16.28-.25.61-.25.96 0 1.1.9 2 2 2h12v-2H7.42c-.14 0-.25-.11-.25-.25l.03-.12.9-1.63h7.45c.75 0 1.41-.41 1.75-1.03l3.58-6.49c.08-.14.12-.31.12-.48 0-.55-.45-1-1-1H5.21l-.94-2H1v2z"/></svg>
+                    <svg viewBox="0 0 24 24"><path d="M7 18c-1.1 0-1.99.9-1.99 2S5.9 22 7 22s2-.9 2-2-.9-2-2-2zm10 0c-1.1 0-1.99.9-1.99 2s.9 2 1.99 2 2-.9 2-2-.9-2-2-2zm-9.83-3.25l.03-.12M1 2h3.27l3.6 7.59-1.35 2.45c-.16.28-.25.61-.25.96 0 1.1.9 2 2 2h12v-2H7.42c-.14 0-.25-.11-.25-.25l.03-.12.9-1.63h7.45c.75 0 1.41-.41 1.75-1.03l3.58-6.49c.08-.14.12-.31.12-.48 0-.55-.45-1-1-1H5.21l-.94-2H1v2z"/></svg>
                 </a>
             </div>
 
@@ -1400,41 +1378,39 @@
 
     <section class="hero-section">
         <div class="carousel-track-wrapper" id="heroCarouselTrack">
-            <div class="carousel-slide active-slide" style="background-image: url('hero-background.png');"></div>
-            <div class="carousel-slide" style="background-image: url('abaya.png');"></div>
-            <div class="carousel-slide" style="background-image: url('naqabs.png');"></div>
-            <div class="carousel-slide" style="background-image: url('hijabs.png');"></div>
+            <div class="carousel-slide active-slide" style="background-image: url('images/hero-background.png');"></div>
+            <div class="carousel-slide" style="background-image: url('images/abaya.png');"></div>
+            <div class="carousel-slide" style="background-image: url('images/naqabs.png');"></div>
+            <div class="carousel-slide" style="background-image: url('images/hijabs.png');"></div>
+            <div class="carousel-slide" style="background-image: url('images/accessiories.png');"></div>
+            <div class="carousel-slide" style="background-image: url('images/hampers.png');"></div>
         </div>
         
         <div class="carousel-overlay-shadow"></div>
         <div class="ambient-glow"></div>
         
         <div class="hero-content-container" id="heroContainer">
-            <div class="hero-trust-badges">
-                <span><svg viewBox="0 0 24 24"><path d="M12 2L2 22h20L12 2zm0 3.99L19.53 19H4.47L12 5.99zM13 16h-2v2h2v-2zm0-6h-2v4h2v-4z"/></svg> Quality First</span>
-                <span class="badge-divider">•</span>
-                <span><svg viewBox="0 0 24 24"><path d="M12 17.27L18.18 21l-1.64-7.03L22 9.24l-7.19-.61L12 2 9.19 8.63 2 9.24l5.46 4.73L5.82 21z"/></svg> Client Choice</span>
-            </div>
-
             <div class="carousel-indicator-dots" id="carouselDotTrack">
                 <div class="indicator-dot active-dot" data-slide-index="0"></div>
                 <div class="indicator-dot" data-slide-index="1"></div>
                 <div class="indicator-dot" data-slide-index="2"></div>
                 <div class="indicator-dot" data-slide-index="3"></div>
+                <div class="indicator-dot" data-slide-index="4"></div>
+                <div class="indicator-dot" data-slide-index="5"></div>
             </div>
 
             <div class="hero-action-row">
                 <button class="hero-btn primary-action" onclick="document.getElementById('catalogs').scrollIntoView({behavior: 'smooth'});">
                     Explore Collections
                 </button>
-                <a href="https://wa.me/YOUR_PHONE_NUMBER" target="_blank" rel="noopener" class="hero-btn secondary-action">
-                    <svg viewBox="0 0 24 24"><path d="M2.01 21L23 12 2.01 3 2 10l15 2-15 2z"/></svg> Speak to Concierge
-                </a>
             </div>
         </div>
     </section>
 
     <section class="brand-manifest-section">
+        <div class="manifest-section-header">
+            <h2>Why Abayrah</h2>
+        </div>
         <div class="value-pillars-ribbon-row">
             <div class="pillar-ribbon-card" onclick="document.getElementById('catalogs').scrollIntoView({behavior: 'smooth'});">
                 <span class="pillar-number">01</span>
@@ -1589,13 +1565,19 @@
         let currentSlideIndex = 0;
         let carouselIntervalId = null;
 
-        function showTargetSlide(index) {
+       function showTargetSlide(index) {
             slides[currentSlideIndex].classList.remove('active-slide');
-            dots[currentSlideIndex].classList.remove('active-dot');
+            if (dots[currentSlideIndex]) {
+                dots[currentSlideIndex].classList.remove('active-dot');
+            }
+            
             currentSlideIndex = (index + slides.length) % slides.length;
+            
             slides[currentSlideIndex].classList.add('active-slide');
-            dots[currentSlideIndex].classList.add('active-dot');
-        }
+            if (dots[currentSlideIndex]) {
+                dots[currentSlideIndex].classList.add('active-dot');
+            }
+       }
 
         function runAutoRotationPipeline() { showTargetSlide(currentSlideIndex + 1); }
         function startSliderInterval() { carouselIntervalId = setInterval(runAutoRotationPipeline, 5000); }
@@ -1635,21 +1617,19 @@
         import { getAuth, onAuthStateChanged, signOut, signInWithPopup, GoogleAuthProvider, signInWithEmailAndPassword, createUserWithEmailAndPassword } from "https://www.gstatic.com/firebasejs/10.11.0/firebase-auth.js";
         import { getFirestore, doc, getDoc, setDoc } from "https://www.gstatic.com/firebasejs/10.11.0/firebase-firestore.js";
 
-        // Mapped Project Cluster Keys matching your initialization parameters cleanly
         const firebaseConfig = {
-            apiKey: "AIzaSyDxe9DeHRsCzD4vlNsknlDHN0w7txd51ic",
+            apiKey: "AIzaSyAzUOh21Ec31kKmf42Tcw-xs4fVZyPh2fM",
             authDomain: "abayrah-9df21.firebaseapp.com",
-            projectId: "abayrah-9df21",
-            storageBucket: "abayrah-9df21.firebasestorage.app",
-            messagingSenderId: "789725334313",
-            appId: "1:789725334313:web:b37408f42add9611730538",
-            measurementId: "G-NLJJVVE32M"
+            projectId: "abayrah-9df21"
         };
 
         const app = initializeApp(firebaseConfig);
         const auth = getAuth(app);
         const db = getFirestore(app);
         const googleProvider = new GoogleAuthProvider();
+        
+        // Custom OAuth Tuning parameters to prevent local file context cancellation loops
+        googleProvider.setCustomParameters({ prompt: 'select_account' });
 
         const authOverlay = document.getElementById('authPortalModal');
         const accountTrigger = document.getElementById('accountTrigger');
@@ -1657,13 +1637,11 @@
         const headerUserIconSvg = document.getElementById('headerUserIconSvg');
         const headerUserAvatarImg = document.getElementById('headerUserAvatarImg');
 
-        // View Navs
         const toRegister = document.getElementById('goToRegisterBtn');
         const toForgot = document.getElementById('goToForgotBtn');
         const regToSignIn = document.getElementById('backToSignInFromReg');
         const forgotToSignIn = document.getElementById('backToSignInFromForgot');
 
-        // Live Real-time Authentication Sync Hook Rule
         onAuthStateChanged(auth, async (user) => {
             if (user) {
                 try {
@@ -1675,12 +1653,10 @@
                         const clientEmail = customerData.email || user.email;
                         const avatarSrc = user.photoURL || "https://images.unsplash.com/photo-1535713875002-d1d0cf377fde?auto=format&fit=crop&w=150&q=80";
 
-                        // Update Main Header UI Node Context elements
                         headerUserIconSvg.style.display = 'none';
                         headerUserAvatarImg.src = avatarSrc;
                         headerUserAvatarImg.style.display = 'block';
 
-                        // Sync active elements inside user profile space cards
                         document.getElementById('dashUserProfileImg').src = avatarSrc;
                         document.getElementById('dashProfileGreetingName').textContent = `Welcome, ${clientName}`;
                         document.getElementById('dashProfileEmailStringAddress').textContent = clientEmail;
@@ -1690,10 +1666,20 @@
                             initializeLiveOrderTrackingSimulationCycle();
                         }
                     } else {
-                        // Firebase entry is registered but structural document context layout doesn't exist yet
-                        alert("Profile activation incomplete. Redirecting to the customer database registration card module...");
-                        switchAuthView('registerPanel');
-                        document.getElementById('regEmailAddress').value = user.email;
+                        // Automatically complete initial profile mapping silently for Google Auth integrations
+                        await setDoc(doc(db, "registered_customers", user.uid), {
+                            name: user.displayName || "Boutique Guest Account",
+                            email: user.email,
+                            registeredAt: new Date().toISOString()
+                        });
+                        
+                        headerUserIconSvg.style.display = 'none';
+                        headerUserAvatarImg.src = user.photoURL || "https://images.unsplash.com/photo-1535713875002-d1d0cf377fde?auto=format&fit=crop&w=150&q=80";
+                        headerUserAvatarImg.style.display = 'block';
+                        
+                        if (authOverlay.classList.contains('open-portal')) {
+                            switchAuthView('userDashboardPanel');
+                        }
                     }
                 } catch (error) {
                     console.error("Database schema alignment exception loop caught: ", error);
@@ -1733,25 +1719,17 @@
         if(regToSignIn) regToSignIn.addEventListener('click', (e) => { e.preventDefault(); switchAuthView('signInPanel'); });
         if(forgotToSignIn) forgotToSignIn.addEventListener('click', (e) => { e.preventDefault(); switchAuthView('signInPanel'); });
 
-        /* 🌟 POPUP FEDERATION VIA GOOGLE OAuth TOKEN MATRIX ENTRY SETUP */
+        /* 🌟 LIVE POPUP GOOGLE AUTH WITH OAUTH TOKEN TUNNEL MATRIX */
         document.getElementById('googleSignInAction').addEventListener('click', executeGoogleAuthTunnelMatrixPipeline);
         document.getElementById('googleSignUpAction').addEventListener('click', executeGoogleAuthTunnelMatrixPipeline);
 
         async function executeGoogleAuthTunnelMatrixPipeline() {
             try {
-                const result = await signInWithPopup(auth, googleProvider);
-                const user = result.user;
-                
-                const customerDoc = await getDoc(doc(db, "registered_customers", user.uid));
-                if (!customerDoc.exists()) {
-                    await setDoc(doc(db, "registered_customers", user.uid), {
-                        name: user.displayName || "Boutique Guest Account",
-                        email: user.email,
-                        registeredAt: new Date().toISOString()
-                    });
-                }
+                // Ensure authentication works smoothly in modern deployment pipelines
+                await signInWithPopup(auth, googleProvider);
             } catch (error) {
-                alert("Identity synchronization pipeline dropped error code: " + error.message);
+                console.error("Identity synchronization pipeline dropped error code: ", error);
+                alert("Authentication Note: If you are previewing this page directly from your local filesystem (file:///), Google authentication requires a live server deployment link. Please host via a standard development server environment or GitHub Pages.");
             }
         }
 
@@ -1762,13 +1740,13 @@
             const password = document.getElementById('passwordInputFormField').value;
             
             if(!email || !password) {
-                alert("Please complete the required user credentials framework fields.");
+                alert("Please complete the required user credentials fields.");
                 return;
             }
             try {
                 await signInWithEmailAndPassword(auth, email, password);
             } catch (error) {
-                alert("Boutique Account Rejection: Invalid passphrase pattern array or missing profile schema record registry.");
+                alert("Boutique Account Rejection: Invalid credentials framework framework mapping.");
             }
         });
 
@@ -1781,7 +1759,7 @@
             const password = document.getElementById('regPassword').value;
 
             if(!firstName || !email || !password) {
-                alert("Required profile metrics missing inside client enrollment registry script layout.");
+                alert("Required profile metrics missing inside layout schema.");
                 return;
             }
             try {
@@ -1809,26 +1787,32 @@
             const labelFour = document.getElementById('labelStepFourTextNode');
 
             setTimeout(() => {
-                rail.style.width = '33.33%';
-                statusText.innerText = "Verified by Boutique Concierge";
-                nodeTwo.classList.add('completed-step');
-                labelTwo.classList.add('active-label');
+                if(rail && statusText && nodeTwo && labelTwo) {
+                    rail.style.width = '33.33%';
+                    statusText.innerText = "Order Packed & Verified";
+                    nodeTwo.classList.add('completed-step');
+                    labelTwo.classList.add('active-label');
+                }
             }, 1500);
 
             setTimeout(() => {
-                rail.style.width = '66.66%';
-                statusText.innerText = "In Transit - Flying via Premium Air Logistics Route";
-                statusText.style.color = "var(--accent-gold)";
-                nodeThree.classList.add('completed-step');
-                labelThree.classList.add('active-label');
+                if(rail && statusText && nodeThree && labelThree) {
+                    rail.style.width = '66.66%';
+                    statusText.innerText = "Dispatched via Air Courier (In Transit)";
+                    statusText.style.color = "var(--accent-gold)";
+                    nodeThree.classList.add('completed-step');
+                    labelThree.classList.add('active-label');
+                }
             }, 5000);
 
             setTimeout(() => {
-                rail.style.width = '100%';
-                statusText.innerText = "Out for Delivery via Elite Local Carrier Dispatch";
-                statusText.style.color = "var(--success-green)";
-                nodeFour.classList.add('active-step');
-                labelFour.classList.add('active-label');
+                if(rail && statusText && nodeFour && labelFour) {
+                    rail.style.width = '100%';
+                    statusText.innerText = "Out for Delivery via Elite Local Carrier Dispatch";
+                    statusText.style.color = "var(--success-green)";
+                    nodeFour.classList.add('active-step');
+                    labelFour.classList.add('active-label');
+                }
             }, 9000);
         }
 
@@ -1840,4 +1824,4 @@
         });
     </script>
 </body>
-                        </html>
+</html>
