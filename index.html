@@ -13,7 +13,7 @@
     <style>
         /* --- Luxury Design Tokens & Variables --- */
         :root {
-            --primary-bg: #FDFCE8;       /* Updated to the new warm ivory hex code */
+            --primary-bg: #FCFBFA;       /* Soft luxury ivory/off-white */
             --dark-text: #1C1B1A;        /* Premium charcoal black */
             --muted-gray: #7A7571;       /* Editorial soft taupe */
             --border-color: #ECEAE6;     /* Delicate divider line color */
@@ -90,8 +90,7 @@
         .main-header {
             position: sticky;
             top: 0;
-            /* Header background adjusted slightly to blend with new body color */
-            background-color: rgba(253, 252, 232, 0.75);
+            background-color: rgba(252, 251, 250, 0.75);
             backdrop-filter: blur(20px);
             -webkit-backdrop-filter: blur(20px);
             border-bottom: 1px solid rgba(28, 27, 26, 0.05);
@@ -101,7 +100,7 @@
         }
 
         .main-header.scrolled {
-            background-color: rgba(253, 252, 232, 0.9);
+            background-color: rgba(252, 251, 250, 0.9);
             box-shadow: 0 10px 30px rgba(0, 0, 0, 0.02);
         }
 
@@ -281,12 +280,14 @@
             height: 100%;
             max-width: 1440px;
             margin: 0 auto;
+            /* Added heavy padding-bottom to keep it off the immediate edge */
             padding: 20px 40px 20px 40px; 
             will-change: transform;
             transform: translate3d(0,0,0);
             transition: transform 0.2s cubic-bezier(0.25, 1, 0.5, 1);
             display: flex;
             flex-direction: column;
+            /* Pushes the button downwards */
             justify-content: flex-end; 
             align-items: center;
         }
@@ -300,6 +301,7 @@
         }
 
         .hero-btn {
+            /* High visibility premium solid dark background with frosted filter */
             background-color: rgba(28, 27, 26, 0.85);
             backdrop-filter: blur(4px);
             color: #FFFFFF;
@@ -308,6 +310,7 @@
             font-weight: 500;
             text-transform: uppercase;
             letter-spacing: 4px;
+            /* Stronger gold border for luxury framing */
             border: 1px solid var(--accent-gold);
             cursor: pointer;
             position: relative;
@@ -320,7 +323,7 @@
             content: '';
             position: absolute;
             top: 0; left: -100%; width: 100%; height: 100%;
-            background-color: var(--accent-gold); 
+            background-color: var(--accent-gold); /* Gold fill on hover */
             z-index: -1;
             transition: left 0.6s cubic-bezier(0.16, 1, 0.3, 1);
         }
@@ -398,12 +401,12 @@
         .marquee-separator {
             margin: 0 35px;
             font-size: 14px;
-            color: rgba(197, 168, 128, 0.5); 
+            color: rgba(197, 168, 128, 0.5); /* Subtle gold star */
         }
 
         @keyframes marqueeScroll {
             0% { transform: translateX(0); }
-            100% { transform: translateX(-50%); } 
+            100% { transform: translateX(-50%); } /* Scrolls exactly half its width to loop */
         }
 
         /* --- Brand Manifest Foundations --- */
@@ -503,6 +506,7 @@
             transition: all 0.5s cubic-bezier(0.16, 1, 0.3, 1);
             animation: vaultBreathe 4s ease-in-out infinite;
             
+            /* Background Image setup */
             background-image: linear-gradient(rgba(0, 0, 0, 0.5), rgba(0, 0, 0, 0.5)), url('sale-image.png');
             background-size: cover;
             background-position: center;
