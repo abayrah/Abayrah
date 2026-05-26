@@ -21,7 +21,7 @@
             --success-green: #4A5D4E;    /* Soft elegant luxury green */
             --font-serif: 'Cormorant Garamond', serif;
             --font-sans: 'Montserrat', sans-serif;
-            --font-premium: 'Playfair Display', serif; /* New Premium Font */
+            --font-premium: 'Playfair Display', serif; 
             --transition-smooth: all 0.5s cubic-bezier(0.25, 1, 0.5, 1);
         }
 
@@ -457,7 +457,7 @@
             animation: vaultBreathe 4s ease-in-out infinite;
             
             /* Background Image setup */
-            background-image: linear-gradient(rgba(0, 0, 0, 0.5), rgba(0, 0, 0, 0.5)), url('sale-image.png');
+            background-image: linear-gradient(rgba(0, 0, 0, 0.5), rgba(0, 0, 0, 0.5)), url('images/sale-background.jpg');
             background-size: cover;
             background-position: center;
             background-repeat: no-repeat;
@@ -490,7 +490,7 @@
         
         .vault-ambient-light {
             position: absolute;
-            top: 50%; left: 35%; /* Centered behind the new text position */
+            top: 50%; left: 35%; 
             width: 100%; height: 200%;
             background: radial-gradient(ellipse at center, rgba(197,168,128,0.2) 0%, transparent 50%);
             transform: translate(-50%, -50%);
@@ -513,7 +513,6 @@
             flex-direction: column;
             align-items: flex-start; 
             text-align: left;
-            /* Shifting content heavily to the right to sit in the open space */
             padding: 60px 40px 60px 18%; 
             transition: all 0.6s cubic-bezier(0.16, 1, 0.3, 1);
         }
@@ -549,23 +548,24 @@
         }
 
         .vault-value {
-            font-family: var(--font-premium); /* Applied Premium Font */
-            font-size: 110px; /* Slightly larger for visual impact */
+            font-family: var(--font-premium);
+            font-size: 110px; 
             color: var(--accent-gold);
             line-height: 0.9;
             font-weight: 400;
-            font-style: italic; /* Adds editorial elegance */
+            font-style: italic; 
             text-shadow: 0 0 40px rgba(197, 168, 128, 0.5);
         }
 
         .vault-value-symbol {
-            font-size: 50px;
-            vertical-align: text-top;
-            font-style: normal;
+            font-size: 60px; /* Reduced slightly to nestle perfectly */
+            vertical-align: baseline; /* This brings the % directly beside the 50 */
+            font-style: italic;
+            margin-left: 2px;
         }
 
         .vault-value-text {
-            font-family: var(--font-premium); /* Applied Premium Font */
+            font-family: var(--font-premium); 
             font-size: 45px;
             color: var(--accent-gold);
             letter-spacing: 6px;
@@ -578,7 +578,7 @@
             color: #D3CFCB;
             letter-spacing: 1.5px;
             font-style: italic;
-            font-family: var(--font-premium); /* Applied Premium Font */
+            font-family: var(--font-premium); 
             margin-top: 15px;
             max-width: 420px; 
             line-height: 1.6;
@@ -747,9 +747,9 @@
             .category-grid { grid-template-columns: repeat(3, 1fr); }
             
             /* Responsive updates for banner */
-            .vault-promo-content { padding: 50px 10%; } /* Reduces extreme left padding on medium screens */
+            .vault-promo-content { padding: 50px 10%; } 
             .vault-value { font-size: 80px; }
-            .vault-value-symbol { font-size: 40px; }
+            .vault-value-symbol { font-size: 45px; }
             .vault-value-text { font-size: 30px; }
         }
 
@@ -778,7 +778,7 @@
             }
             .vault-ambient-light { left: 50%; }
             .vault-value { font-size: 70px; }
-            .vault-value-symbol { font-size: 35px; }
+            .vault-value-symbol { font-size: 40px; }
             .vault-value-text { font-size: 28px; letter-spacing: 4px; }
             .vault-desc { max-width: 100%; }
         }
