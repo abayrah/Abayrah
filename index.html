@@ -359,11 +359,56 @@
             box-shadow: 0 0 8px var(--accent-gold);
         }
 
+        /* 🔥 PREMIUM MARQUEE BANNER 🔥 */
+        .premium-marquee {
+            width: 100%;
+            background-color: #121110;
+            color: var(--accent-gold);
+            padding: 14px 0;
+            overflow: hidden;
+            white-space: nowrap;
+            display: flex;
+            align-items: center;
+            border-bottom: 1px solid #2A2826;
+            position: relative;
+            z-index: 10;
+        }
+
+        .marquee-track {
+            display: inline-flex;
+            animation: marqueeScroll 35s linear infinite;
+        }
+
+        .marquee-track:hover {
+            animation-play-state: paused;
+        }
+
+        .marquee-item {
+            display: inline-flex;
+            align-items: center;
+            font-family: var(--font-sans);
+            font-size: 10px;
+            font-weight: 400;
+            letter-spacing: 4px;
+            text-transform: uppercase;
+        }
+
+        .marquee-separator {
+            margin: 0 35px;
+            font-size: 14px;
+            color: rgba(197, 168, 128, 0.5); /* Subtle gold star */
+        }
+
+        @keyframes marqueeScroll {
+            0% { transform: translateX(0); }
+            100% { transform: translateX(-50%); } /* Scrolls exactly half its width to loop */
+        }
+
         /* --- Brand Manifest Foundations --- */
         .brand-manifest-section {
             background-color: #FFFFFF;
             border-bottom: 1px solid var(--border-color);
-            padding: 50px 4% 45px 4%;
+            padding: 60px 4% 55px 4%;
             contain: content;
         }
 
@@ -457,7 +502,7 @@
             animation: vaultBreathe 4s ease-in-out infinite;
             
             /* Background Image setup */
-            background-image: linear-gradient(rgba(0, 0, 0, 0.5), rgba(0, 0, 0, 0.5)), url('sale-image.png');
+            background-image: linear-gradient(rgba(0, 0, 0, 0.5), rgba(0, 0, 0, 0.5)), url('images/sale-background.jpg');
             background-size: cover;
             background-position: center;
             background-repeat: no-repeat;
@@ -558,8 +603,8 @@
         }
 
         .vault-value-symbol {
-            font-size: 60px; /* Reduced slightly to nestle perfectly */
-            vertical-align: baseline; /* This brings the % directly beside the 50 */
+            font-size: 60px;
+            vertical-align: baseline; 
             font-style: italic;
             margin-left: 2px;
         }
@@ -951,6 +996,19 @@
             </div>
         </div>
     </section>
+
+    <div class="premium-marquee">
+        <div class="marquee-track">
+            <span class="marquee-item">COMPLIMENTARY WORLDWIDE SHIPPING<span class="marquee-separator">✦</span></span>
+            <span class="marquee-item">PREMIUM HANDPICKED TEXTILES<span class="marquee-separator">✦</span></span>
+            <span class="marquee-item">BESPOKE TAILORED PRECISION<span class="marquee-separator">✦</span></span>
+            <span class="marquee-item">TIMELESS SILHOUETTES<span class="marquee-separator">✦</span></span>
+            <span class="marquee-item">COMPLIMENTARY WORLDWIDE SHIPPING<span class="marquee-separator">✦</span></span>
+            <span class="marquee-item">PREMIUM HANDPICKED TEXTILES<span class="marquee-separator">✦</span></span>
+            <span class="marquee-item">BESPOKE TAILORED PRECISION<span class="marquee-separator">✦</span></span>
+            <span class="marquee-item">TIMELESS SILHOUETTES<span class="marquee-separator">✦</span></span>
+        </div>
+    </div>
 
     <section class="brand-manifest-section">
         <div class="manifest-section-header">
