@@ -10,6 +10,10 @@
     <link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,300;0,400;0,500;1,300&family=Montserrat:wght@200;300;400;500&display=swap" rel="stylesheet">
     <link rel="icon" type="image/png" href="star-logo.png">
 
+    <script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-app.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-auth.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-firestore.js"></script>
+
     <style>
         /* --- Luxury Design Tokens & Variables --- */
         :root {
@@ -244,7 +248,7 @@
             color: var(--accent-gold);
         }
         
-        /* --- Carousel Hero Layout Section --- */
+        /* --- Carousel Section View Frame --- */
         .hero-section {
             position: relative;
             width: 100%;
@@ -384,7 +388,7 @@
             box-shadow: 0 0 8px var(--accent-gold);
         }
 
-        /* --- Brand Manifest Grid --- */
+        /* --- Manifest Foundations --- */
         .brand-manifest-section {
             background-color: #FFFFFF;
             border-bottom: 1px solid var(--border-color);
@@ -667,7 +671,7 @@
             margin-top: 25px;
         }
         
-        /* --- Premium Authentication Portal Modals --- */
+        /* --- Access Portal Overlays --- */
         .auth-modal-overlay {
             position: fixed;
             inset: 0;
@@ -1169,12 +1173,6 @@
                 text-align: center;
             }
         }
-
-        @media (max-width: 480px) {
-            .category-grid {
-                grid-template-columns: 1fr;
-            }
-        }
     </style>
 </head>
 <body>
@@ -1299,9 +1297,9 @@
                 
                 <div class="auth-input-group">
                     <label>Your Google Gmail Account Address</label>
-                    <input type="email" placeholder="yourname@gmail.com" required>
+                    <input type="email" id="forgotPasswordEmailInput" placeholder="yourname@gmail.com" required>
                 </div>
-                <button type="button" class="auth-submit-action-btn" onclick="alert('Password Recovery parameters successfully dispatched to your inbox.'); switchAuthView('signInPanel');">Send Reset Password Link</button>
+                <button type="button" class="auth-submit-action-btn" id="manualPasswordResetBtn">Send Reset Password Link</button>
                 
                 <div class="auth-modal-footer-links">
                     <p>Remembered credential security? <a href="#signin" id="backToSignInFromForgot" class="accentuated-link">Return to Log In</a></p>
@@ -1584,7 +1582,7 @@
         });
         startSliderInterval();
 
-        // Parallax Interaction Setup
+        // Parallax Core Layout Logic 
         const heroSection = document.querySelector('.hero-section');
         const heroContainer = document.getElementById('heroContainer');
         if(heroSection && heroContainer) {
@@ -1605,11 +1603,8 @@
         }
     </script>
 
-    <script type="module">
-        import { initializeApp } from "https://www.gstatic.com/firebasejs/10.11.0/firebase-app.js";
-        import { getAuth, onAuthStateChanged, signOut, signInWithPopup, GoogleAuthProvider, signInWithEmailAndPassword, createUserWithEmailAndPassword } from "https://www.gstatic.com/firebasejs/10.11.0/firebase-auth.js";
-        import { getFirestore, doc, getDoc, setDoc } from "https://www.gstatic.com/firebasejs/10.11.0/firebase-firestore.js";
-
+    <script>
+        // Global Product Configuration 
         const firebaseConfig = {
             apiKey: "AIzaSyDxe9DeHRsCzD4vlNsknlDHN0w7txd51ic",
             authDomain: "abayrah-9df21.firebaseapp.com",
@@ -1620,13 +1615,17 @@
             measurementId: "G-NLJJVVE32M"
         };
 
-        const app = initializeApp(firebaseConfig);
-        const auth = getAuth(app);
-        const db = getFirestore(app);
-        const googleProvider = new GoogleAuthProvider();
+        // Initialize Firebase Namespace Secure Routing
+        if (!firebase.apps.length) {
+            firebase.initializeApp(firebaseConfig);
+        }
 
+        const auth = firebase.auth();
+        const db = firebase.firestore();
+        const googleProvider = new firebase.auth.GoogleAuthProvider();
         googleProvider.setCustomParameters({ prompt: 'select_account' });
 
+        // Component Target Containers
         const authOverlay = document.getElementById('authPortalModal');
         const accountTrigger = document.getElementById('accountTrigger');
         const closeBtn = document.getElementById('modalCloseBtn');
@@ -1638,50 +1637,56 @@
         const regToSignIn = document.getElementById('backToSignInFromReg');
         const forgotToSignIn = document.getElementById('backToSignInFromForgot');
 
-        // Automated Session Handler Matrix
-        onAuthStateChanged(auth, async (user) => {
+        // Automated Core Authentication Observer Loops
+        auth.onAuthStateChanged(async (user) => {
             if (user) {
                 try {
-                    const customerDoc = await getDoc(doc(db, "registered_customers", user.uid));
+                    const customerDoc = await db.collection("registered_customers").doc(user.uid).get();
+                    const customerData = customerDoc.exists ? customerDoc.data() : null;
                     
-                    const customerData = customerDoc.exists() ? customerDoc.data() : null;
                     const clientName = customerData ? (customerData.name || "Boutique Guest") : (user.displayName || "Boutique Guest");
                     const clientEmail = customerData ? (customerData.email || user.email) : user.email;
                     const avatarSrc = user.photoURL || "https://images.unsplash.com/photo-1535713875002-d1d0cf377fde?auto=format&fit=crop&w=150&q=80";
 
-                    headerUserIconSvg.style.display = 'none';
-                    headerUserAvatarImg.src = avatarSrc;
-                    headerUserAvatarImg.style.display = 'block';
+                    if(headerUserIconSvg) headerUserIconSvg.style.display = 'none';
+                    if(headerUserAvatarImg) {
+                        headerUserAvatarImg.src = avatarSrc;
+                        headerUserAvatarImg.style.display = 'block';
+                    }
 
-                    document.getElementById('dashUserProfileImg').src = avatarSrc;
-                    document.getElementById('dashProfileGreetingName').textContent = `Welcome back, ${clientName}`;
-                    document.getElementById('dashProfileEmailStringAddress').textContent = clientEmail;
+                    const dashImg = document.getElementById('dashUserProfileImg');
+                    const greetingName = document.getElementById('dashProfileGreetingName');
+                    const stringAddress = document.getElementById('dashProfileEmailStringAddress');
 
-                    if (!customerDoc.exists()) {
-                        await setDoc(doc(db, "registered_customers", user.uid), {
+                    if(dashImg) dashImg.src = avatarSrc;
+                    if(greetingName) greetingName.textContent = `Welcome back, ${clientName}`;
+                    if(stringAddress) stringAddress.textContent = clientEmail;
+
+                    if (!customerDoc.exists) {
+                        await db.collection("registered_customers").doc(user.uid).set({
                             name: clientName,
                             email: clientEmail,
                             registeredAt: new Date().toISOString()
                         });
                     }
 
-                    if (authOverlay.classList.contains('open-portal')) {
+                    if (authOverlay && authOverlay.classList.contains('open-portal')) {
                         switchAuthView('userDashboardPanel');
                         initializeLiveOrderTrackingSimulationCycle();
                     }
                 } catch (error) {
-                    console.error("Database alignment logging exception: ", error);
+                    console.error("Database connection registry error trace: ", error);
                 }
             } else {
-                headerUserAvatarImg.style.display = 'none';
-                headerUserIconSvg.style.display = 'block';
+                if(headerUserAvatarImg) headerUserAvatarImg.style.display = 'none';
+                if(headerUserIconSvg) headerUserIconSvg.style.display = 'block';
             }
         });
 
         if(accountTrigger) {
             accountTrigger.addEventListener('click', (e) => {
                 e.preventDefault();
-                authOverlay.classList.add('open-portal');
+                if(authOverlay) authOverlay.classList.add('open-portal');
                 if(auth.currentUser) {
                     switchAuthView('userDashboardPanel');
                     initializeLiveOrderTrackingSimulationCycle();
@@ -1703,62 +1708,90 @@
         }
 
         if(toRegister) toRegister.addEventListener('click', (e) => { e.preventDefault(); switchAuthView('registerPanel'); });
-       if(toForgot) toForgot.addEventListener('click', (e) => { switchAuthView('forgotPanel'); });
+        if(toForgot) toForgot.addEventListener('click', (e) => { e.preventDefault(); switchAuthView('forgotPanel'); });
         if(regToSignIn) regToSignIn.addEventListener('click', (e) => { e.preventDefault(); switchAuthView('signInPanel'); });
         if(forgotToSignIn) forgotToSignIn.addEventListener('click', (e) => { e.preventDefault(); switchAuthView('signInPanel'); });
 
-        /* 🌟 POPUP TUNNELS: Safe from Incognito and local alert loop bugs */
-        document.getElementById('googleSignInAction').addEventListener('click', executeGoogleAuthPopupMatrix);
-        document.getElementById('googleSignUpAction').addEventListener('click', executeGoogleAuthPopupMatrix);
+        // 🌟 REWRITTEN CONTINUE WITH GOOGLE POPUP HANDLING ROUTE 🌟
+        const signInBtn = document.getElementById('googleSignInAction');
+        const signUpBtn = document.getElementById('googleSignUpAction');
+
+        if(signInBtn) signInBtn.addEventListener('click', executeGoogleAuthPopupMatrix);
+        if(signUpBtn) signUpBtn.addEventListener('click', executeGoogleAuthPopupMatrix);
 
         async function executeGoogleAuthPopupMatrix() {
             try {
-                await signInWithPopup(auth, googleProvider);
+                await auth.signInWithPopup(googleProvider);
             } catch (error) {
-                console.error("OAuth Authentication Failed: ", error.message);
+                console.error("OAuth Authentication Rejection Matrix Loop Exception: ", error.message);
             }
         }
 
-        /* 🌟 EMAIL CREDENTIAL FALLBACKS */
-        document.getElementById('manualEmailLoginSubmitTrigger').addEventListener('click', async (e) => {
-            e.preventDefault();
-            const email = document.getElementById('emailInputFormFields').value;
-            const password = document.getElementById('passwordInputFormField').value;
-            
-            if(!email || !password) {
-                alert("Please complete fields.");
-                return;
-            }
-            try {
-    await signInWithEmailAndPassword(auth, email, password);
-} catch (error) {
-    console.error("Auth Exception Frame: Authentication rejected framework metrics mapping.");
-}
-        });
+        /* --- Custom Password Credential Callbacks --- */
+        const emailLoginTrigger = document.getElementById('manualEmailLoginSubmitTrigger');
+        if(emailLoginTrigger) {
+            emailLoginTrigger.addEventListener('click', async (e) => {
+                e.preventDefault();
+                const email = document.getElementById('emailInputFormFields').value;
+                const password = document.getElementById('passwordInputFormField').value;
+                
+                if(!email || !password) {
+                    alert("Please complete requested field spaces.");
+                    return;
+                }
+                try {
+                    await auth.signInWithEmailAndPassword(email, password);
+                } catch (error) {
+                    alert("Authentication trace matching rejection framework.");
+                }
+            });
+        }
 
-        document.getElementById('manualRegisterSubmitTrigger').addEventListener('click', async (e) => {
-            e.preventDefault();
-            const firstName = document.getElementById('regFirstName').value;
-            const lastName = document.getElementById('regLastName').value;
-            const email = document.getElementById('regEmailAddress').value;
-            const password = document.getElementById('regPassword').value;
+        const manualRegTrigger = document.getElementById('manualRegisterSubmitTrigger');
+        if(manualRegTrigger) {
+            manualRegTrigger.addEventListener('click', async (e) => {
+                e.preventDefault();
+                const firstName = document.getElementById('regFirstName').value;
+                const lastName = document.getElementById('regLastName').value;
+                const email = document.getElementById('regEmailAddress').value;
+                const password = document.getElementById('regPassword').value;
 
-            if(!firstName || !email || !password) {
-                alert("Required framework dimensions missing.");
-                return;
-            }
-            try {
-                const sessionCredential = await createUserWithEmailAndPassword(auth, email, password);
-                await setDoc(doc(db, "registered_customers", sessionCredential.user.uid), {
-                    name: `${firstName} ${lastName}`,
-                    email: email,
-                    registeredAt: new Date().toISOString()
-                });
-                alert("Production Database Sheet entry secured successfully!");
-            } catch (error) {
-                alert("Registration Rejection: " + error.message);
-            }
-        });
+                if(!firstName || !email || !password) {
+                    alert("Required parameter framework metrics configuration missing.");
+                    return;
+                }
+                try {
+                    const sessionCredential = await auth.createUserWithEmailAndPassword(email, password);
+                    await db.collection("registered_customers").doc(sessionCredential.user.uid).set({
+                        name: `${firstName} ${lastName}`,
+                        email: email,
+                        registeredAt: new Date().toISOString()
+                    });
+                    alert("Boutique space configured and metrics written directly to schema collection!");
+                } catch (error) {
+                    alert("Registration Error Tracker: " + error.message);
+                }
+            });
+        }
+
+        const passwordResetTrigger = document.getElementById('manualPasswordResetBtn');
+        if(passwordResetTrigger) {
+            passwordResetTrigger.addEventListener('click', async (e) => {
+                e.preventDefault();
+                const email = document.getElementById('forgotPasswordEmailInput').value;
+                if(!email) {
+                    alert("Please fill out email parameters.");
+                    return;
+                }
+                try {
+                    await auth.sendPasswordResetEmail(email);
+                    alert("Password reset parameters dispatched to targeted inbox directory chain.");
+                    switchAuthView('signInPanel');
+                } catch (error) {
+                    alert("Recovery failed: " + error.message);
+                }
+            });
+        }
 
         function initializeLiveOrderTrackingSimulationCycle() {
             const rail = document.getElementById('liveTrackingRailIndicatorFillWidth');
@@ -1800,12 +1833,15 @@
             }, 9000);
         }
 
-        document.getElementById('signOutTriggerBtn').addEventListener('click', async () => {
-            if (confirm("Are you sure you want to end your dashboard session?")) {
-                await signOut(auth);
-                authOverlay.classList.remove('open-portal');
-            }
-        });
+        const signOutTrigger = document.getElementById('signOutTriggerBtn');
+        if(signOutTrigger) {
+            signOutTrigger.addEventListener('click', async () => {
+                if (confirm("Are you sure you want to end your dashboard session?")) {
+                    await auth.signOut();
+                    if(authOverlay) authOverlay.classList.remove('open-portal');
+                }
+            });
+        }
     </script>
 </body>
 </html>
