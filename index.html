@@ -434,7 +434,7 @@
             font-weight: 300;
         }
 
-        /* 🔥 DEDICATED VAULT SALE BANNER 🔥 */
+        /* 🔥 DEDICATED VAULT SALE BANNER WITH HALO/BREATHING ANIMATION 🔥 */
         .vault-sale-section {
             max-width: 1480px;
             margin: 80px auto 0 auto;
@@ -455,13 +455,35 @@
             text-align: center;
             cursor: pointer;
             overflow: hidden;
-            transition: all 0.7s cubic-bezier(0.16, 1, 0.3, 1);
+            transition: all 0.5s cubic-bezier(0.16, 1, 0.3, 1);
+            /* Halo & Breathing Animation */
+            animation: vaultBreathe 4s ease-in-out infinite;
+        }
+
+        @keyframes vaultBreathe {
+            0% {
+                transform: scale(1);
+                box-shadow: 0 0 15px rgba(197, 168, 128, 0.05);
+                border-color: rgba(42, 40, 38, 1);
+            }
+            50% {
+                transform: scale(1.015); /* Zoom in */
+                box-shadow: 0 0 40px rgba(197, 168, 128, 0.35), 0 0 15px rgba(197, 168, 128, 0.15) inset; /* Halo glow */
+                border-color: rgba(197, 168, 128, 0.6);
+            }
+            100% {
+                transform: scale(1);
+                box-shadow: 0 0 15px rgba(197, 168, 128, 0.05);
+                border-color: rgba(42, 40, 38, 1);
+            }
         }
 
         .vault-sale-banner:hover {
+            /* Pauses the breathing animation on hover to allow the hover states to take over cleanly */
+            animation-play-state: paused;
             border-color: var(--accent-gold);
-            box-shadow: 0 25px 50px rgba(197, 168, 128, 0.15);
-            transform: translate3d(0, -5px, 0);
+            box-shadow: 0 25px 60px rgba(197, 168, 128, 0.3);
+            transform: scale(1.02) translate3d(0, -5px, 0); 
         }
         
         .vault-ambient-light {
@@ -491,7 +513,7 @@
 
         .vault-sale-banner:hover .vault-promo-content {
             border-color: rgba(197, 168, 128, 0.5);
-            background-color: rgba(197, 168, 128, 0.02);
+            background-color: rgba(197, 168, 128, 0.03);
         }
 
         .vault-subtitle {
@@ -600,7 +622,7 @@
 
         .category-grid {
             display: grid;
-            grid-template-columns: repeat(5, 1fr); /* Fixed: 5 cards in one row */
+            grid-template-columns: repeat(5, 1fr); /* 5 cards strictly in one row */
             gap: 24px;
             width: 100%;
             max-width: 1480px; 
