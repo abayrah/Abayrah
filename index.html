@@ -7,7 +7,7 @@
     
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,300;0,400;0,500;1,300&family=Montserrat:wght@200;300;400;500&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,300;0,400;0,500;1,300&family=Montserrat:wght@200;300;400;500&family=Playfair+Display:ital,wght@0,400;0,500;0,600;1,400&display=swap" rel="stylesheet">
     <link rel="icon" type="image/png" href="star-logo.png">
 
     <style>
@@ -21,6 +21,7 @@
             --success-green: #4A5D4E;    /* Soft elegant luxury green */
             --font-serif: 'Cormorant Garamond', serif;
             --font-sans: 'Montserrat', sans-serif;
+            --font-premium: 'Playfair Display', serif; /* New Premium Font */
             --transition-smooth: all 0.5s cubic-bezier(0.25, 1, 0.5, 1);
         }
 
@@ -447,7 +448,7 @@
             background-color: #121110;
             border: 1px solid #2A2826;
             border-radius: 2px;
-            padding: 40px; /* Reduced outer padding slightly for better framing */
+            padding: 40px; 
             display: flex;
             flex-direction: column;
             cursor: pointer;
@@ -489,7 +490,7 @@
         
         .vault-ambient-light {
             position: absolute;
-            top: 50%; left: 30%; /* Shifted light to the left to match text */
+            top: 50%; left: 35%; /* Centered behind the new text position */
             width: 100%; height: 200%;
             background: radial-gradient(ellipse at center, rgba(197,168,128,0.2) 0%, transparent 50%);
             transform: translate(-50%, -50%);
@@ -508,18 +509,18 @@
             z-index: 2;
             width: 100%;
             border: 1px solid rgba(197, 168, 128, 0.2);
-            /* NEW: Flexbox alignment to left side */
             display: flex;
             flex-direction: column;
             align-items: flex-start; 
             text-align: left;
-            padding: 60px 80px; /* Spacious padding on left to frame nicely */
+            /* Shifting content heavily to the right to sit in the open space */
+            padding: 60px 40px 60px 18%; 
             transition: all 0.6s cubic-bezier(0.16, 1, 0.3, 1);
         }
 
         .vault-sale-banner:hover .vault-promo-content {
             border-color: rgba(197, 168, 128, 0.5);
-            background-color: rgba(197, 168, 128, 0.03); /* Slight overlay on hover inside the border */
+            background-color: rgba(197, 168, 128, 0.03); 
         }
 
         .vault-subtitle {
@@ -529,16 +530,17 @@
             color: #ECEAE6;
             margin-bottom: 15px;
             display: block;
+            font-family: var(--font-sans);
         }
 
         .vault-value-wrapper {
             display: flex;
             align-items: baseline;
-            justify-content: flex-start; /* Aligned left */
+            justify-content: flex-start; 
             gap: 15px;
             margin-bottom: 10px;
             transform: scale(1);
-            transform-origin: left center; /* Scales from left side */
+            transform-origin: left center; 
             transition: transform 0.6s cubic-bezier(0.16, 1, 0.3, 1);
         }
 
@@ -547,36 +549,39 @@
         }
 
         .vault-value {
-            font-family: var(--font-serif);
-            font-size: 100px;
+            font-family: var(--font-premium); /* Applied Premium Font */
+            font-size: 110px; /* Slightly larger for visual impact */
             color: var(--accent-gold);
             line-height: 0.9;
-            font-weight: 300;
+            font-weight: 400;
+            font-style: italic; /* Adds editorial elegance */
             text-shadow: 0 0 40px rgba(197, 168, 128, 0.5);
         }
 
         .vault-value-symbol {
             font-size: 50px;
             vertical-align: text-top;
+            font-style: normal;
         }
 
         .vault-value-text {
-            font-family: var(--font-serif);
-            font-size: 40px;
+            font-family: var(--font-premium); /* Applied Premium Font */
+            font-size: 45px;
             color: var(--accent-gold);
-            letter-spacing: 8px;
-            font-weight: 300;
+            letter-spacing: 6px;
+            font-weight: 400;
         }
 
         .vault-desc {
-            font-size: 14px;
-            font-weight: 300;
-            color: #B5B0AA;
-            letter-spacing: 2px;
+            font-size: 15px;
+            font-weight: 400;
+            color: #D3CFCB;
+            letter-spacing: 1.5px;
             font-style: italic;
-            font-family: var(--font-serif);
+            font-family: var(--font-premium); /* Applied Premium Font */
             margin-top: 15px;
-            max-width: 420px; /* Constrains width so it doesn't cross the image */
+            max-width: 420px; 
+            line-height: 1.6;
         }
 
         .vault-cta {
@@ -742,7 +747,7 @@
             .category-grid { grid-template-columns: repeat(3, 1fr); }
             
             /* Responsive updates for banner */
-            .vault-promo-content { padding: 40px; }
+            .vault-promo-content { padding: 50px 10%; } /* Reduces extreme left padding on medium screens */
             .vault-value { font-size: 80px; }
             .vault-value-symbol { font-size: 40px; }
             .vault-value-text { font-size: 30px; }
@@ -761,7 +766,7 @@
             /* Re-center banner text on mobile */
             .vault-sale-banner { padding: 30px 20px; }
             .vault-promo-content { 
-                padding: 30px 10px; 
+                padding: 40px 20px; 
                 align-items: center; 
                 text-align: center;
             }
@@ -772,9 +777,9 @@
                 gap: 5px;
             }
             .vault-ambient-light { left: 50%; }
-            .vault-value { font-size: 60px; }
-            .vault-value-symbol { font-size: 30px; }
-            .vault-value-text { font-size: 24px; letter-spacing: 4px; }
+            .vault-value { font-size: 70px; }
+            .vault-value-symbol { font-size: 35px; }
+            .vault-value-text { font-size: 28px; letter-spacing: 4px; }
             .vault-desc { max-width: 100%; }
         }
 
