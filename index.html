@@ -244,7 +244,7 @@
             color: var(--accent-gold);
         }
         
-        /* --- 🌟 LUXURY 16:5 PANORAMA CAROUSEL HERO SECTION (CENTERED BUTTON CONFIG) 🌟 --- */
+        /* --- Carousel Hero Layout Section --- */
         .hero-section {
             position: relative;
             width: 100%;
@@ -384,7 +384,7 @@
             box-shadow: 0 0 8px var(--accent-gold);
         }
 
-        /* --- 🌟 PREMIUM BRAND MANIFEST VALUES SECTION 🌟 --- */
+        /* --- Brand Manifest Grid --- */
         .brand-manifest-section {
             background-color: #FFFFFF;
             border-bottom: 1px solid var(--border-color);
@@ -392,7 +392,6 @@
             contain: content;
         }
 
-        /* Elegant Section Header for Why Abayrah */
         .manifest-section-header {
             text-align: center;
             margin-bottom: 40px;
@@ -491,7 +490,6 @@
             text-transform: uppercase;
         }
 
-        /* 🌟 LUXURY 5-COLUMN MATRIX LAYOUT CONFIGURATION 🌟 */
         .category-grid {
             display: grid;
             grid-template-columns: repeat(5, 1fr);
@@ -601,7 +599,7 @@
             width: 100%;
         }
 
-        /* --- High-End Functional Footer --- */
+        /* --- Footer Matrix --- */
         .premium-footer {
             background-color: #1C1B1A;
             color: #ECEAE6;
@@ -669,7 +667,7 @@
             margin-top: 25px;
         }
         
-        /* --- Premium Customer Account Access Portal Modals --- */
+        /* --- Premium Authentication Portal Modals --- */
         .auth-modal-overlay {
             position: fixed;
             inset: 0;
@@ -729,7 +727,6 @@
             transform: rotate(90deg);
         }
 
-        /* 🌟 FIXED VIEW PANEL SYSTEM DEEP HOOKS 🌟 */
         .auth-view-panel {
             display: none !important;
         }
@@ -1239,17 +1236,15 @@
                 
                 <div class="auth-divider-line"><span>or use email credential entry</span></div>
                 
-                <form onsubmit="event.preventDefault();">
-                    <div class="auth-input-group">
-                        <label>Google Gmail Account Address</label>
-                        <input type="email" id="emailInputFormFields" placeholder="name@gmail.com" required>
-                    </div>
-                    <div class="auth-input-group">
-                        <label>Password</label>
-                        <input type="password" id="passwordInputFormField" placeholder="••••••••••••" required>
-                    </div>
-                    <button type="submit" class="auth-submit-action-btn" id="manualEmailLoginSubmitTrigger">Sign In to Vault</button>
-                </form>
+                <div class="auth-input-group">
+                    <label>Google Gmail Account Address</label>
+                    <input type="email" id="emailInputFormFields" placeholder="name@gmail.com" required>
+                </div>
+                <div class="auth-input-group">
+                    <label>Password</label>
+                    <input type="password" id="passwordInputFormField" placeholder="••••••••••••" required>
+                </div>
+                <button type="button" class="auth-submit-action-btn" id="manualEmailLoginSubmitTrigger">Sign In to Vault</button>
                 
                 <div class="auth-modal-footer-links">
                     <a href="#forgot" id="goToForgotBtn" class="accentuated-link">Forgot Password?</a>
@@ -1259,7 +1254,7 @@
 
             <div class="auth-view-panel" id="registerPanel">
                 <h2 class="auth-modal-title">Register</h2>
-                <p class="auth-modal-subtitle">Join the house of ABAYRAH for customized bag storage</p>
+                <p class="auth-modal-subtitle">Join the house of ABAYRAH for customized modest statements</p>
                 
                 <button type="button" class="federated-google-btn" id="googleSignUpAction">
                     <svg class="google-icon" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg" style="margin-right:12px;">
@@ -1273,27 +1268,25 @@
                 
                 <div class="auth-divider-line"><span>or create custom credentials</span></div>
                 
-                <form onsubmit="event.preventDefault();">
-                    <div class="auth-input-row">
-                        <div class="auth-input-group">
-                            <label>First Name</label>
-                            <input type="text" id="regFirstName" placeholder="Sarah" required>
-                        </div>
-                        <div class="auth-input-group">
-                            <label>Last Name</label>
-                            <input type="text" id="regLastName" placeholder="Khan" required>
-                        </div>
+                <div class="auth-input-row">
+                    <div class="auth-input-group">
+                        <label>First Name</label>
+                        <input type="text" id="regFirstName" placeholder="Sarah" required>
                     </div>
                     <div class="auth-input-group">
-                        <label>Google Gmail Address</label>
-                        <input type="email" id="regEmailAddress" placeholder="yourname@gmail.com" required>
+                        <label>Last Name</label>
+                        <input type="text" id="regLastName" placeholder="Khan" required>
                     </div>
-                    <div class="auth-input-group">
-                        <label>Secure Password</label>
-                        <input type="password" id="regPassword" placeholder="Min. 8 characters" required>
-                    </div>
-                    <button type="submit" class="auth-submit-action-btn" id="manualRegisterSubmitTrigger">Create Luxury Profile</button>
-                </form>
+                </div>
+                <div class="auth-input-group">
+                    <label>Google Gmail Address</label>
+                    <input type="email" id="regEmailAddress" placeholder="yourname@gmail.com" required>
+                </div>
+                <div class="auth-input-group">
+                    <label>Secure Password</label>
+                    <input type="password" id="regPassword" placeholder="Min. 8 characters" required>
+                </div>
+                <button type="button" class="auth-submit-action-btn" id="manualRegisterSubmitTrigger">Create Luxury Profile</button>
                 
                 <div class="auth-modal-footer-links">
                     <p>Already registered? <a href="#signin" id="backToSignInFromReg" class="accentuated-link">Sign In</a></p>
@@ -1304,13 +1297,11 @@
                 <h2 class="auth-modal-title">Reset Password</h2>
                 <p class="auth-modal-subtitle">Enter your registered email below to receive a secure recovery sequence token</p>
                 
-                <form onsubmit="event.preventDefault(); alert('Password Recovery parameters successfully dispatched to your inbox.'); switchAuthView('signInPanel');">
-                    <div class="auth-input-group">
-                        <label>Your Google Gmail Account Address</label>
-                        <input type="email" placeholder="yourname@gmail.com" required>
-                    </div>
-                    <button type="submit" class="auth-submit-action-btn">Send Reset Password Link</button>
-                </form>
+                <div class="auth-input-group">
+                    <label>Your Google Gmail Account Address</label>
+                    <input type="email" placeholder="yourname@gmail.com" required>
+                </div>
+                <button type="button" class="auth-submit-action-btn" onclick="alert('Password Recovery parameters successfully dispatched to your inbox.'); switchAuthView('signInPanel');">Send Reset Password Link</button>
                 
                 <div class="auth-modal-footer-links">
                     <p>Remembered credential security? <a href="#signin" id="backToSignInFromForgot" class="accentuated-link">Return to Log In</a></p>
@@ -1566,7 +1557,7 @@
         let currentSlideIndex = 0;
         let carouselIntervalId = null;
 
-       function showTargetSlide(index) {
+        function showTargetSlide(index) {
             if (!slides.length) return;
             slides[currentSlideIndex].classList.remove('active-slide');
             if (dots[currentSlideIndex]) {
@@ -1579,7 +1570,7 @@
             if (dots[currentSlideIndex]) {
                 dots[currentSlideIndex].classList.add('active-dot');
             }
-       }
+        }
 
         function runAutoRotationPipeline() { showTargetSlide(currentSlideIndex + 1); }
         function startSliderInterval() { if(slides.length) carouselIntervalId = setInterval(runAutoRotationPipeline, 5000); }
@@ -1621,12 +1612,12 @@
 
         const firebaseConfig = {
             apiKey: "AIzaSyDxe9DeHRsCzD4vlNsknlDHN0w7txd51ic",
-  authDomain: "abayrah-9df21.firebaseapp.com",
-  projectId: "abayrah-9df21",
-  storageBucket: "abayrah-9df21.firebasestorage.app",
-  messagingSenderId: "789725334313",
-  appId: "1:789725334313:web:b37408f42add9611730538",
-  measurementId: "G-NLJJVVE32M"
+            authDomain: "abayrah-9df21.firebaseapp.com",
+            projectId: "abayrah-9df21",
+            storageBucket: "abayrah-9df21.firebasestorage.app",
+            messagingSenderId: "789725334313",
+            appId: "1:789725334313:web:b37408f42add9611730538",
+            measurementId: "G-NLJJVVE32M"
         };
 
         const app = initializeApp(firebaseConfig);
