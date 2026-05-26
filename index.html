@@ -434,7 +434,7 @@
             font-weight: 300;
         }
 
-        /* 🔥 DEDICATED VAULT SALE BANNER WITH HALO/BREATHING ANIMATION 🔥 */
+        /* 🔥 DEDICATED VAULT SALE PROMO BANNER WITH BACKGROUND IMAGE 🔥 */
         .vault-sale-section {
             max-width: 1480px;
             margin: 80px auto 0 auto;
@@ -456,30 +456,36 @@
             cursor: pointer;
             overflow: hidden;
             transition: all 0.5s cubic-bezier(0.16, 1, 0.3, 1);
-            /* Halo & Breathing Animation */
             animation: vaultBreathe 4s ease-in-out infinite;
+            /* 🌟 ADD YOUR BACKGROUND IMAGE HERE 🌟
+              1. Replace 'images/sale-background.jpg' with the actual path to your image file.
+              2. Adjust the linear-gradient rgba values to make the dark overlay lighter or darker as needed.
+            */
+            background-image: linear-gradient(rgba(0, 0, 0, 0.6), rgba(0, 0, 0, 0.6)), url('sale-image.png');
+            background-size: cover;
+            background-position: center;
+            background-repeat: no-repeat;
         }
 
         @keyframes vaultBreathe {
             0% {
                 transform: scale(1);
-                box-shadow: 0 0 15px rgba(197, 168, 128, 0.05);
-                border-color: rgba(42, 40, 38, 1);
+                box-shadow: 0 0 10px rgba(197, 168, 128, 0.1);
+                border-color: rgba(42, 40, 38, 0.6);
             }
             50% {
-                transform: scale(1.015); /* Zoom in */
-                box-shadow: 0 0 40px rgba(197, 168, 128, 0.35), 0 0 15px rgba(197, 168, 128, 0.15) inset; /* Halo glow */
-                border-color: rgba(197, 168, 128, 0.6);
+                transform: scale(1.01);
+                box-shadow: 0 0 25px rgba(197, 168, 128, 0.3);
+                border-color: rgba(197, 168, 128, 0.8);
             }
             100% {
                 transform: scale(1);
-                box-shadow: 0 0 15px rgba(197, 168, 128, 0.05);
-                border-color: rgba(42, 40, 38, 1);
+                box-shadow: 0 0 10px rgba(197, 168, 128, 0.1);
+                border-color: rgba(42, 40, 38, 0.6);
             }
         }
 
         .vault-sale-banner:hover {
-            /* Pauses the breathing animation on hover to allow the hover states to take over cleanly */
             animation-play-state: paused;
             border-color: var(--accent-gold);
             box-shadow: 0 25px 60px rgba(197, 168, 128, 0.3);
