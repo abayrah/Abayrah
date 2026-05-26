@@ -1613,226 +1613,203 @@
     </script>
 
     <script type="module">
-        import { initializeApp } from "https://www.gstatic.com/firebasejs/10.11.0/firebase-app.js";
-        import { getAuth, onAuthStateChanged, signOut, signInWithRedirect, getRedirectResult, GoogleAuthProvider, signInWithEmailAndPassword, createUserWithEmailAndPassword } from "https://www.gstatic.com/firebasejs/10.11.0/firebase-auth.js";
-        import { getFirestore, doc, getDoc, setDoc } from "https://www.gstatic.com/firebasejs/10.11.0/firebase-firestore.js";
+        /* 🌟 UPGRADED MULTI-ENVIRONMENT CORES (REPLACES CURRENT BOTTOM BUTTON CODES) */
+import { initializeApp } from "https://www.gstatic.com/firebasejs/10.11.0/firebase-app.js";
+import { getAuth, onAuthStateChanged, signOut, signInWithPopup, GoogleAuthProvider, signInWithEmailAndPassword, createUserWithEmailAndPassword } from "https://www.gstatic.com/firebasejs/10.11.0/firebase-auth.js";
+import { getFirestore, doc, getDoc, setDoc } from "https://www.gstatic.com/firebasejs/10.11.0/firebase-firestore.js";
 
-        const firebaseConfig = {
-            apiKey: "AIzaSyAzUOh21Ec31kKmf42Tcw-xs4fVZyPh2fM",
-            authDomain: "abayrah-9df21.firebaseapp.com",
-            projectId: "abayrah-9df21"
-        };
+const firebaseConfig = {
+    apiKey: "AIzaSyAzUOh21Ec31kKmf42Tcw-xs4fVZyPh2fM",
+    authDomain: "abayrah-9df21.firebaseapp.com",
+    projectId: "abayrah-9df21"
+};
 
-        const app = initializeApp(firebaseConfig);
-        const auth = getAuth(app);
-        const db = getFirestore(app);
-        const googleProvider = new GoogleAuthProvider();
-        
-        googleProvider.setCustomParameters({ prompt: 'select_account' });
+const app = initializeApp(firebaseConfig);
+const auth = getAuth(app);
+const db = getFirestore(app);
+const googleProvider = new GoogleAuthProvider();
 
-        const authOverlay = document.getElementById('authPortalModal');
-        const accountTrigger = document.getElementById('accountTrigger');
-        const closeBtn = document.getElementById('modalCloseBtn');
-        const headerUserIconSvg = document.getElementById('headerUserIconSvg');
-        const headerUserAvatarImg = document.getElementById('headerUserAvatarImg');
+googleProvider.setCustomParameters({ prompt: 'select_account' });
 
-        const toRegister = document.getElementById('goToRegisterBtn');
-        const toForgot = document.getElementById('goToForgotBtn');
-        const regToSignIn = document.getElementById('backToSignInFromReg');
-        const forgotToSignIn = document.getElementById('backToSignInFromForgot');
+const authOverlay = document.getElementById('authPortalModal');
+const accountTrigger = document.getElementById('accountTrigger');
+const closeBtn = document.getElementById('modalCloseBtn');
+const headerUserIconSvg = document.getElementById('headerUserIconSvg');
+const headerUserAvatarImg = document.getElementById('headerUserAvatarImg');
 
-        // Handle the redirect callback handshake cleanly on page initialization
-        async function checkRedirectHandshakeResult() {
-            try {
-                const result = await getRedirectResult(auth);
-                if (result && result.user) {
-                    const user = result.user;
-                    const customerDoc = await getDoc(doc(db, "registered_customers", user.uid));
-                    if (!customerDoc.exists()) {
-                        await setDoc(doc(db, "registered_customers", user.uid), {
-                            name: user.displayName || "Boutique Guest Account",
-                            email: user.email,
-                            registeredAt: new Date().toISOString()
-                        });
-                    }
-                    authOverlay.classList.add('open-portal');
-                    switchAuthView('userDashboardPanel');
-                }
-            } catch (error) {
-                console.error("OAuth Cross-Origin Redirect Exception: ", error);
-            }
-        }
-        checkRedirectHandshakeResult();
+const toRegister = document.getElementById('goToRegisterBtn');
+const toForgot = document.getElementById('goToForgotBtn');
+const regToSignIn = document.getElementById('backToSignInFromReg');
+const forgotToSignIn = document.getElementById('backToSignInFromForgot');
 
-        onAuthStateChanged(auth, async (user) => {
-            if (user) {
-                try {
-                    const customerDoc = await getDoc(doc(db, "registered_customers", user.uid));
-                    
-                    if (customerDoc.exists()) {
-                        const customerData = customerDoc.data();
-                        const clientName = customerData.name || "Boutique Guest";
-                        const clientEmail = customerData.email || user.email;
-                        const avatarSrc = user.photoURL || "https://images.unsplash.com/photo-1535713875002-d1d0cf377fde?auto=format&fit=crop&w=150&q=80";
-
-                        headerUserIconSvg.style.display = 'none';
-                        headerUserAvatarImg.src = avatarSrc;
-                        headerUserAvatarImg.style.display = 'block';
-
-                        document.getElementById('dashUserProfileImg').src = avatarSrc;
-                        document.getElementById('dashProfileGreetingName').textContent = `Welcome back, ${clientName}`;
-                        document.getElementById('dashProfileEmailStringAddress').textContent = clientEmail;
-
-                        if (authOverlay.classList.contains('open-portal')) {
-                            switchAuthView('userDashboardPanel');
-                            initializeLiveOrderTrackingSimulationCycle();
-                        }
-                    } else {
-                        await setDoc(doc(db, "registered_customers", user.uid), {
-                            name: user.displayName || "Boutique Guest Account",
-                            email: user.email,
-                            registeredAt: new Date().toISOString()
-                        });
-                    }
-                } catch (error) {
-                    console.error("Database schema alignment exception: ", error);
-                }
-            } else {
-                headerUserAvatarImg.style.display = 'none';
-                headerUserIconSvg.style.display = 'block';
-            }
-        });
-
-        if(accountTrigger) {
-            accountTrigger.addEventListener('click', (e) => {
-                e.preventDefault();
-                authOverlay.classList.add('open-portal');
-                if(auth.currentUser) {
-                    switchAuthView('userDashboardPanel');
-                    initializeLiveOrderTrackingSimulationCycle();
-                } else {
-                    switchAuthView('signInPanel');
-                }
-            });
-        }
-
-        if(closeBtn) {
-            closeBtn.addEventListener('click', () => authOverlay.classList.remove('open-portal'));
-            authOverlay.addEventListener('click', (e) => { if(e.target === authOverlay) authOverlay.classList.remove('open-portal'); });
-        }
-
-        function switchAuthView(targetPanelId) {
-            document.querySelectorAll('.auth-view-panel').forEach(p => p.classList.remove('active-panel'));
-            const activeTarget = document.getElementById(targetPanelId);
-            if(activeTarget) activeTarget.classList.add('active-panel');
-        }
-
-        if(toRegister) toRegister.addEventListener('click', (e) => { e.preventDefault(); switchAuthView('registerPanel'); });
-        if(toForgot) toForgot.addEventListener('click', (e) => { e.preventDefault(); switchAuthView('forgotPanel'); });
-        if(regToSignIn) regToSignIn.addEventListener('click', (e) => { e.preventDefault(); switchAuthView('signInPanel'); });
-        if(forgotToSignIn) forgotToSignIn.addEventListener('click', (e) => { e.preventDefault(); switchAuthView('signInPanel'); });
-
-        /* 🌟 UPGRADED REDIRECT TUNNEL MATRIX TO BYPASS SUBFOLDER BLOCKS */
-        document.getElementById('googleSignInAction').addEventListener('click', executeGoogleAuthRedirectMatrix);
-        document.getElementById('googleSignUpAction').addEventListener('click', executeGoogleAuthRedirectMatrix);
-
-        async function executeGoogleAuthRedirectMatrix() {
-            try {
-                await signInWithRedirect(auth, googleProvider);
-            } catch (error) {
-                console.error("OAuth Initializer failure: ", error);
-            }
-        }
-
-        /* 🌟 LIVE MANUAL EMAIL-ID SIGN IN VALIDATION SCHEMAS */
-        document.getElementById('manualEmailLoginSubmitTrigger').addEventListener('click', async (e) => {
-            e.preventDefault();
-            const email = document.getElementById('emailInputFormFields').value;
-            const password = document.getElementById('passwordInputFormField').value;
+// Automated Session Handler Matrix
+onAuthStateChanged(auth, async (user) => {
+    if (user) {
+        try {
+            const customerDoc = await getDoc(doc(db, "registered_customers", user.uid));
             
-            if(!email || !password) {
-                alert("Please complete the required user credentials fields.");
-                return;
-            }
-            try {
-                await signInWithEmailAndPassword(auth, email, password);
-            } catch (error) {
-                alert("Boutique Account Rejection: Invalid credentials framework framework mapping.");
-            }
-        });
+            const customerData = customerDoc.exists() ? customerDoc.data() : null;
+            const clientName = customerData ? (customerData.name || "Boutique Guest") : (user.displayName || "Boutique Guest");
+            const clientEmail = customerData ? (customerData.email || user.email) : user.email;
+            const avatarSrc = user.photoURL || "https://images.unsplash.com/photo-1535713875002-d1d0cf377fde?auto=format&fit=crop&w=150&q=80";
 
-        /* 🌟 NEW ACCOUNT MANUAL ENROLLMENT RECORD REGISTRY INJECTOR */
-        document.getElementById('manualRegisterSubmitTrigger').addEventListener('click', async (e) => {
-            e.preventDefault();
-            const firstName = document.getElementById('regFirstName').value;
-            const lastName = document.getElementById('regLastName').value;
-            const email = document.getElementById('regEmailAddress').value;
-            const password = document.getElementById('regPassword').value;
+            headerUserIconSvg.style.display = 'none';
+            headerUserAvatarImg.src = avatarSrc;
+            headerUserAvatarImg.style.display = 'block';
 
-            if(!firstName || !email || !password) {
-                alert("Required profile metrics missing inside layout schema.");
-                return;
-            }
-            try {
-                const sessionCredential = await createUserWithEmailAndPassword(auth, email, password);
-                await setDoc(doc(db, "registered_customers", sessionCredential.user.uid), {
-                    name: `${firstName} ${lastName}`,
-                    email: email,
+            document.getElementById('dashUserProfileImg').src = avatarSrc;
+            document.getElementById('dashProfileGreetingName').textContent = `Welcome back, ${clientName}`;
+            document.getElementById('dashProfileEmailStringAddress').textContent = clientEmail;
+
+            if (!customerDoc.exists()) {
+                await setDoc(doc(db, "registered_customers", user.uid), {
+                    name: clientName,
+                    email: clientEmail,
                     registeredAt: new Date().toISOString()
                 });
-                alert("Account configured and stored securely inside active production database registry sheet!");
-            } catch (error) {
-                alert("Encryption cluster creation rejected entry error trace: " + error.message);
             }
-        });
 
-        /* Real-time Order Tracking Status Automation Rails Loop Engine */
-        function initializeLiveOrderTrackingSimulationCycle() {
-            const rail = document.getElementById('liveTrackingRailIndicatorFillWidth');
-            const statusText = document.getElementById('activeStatusLabelSummaryString');
-            const nodeTwo = document.getElementById('nodeStateTransitStepTwo');
-            const nodeThree = document.getElementById('nodeStateTransitStepThree');
-            const nodeFour = document.getElementById('nodeStateTransitStepFour');
-            const labelTwo = document.getElementById('labelStepTwoTextNode');
-            const labelThree = document.getElementById('labelStepThreeTextNode');
-            const labelFour = document.getElementById('labelStepFourTextNode');
-
-            setTimeout(() => {
-                if(rail && statusText && nodeTwo && labelTwo) {
-                    rail.style.width = '33.33%';
-                    statusText.innerText = "Order Packed & Verified";
-                    nodeTwo.classList.add('completed-step');
-                    labelTwo.classList.add('active-label');
-                }
-            }, 1500);
-
-            setTimeout(() => {
-                if(rail && statusText && nodeThree && labelThree) {
-                    rail.style.width = '66.66%';
-                    statusText.innerText = "Dispatched via Air Courier (In Transit)";
-                    statusText.style.color = "var(--accent-gold)";
-                    nodeThree.classList.add('completed-step');
-                    labelThree.classList.add('active-label');
-                }
-            }, 5000);
-
-            setTimeout(() => {
-                if(rail && statusText && nodeFour && labelFour) {
-                    rail.style.width = '100%';
-                    statusText.innerText = "Out for Delivery via Elite Local Carrier Dispatch";
-                    statusText.style.color = "var(--success-green)";
-                    nodeFour.classList.add('active-step');
-                    labelFour.classList.add('active-label');
-                }
-            }, 9000);
+            if (authOverlay.classList.contains('open-portal')) {
+                switchAuthView('userDashboardPanel');
+                initializeLiveOrderTrackingSimulationCycle();
+            }
+        } catch (error) {
+            console.error("Database alignment logging exception: ", error);
         }
+    } else {
+        headerUserAvatarImg.style.display = 'none';
+        headerUserIconSvg.style.display = 'block';
+    }
+});
 
-        document.getElementById('signOutTriggerBtn').addEventListener('click', async () => {
-            if (confirm("Are you sure you want to end your dashboard session?")) {
-                await signOut(auth);
-                authOverlay.classList.remove('open-portal');
-            }
+if(accountTrigger) {
+    accountTrigger.addEventListener('click', (e) => {
+        e.preventDefault();
+        authOverlay.classList.add('open-portal');
+        if(auth.currentUser) {
+            switchAuthView('userDashboardPanel');
+            initializeLiveOrderTrackingSimulationCycle();
+        } else {
+            switchAuthView('signInPanel');
+        }
+    });
+}
+
+if(closeBtn) {
+    closeBtn.addEventListener('click', () => authOverlay.classList.remove('open-portal'));
+    authOverlay.addEventListener('click', (e) => { if(e.target === authOverlay) authOverlay.classList.remove('open-portal'); });
+}
+
+function switchAuthView(targetPanelId) {
+    document.querySelectorAll('.auth-view-panel').forEach(p => p.classList.remove('active-panel'));
+    const activeTarget = document.getElementById(targetPanelId);
+    if(activeTarget) activeTarget.classList.add('active-panel');
+}
+
+if(toRegister) toRegister.addEventListener('click', (e) => { e.preventDefault(); switchAuthView('registerPanel'); });
+if(toForgot) toForgot.addEventListener('click', (e) => { e.preventDefault(); switchAuthView('forgotPanel'); });
+if(regToSignIn) regToSignIn.addEventListener('click', (e) => { e.preventDefault(); switchAuthView('signInPanel'); });
+if(forgotToSignIn) forgotToSignIn.addEventListener('click', (e) => { e.preventDefault(); switchAuthView('signInPanel'); });
+
+/* 🌟 POPUP TUNNELS: Safe from Incognito and local alert loop bugs */
+document.getElementById('googleSignInAction').addEventListener('click', executeGoogleAuthPopupMatrix);
+document.getElementById('googleSignUpAction').addEventListener('click', executeGoogleAuthPopupMatrix);
+
+async function executeGoogleAuthPopupMatrix() {
+    try {
+        await signInWithPopup(auth, googleProvider);
+    } catch (error) {
+        console.error("OAuth Authentication Failed: ", error.message);
+    }
+}
+
+/* 🌟 EMAIL CREDENTIAL FALLBACKS */
+document.getElementById('manualEmailLoginSubmitTrigger').addEventListener('click', async (e) => {
+    e.preventDefault();
+    const email = document.getElementById('emailInputFormFields').value;
+    const password = document.getElementById('passwordInputFormField').value;
+    
+    if(!email || !password) {
+        alert("Please complete fields.");
+        return;
+    }
+    try {
+        await signInWithEmailAndPassword(auth, email, password);
+    } catch (error) {
+        alert("Invalid boutique profile configuration credentials mapping.");
+    }
+});
+
+document.getElementById('manualRegisterSubmitTrigger').addEventListener('click', async (e) => {
+    e.preventDefault();
+    const firstName = document.getElementById('regFirstName').value;
+    const lastName = document.getElementById('regLastName').value;
+    const email = document.getElementById('regEmailAddress').value;
+    const password = document.getElementById('regPassword').value;
+
+    if(!firstName || !email || !password) {
+        alert("Required framework dimensions missing.");
+        return;
+    }
+    try {
+        const sessionCredential = await createUserWithEmailAndPassword(auth, email, password);
+        await setDoc(doc(db, "registered_customers", sessionCredential.user.uid), {
+            name: `${firstName} ${lastName}`,
+            email: email,
+            registeredAt: new Date().toISOString()
         });
+        alert("Production Database Sheet entry secured successfully!");
+    } catch (error) {
+        alert("Registration Rejection: " + error.message);
+    }
+});
+
+function initializeLiveOrderTrackingSimulationCycle() {
+    const rail = document.getElementById('liveTrackingRailIndicatorFillWidth');
+    const statusText = document.getElementById('activeStatusLabelSummaryString');
+    const nodeTwo = document.getElementById('nodeStateTransitStepTwo');
+    const nodeThree = document.getElementById('nodeStateTransitStepThree');
+    const nodeFour = document.getElementById('nodeStateTransitStepFour');
+    const labelTwo = document.getElementById('labelStepTwoTextNode');
+    const labelThree = document.getElementById('labelStepThreeTextNode');
+    const labelFour = document.getElementById('labelStepFourTextNode');
+
+    setTimeout(() => {
+        if(rail && statusText && nodeTwo && labelTwo) {
+            rail.style.width = '33.33%';
+            statusText.innerText = "Order Packed & Verified";
+            nodeTwo.classList.add('completed-step');
+            labelTwo.classList.add('active-label');
+        }
+    }, 1500);
+
+    setTimeout(() => {
+        if(rail && statusText && nodeThree && labelThree) {
+            rail.style.width = '66.66%';
+            statusText.innerText = "Dispatched via Air Courier (In Transit)";
+            statusText.style.color = "var(--accent-gold)";
+            nodeThree.classList.add('completed-step');
+            labelThree.classList.add('active-label');
+        }
+    }, 5000);
+
+    setTimeout(() => {
+        if(rail && statusText && nodeFour && labelFour) {
+            rail.style.width = '100%';
+            statusText.innerText = "Out for Delivery via Elite Local Carrier Dispatch";
+            statusText.style.color = "var(--success-green)";
+            nodeFour.classList.add('active-step');
+            labelFour.classList.add('active-label');
+        }
+    }, 9000);
+}
+
+document.getElementById('signOutTriggerBtn').addEventListener('click', async () => {
+    if (confirm("Are you sure you want to end your dashboard session?")) {
+        await signOut(auth);
+        authOverlay.classList.remove('open-portal');
+    }
+});
     </script>
 </body>
 </html>
