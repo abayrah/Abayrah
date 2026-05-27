@@ -1041,7 +1041,6 @@
             transform: translateY(20px);
             transition: transform 0.4s cubic-bezier(0.16, 1, 0.3, 1);
             text-align: center;
-            /* Allow scrolling inside modal if content gets too long (especially on mobile) */
             max-height: 90vh;
             overflow-y: auto;
         }
@@ -1149,7 +1148,6 @@
             display: block;
         }
 
-        /* Adjust margin when registering to save space */
         .modal-content.is-registering .input-group {
             margin-bottom: 15px;
         }
@@ -1191,6 +1189,41 @@
 
         .input-group input::placeholder {
             color: #C2BFBB;
+        }
+
+        /* Password Input Wrapper for Eye Icon */
+        .password-wrapper {
+            position: relative;
+            display: flex;
+            align-items: center;
+        }
+
+        .password-wrapper input {
+            padding-right: 40px; /* Leave space for the eye icon */
+        }
+
+        .toggle-password-btn {
+            position: absolute;
+            right: 10px;
+            background: none;
+            border: none;
+            cursor: pointer;
+            color: var(--muted-gray);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            padding: 5px;
+            transition: color 0.3s ease;
+        }
+
+        .toggle-password-btn:hover {
+            color: var(--dark-text);
+        }
+
+        .toggle-password-btn svg {
+            width: 18px;
+            height: 18px;
+            fill: currentColor;
         }
 
         .auth-error-msg {
@@ -1304,7 +1337,6 @@
             .vault-value-text { font-size: 24px; letter-spacing: 4px; }
             .vault-desc { max-width: 100%; font-size: 13px; }
             
-            /* Modal Form Mobile Fixes */
             .modal-content { padding: 40px 20px; width: 95%; }
             .modal-title { font-size: 24px; }
             .form-row { flex-direction: column; gap: 0; }
@@ -1581,12 +1613,28 @@
 
                 <div class="input-group">
                     <label>Password</label>
-                    <input type="password" id="passwordInput" placeholder="Your Password" required minlength="6">
+                    <div class="password-wrapper">
+                        <input type="password" id="passwordInput" placeholder="............" required minlength="6">
+                        <button type="button" class="toggle-password-btn" aria-label="Toggle password visibility">
+                            <svg viewBox="0 0 24 24">
+                                <path d="M12 7c-2.76 0-5 2.24-5 5s2.24 5 5 5 5-2.24 5-5-2.24-5-5-5zm0 8c-1.65 0-3-1.35-3-3s1.35-3 3-3 3 1.35 3 3-1.35 3-3 3zm0-11C7 4 2.73 7.11 1 12c1.73 4.89 6 8 11 8s9.27-3.11 11-8c-1.73-4.89-6-8-11-8zm0 14c-3.87 0-7.35-2.09-9.15-5.35C4.65 9.09 8.13 7 12 7s7.35 2.09 9.15 5.35C19.35 15.91 15.87 18 12 18z"/>
+                                <path class="eye-slash" d="M3.51 3.51l16.97 16.97-.99.99L2.52 4.5z" style="display: block;"/>
+                            </svg>
+                        </button>
+                    </div>
                 </div>
 
                 <div class="input-group register-field">
                     <label>Confirm Password</label>
-                    <input type="password" id="confirmPasswordInput" placeholder="Confirm Your Password" minlength="6">
+                    <div class="password-wrapper">
+                        <input type="password" id="confirmPasswordInput" placeholder="............" minlength="6">
+                        <button type="button" class="toggle-password-btn" aria-label="Toggle password visibility">
+                            <svg viewBox="0 0 24 24">
+                                <path d="M12 7c-2.76 0-5 2.24-5 5s2.24 5 5 5 5-2.24 5-5-2.24-5-5-5zm0 8c-1.65 0-3-1.35-3-3s1.35-3 3-3 3 1.35 3 3-1.35 3-3 3zm0-11C7 4 2.73 7.11 1 12c1.73 4.89 6 8 11 8s9.27-3.11 11-8c-1.73-4.89-6-8-11-8zm0 14c-3.87 0-7.35-2.09-9.15-5.35C4.65 9.09 8.13 7 12 7s7.35 2.09 9.15 5.35C19.35 15.91 15.87 18 12 18z"/>
+                                <path class="eye-slash" d="M3.51 3.51l16.97 16.97-.99.99L2.52 4.5z" style="display: block;"/>
+                            </svg>
+                        </button>
+                    </div>
                 </div>
 
                 <button type="submit" class="submit-btn" id="submitAuthBtn">Sign In To Vault</button>
@@ -1651,6 +1699,25 @@
         });
         startSliderInterval();
 
+        // --- Toggle Password Visibility Logic ---
+        const togglePasswordBtns = document.querySelectorAll('.toggle-password-btn');
+        togglePasswordBtns.forEach(btn => {
+            btn.addEventListener('click', function() {
+                // Find the input field right next to this button
+                const input = this.previousElementSibling;
+                // Find the slash line in the SVG
+                const eyeSlash = this.querySelector('.eye-slash');
+                
+                if (input.getAttribute('type') === 'password') {
+                    input.setAttribute('type', 'text');
+                    eyeSlash.style.display = 'none'; // Hide slash (eye is open)
+                } else {
+                    input.setAttribute('type', 'password');
+                    eyeSlash.style.display = 'block'; // Show slash (eye is closed)
+                }
+            });
+        });
+
         // --- UI Modal Toggle Logic ---
         const accountIconBtn = document.getElementById('accountIconBtn');
         const profilePic = document.getElementById('profilePic');
@@ -1670,7 +1737,13 @@
 
         closeModalBtn.addEventListener('click', () => {
             loginModal.classList.remove('active');
-            authErrorMsg.style.display = 'none'; // Hide errors on close
+            authErrorMsg.style.display = 'none'; 
+            
+            // Optional: reset password fields back to 'password' type if they were left as 'text'
+            const pwInputs = document.querySelectorAll('.password-wrapper input');
+            const eyeSlashes = document.querySelectorAll('.eye-slash');
+            pwInputs.forEach(input => input.setAttribute('type', 'password'));
+            eyeSlashes.forEach(slash => slash.style.display = 'block');
         });
 
         loginModal.addEventListener('click', (e) => {
@@ -1704,8 +1777,12 @@
         toggleAuthBtn.addEventListener('click', (e) => {
             e.preventDefault();
             isRegisteringMode = !isRegisteringMode;
-            authErrorMsg.style.display = 'none'; // clear errors when toggling
-            authForm.reset(); // clear form fields when toggling
+            authErrorMsg.style.display = 'none'; 
+            authForm.reset(); 
+
+            // Reset password toggles visually
+            document.querySelectorAll('.password-wrapper input').forEach(input => input.setAttribute('type', 'password'));
+            document.querySelectorAll('.eye-slash').forEach(slash => slash.style.display = 'block');
 
             if(isRegisteringMode) {
                 // Switch UI to Register Mode
@@ -1739,7 +1816,6 @@
 
     <script type="module">
         import { initializeApp } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-app.js";
-        // Import all required Auth functions, including Email/Password and Profile update
         import { 
             getAuth, 
             signInWithRedirect, 
@@ -1753,15 +1829,13 @@
         } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-auth.js";
 
         // IMPORTANT: PASTE YOUR REAL FIREBASE KEYS HERE 
-        // DO NOT LEAVE THESE AS "YOUR_REAL_API_KEY"
         const firebaseConfig = {
-           apiKey: "AIzaSyDxe9DeHRsCzD4vlNsknlDHN0w7txd51ic",
-  authDomain: "abayrah-9df21.firebaseapp.com",
-  projectId: "abayrah-9df21",
-  storageBucket: "abayrah-9df21.firebasestorage.app",
-  messagingSenderId: "789725334313",
-  appId: "1:789725334313:web:b37408f42add9611730538",
-  measurementId: "G-NLJJVVE32M"
+            apiKey: "YOUR_REAL_API_KEY",
+            authDomain: "your-project-id.firebaseapp.com",
+            projectId: "your-project-id",
+            storageBucket: "your-project-id.appspot.com",
+            messagingSenderId: "YOUR_SENDER_ID",
+            appId: "YOUR_APP_ID"
         };
 
         let app, auth, provider;
@@ -1786,7 +1860,6 @@
         const authForm = document.getElementById('authForm');
         const authErrorMsg = document.getElementById('authErrorMsg');
 
-        // Helper function to show errors
         function showError(message) {
             authErrorMsg.textContent = message;
             authErrorMsg.style.display = 'block';
@@ -1803,19 +1876,18 @@
         // --- Handle Manual Email/Password Form Submit ---
         if (authForm) {
             authForm.addEventListener('submit', (e) => {
-                e.preventDefault(); // Stop page from refreshing
+                e.preventDefault(); 
                 
                 if(!auth) {
                     showError("Firebase not configured. Please add your API keys.");
                     return;
                 }
 
-                authErrorMsg.style.display = 'none'; // Clear previous errors
+                authErrorMsg.style.display = 'none'; 
                 
                 const email = document.getElementById('emailInput').value.trim();
                 const password = document.getElementById('passwordInput').value;
 
-                // We check the same global boolean we defined in the standard script above
                 const isRegistering = document.querySelector('.modal-content').classList.contains('is-registering');
 
                 if (isRegistering) {
@@ -1832,7 +1904,7 @@
                     createUserWithEmailAndPassword(auth, email, password)
                         .then((userCredential) => {
                             const user = userCredential.user;
-                            // 2. Add Name to Profile immediately after creation
+                            // 2. Add Name to Profile
                             return updateProfile(user, {
                                 displayName: `${firstName} ${lastName}`
                             });
@@ -1840,10 +1912,8 @@
                         .then(() => {
                             console.log("Account created successfully!");
                             authForm.reset();
-                            // Modal closes automatically via the Auth State Listener below
                         })
                         .catch((error) => {
-                            // Format Firebase errors neatly
                             let msg = "An error occurred.";
                             if(error.code === 'auth/email-already-in-use') msg = "This email is already registered.";
                             if(error.code === 'auth/weak-password') msg = "Password must be at least 6 characters.";
@@ -1851,12 +1921,11 @@
                         });
 
                 } else {
-                    // Sign In Flow
+                    // Sign In Flow (No First/Last name required)
                     signInWithEmailAndPassword(auth, email, password)
                         .then((userCredential) => {
                             console.log("Signed in successfully!");
                             authForm.reset();
-                            // Modal closes automatically via the Auth State Listener below
                         })
                         .catch((error) => {
                             let msg = "Login failed. Please check your credentials.";
@@ -1890,14 +1959,12 @@
             });
         }
 
-        // --- Listen for Authentication State Changes (Updates the UI automatically) ---
+        // --- Listen for Authentication State Changes ---
         if (auth) {
             onAuthStateChanged(auth, (user) => {
                 if (user) {
-                    // User is signed in.
                     window.isAppLoggedIn = true;
                     
-                    // Update UI
                     loginModal.classList.remove('active');
                     accountIconBtn.style.display = 'none';
                     
@@ -1908,10 +1975,8 @@
                     profileEmail.textContent = user.email || "";
 
                 } else {
-                    // User is signed out.
                     window.isAppLoggedIn = false;
                     
-                    // Revert UI
                     profileDropdown.classList.remove('active');
                     profilePic.style.display = 'none';
                     accountIconBtn.style.display = 'inline-flex';
