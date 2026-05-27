@@ -13,7 +13,7 @@
     <style>
         /* --- Luxury Design Tokens & Variables --- */
         :root {
-            --primary-bg: #FDFCE8;       /* Soft luxury ivory/off-white */
+            --primary-bg: #FFFFFF;       /* Pure white luxury background */
             --dark-text: #1C1B1A;        /* Premium charcoal black */
             --muted-gray: #7A7571;       /* Editorial soft taupe */
             --border-color: #ECEAE6;     /* Delicate divider line color */
@@ -50,8 +50,8 @@
             left: 0;
             width: 200%;
             height: 200%;
-            background: radial-gradient(circle at 10% 20%, rgba(243, 239, 233, 0.4) 0%, transparent 40%),
-                        radial-gradient(circle at 90% 80%, rgba(197, 168, 128, 0.08) 0%, transparent 50%);
+            background: radial-gradient(circle at 10% 20%, rgba(245, 245, 245, 0.6) 0%, transparent 40%),
+                        radial-gradient(circle at 90% 80%, rgba(197, 168, 128, 0.05) 0%, transparent 50%);
             z-index: -1;
             pointer-events: none;
             will-change: transform;
@@ -90,7 +90,7 @@
         .main-header {
             position: sticky;
             top: 0;
-            background-color: rgba(253, 252, 232, 0.75);
+            background-color: rgba(255, 255, 255, 0.85);
             backdrop-filter: blur(20px);
             -webkit-backdrop-filter: blur(20px);
             border-bottom: 1px solid rgba(28, 27, 26, 0.05);
@@ -100,8 +100,8 @@
         }
 
         .main-header.scrolled {
-            background-color: rgba(253, 252, 232, 0.9);
-            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.02);
+            background-color: rgba(255, 255, 255, 0.98);
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.04);
         }
 
         .header-container {
@@ -505,7 +505,7 @@
 
         /* --- Brand Manifest Foundations --- */
         .brand-manifest-section {
-            background-color: #FFFFFF;
+            background-color: var(--primary-bg);
             border-bottom: 1px solid var(--border-color);
             padding: 60px 4% 55px 4%;
             contain: content;
@@ -600,7 +600,7 @@
             transition: all 0.5s cubic-bezier(0.16, 1, 0.3, 1);
             animation: vaultBreathe 4s ease-in-out infinite;
             
-            background-image: linear-gradient(rgba(0, 0, 0, 0.5), rgba(0, 0, 0, 0.5)), url('images/sale-background.jpg');
+            background-image: linear-gradient(rgba(0, 0, 0, 0.5), rgba(0, 0, 0, 0.5)), url('sale-image.png');
             background-size: cover;
             background-position: center;
             background-repeat: no-repeat;
@@ -789,7 +789,7 @@
         .category-card {
             position: relative;
             width: 100%;
-            background-color: #FFFFFF; 
+            background-color: var(--primary-bg); 
             border: 1px solid var(--border-color);
             padding: 12px; 
             cursor: pointer;
@@ -805,7 +805,7 @@
             aspect-ratio: 3 / 4;
             overflow: hidden;
             position: relative;
-            background-color: #F9F8F6;
+            background-color: #FAFAFA;
             display: flex;
             align-items: center;
             justify-content: center;
@@ -837,7 +837,7 @@
             flex-direction: column;
             align-items: center;
             justify-content: center;
-            background-color: #FFFFFF;
+            background-color: var(--primary-bg);
         }
 
         .category-name {
@@ -1194,7 +1194,7 @@
             text-decoration-color: var(--dark-text);
         }
 
-
+        /* 📱 TABLET VIEW */
         @media (max-width: 1024px) {
             .category-grid { grid-template-columns: repeat(3, 1fr); }
             .vault-promo-content { padding: 50px 10%; } 
@@ -1203,25 +1203,47 @@
             .vault-value-text { font-size: 30px; }
         }
 
+        /* 📱 STRICT MOBILE PREMIUM VIEW */
         @media (max-width: 768px) {
-            .category-grid { grid-template-columns: repeat(2, 1fr); gap: 16px; }
-            .category-content { padding: 20px 5px 10px 5px; }
-            .category-name { font-size: 16px; }
+            /* Fix Categories Squishing */
+            .category-grid { grid-template-columns: repeat(2, 1fr); gap: 12px; }
+            .category-card:nth-child(5) { grid-column: span 2; } /* Center 5th item */
+            .category-content { padding: 15px 5px 10px 5px; }
+            .category-name { font-size: 14px; }
+            
+            /* Clean Up Header */
             .nav-links { display: none; }
-            .header-container { padding: 15px 20px; }
-            .brand-logo-img { height: 110px; }
-            .hero-section { aspect-ratio: 4 / 3; }
+            .header-container { padding: 12px 20px; }
+            .header-actions { gap: 15px; }
+            .brand-identity { min-width: 120px; display: flex; align-items: center; justify-content: center; }
+            .brand-logo-img { height: 120px; position: relative; top: auto; left: auto; transform: none; } 
+            
+            /* Fix Hero - Portrait framing instead of Boxy */
+            .hero-section { aspect-ratio: 3 / 4; min-height: 65vh; }
             .hero-content-container { padding-bottom: 40px; }
+            .hero-btn { padding: 14px 30px; font-size: 10px; }
+            
+            /* Fix Value Pillars Squishing */
+            .value-pillars-ribbon-row { grid-template-columns: 1fr; gap: 25px; padding: 0 10px; }
+            .manifest-section-header h2 { font-size: 24px; }
+            
+            /* Footer adjustments */
             .footer-grid { grid-template-columns: 1fr; gap: 40px; }
-            .vault-sale-banner { padding: 30px 20px; }
-            .vault-promo-content { padding: 40px 20px; align-items: center; text-align: center; }
+            
+            /* Promo Vault */
+            .vault-sale-section { padding: 0 15px; margin-top: 60px; }
+            .vault-sale-banner { padding: 30px 15px; }
+            .vault-promo-content { padding: 40px 15px; align-items: center; text-align: center; }
             .vault-value-wrapper { justify-content: center; transform-origin: center center; flex-direction: column; gap: 5px; }
             .vault-ambient-light { left: 50%; }
             .vault-value { font-size: 70px; }
             .vault-value-symbol { font-size: 40px; }
-            .vault-value-text { font-size: 28px; letter-spacing: 4px; }
-            .vault-desc { max-width: 100%; }
-            .modal-content { padding: 40px 25px; }
+            .vault-value-text { font-size: 24px; letter-spacing: 4px; }
+            .vault-desc { max-width: 100%; font-size: 13px; }
+            
+            /* Modal Fixes */
+            .modal-content { padding: 40px 20px; width: 95%; }
+            .modal-title { font-size: 24px; }
         }
     </style>
 </head>
