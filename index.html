@@ -754,19 +754,6 @@
             padding-bottom: 4px;
             transition: all 0.4s ease;
         }
-        #searchResults a {
-    display: block;
-    font-size: 14px;
-    font-weight: 500;
-}
-#searchResults span {
-    color: var(--muted-gray);
-    font-size: 11px;
-    margin-left: 10px;
-}
-#searchResults a:hover {
-    color: var(--accent-gold);
-}
 
         .vault-sale-banner:hover .vault-cta {
             color: var(--accent-gold);
@@ -1758,56 +1745,7 @@
                 }
             });
         });
-// --- Search System Logic ---
-const searchModal = document.getElementById('searchModal');
-const searchIcon = document.querySelector('a[href="#search"]'); // The header icon
-const closeSearchBtn = document.getElementById('closeSearchBtn');
-const searchInput = document.getElementById('searchInput');
-const searchResults = document.getElementById('searchResults');
 
-// Define your product database here
-const products = [
-    { name: "Luxury Abaya", category: "Abayas", link: "#shop-abayas" },
-    { name: "Premium Niqab", category: "Niqabs", link: "#shop-niqabs" },
-    { name: "Chiffon Hijab", category: "Hijabs", link: "#shop-hijabs" },
-    { name: "Signature Silk Scarf", category: "Accessories", link: "#shop-accessories" },
-    { name: "Ramadan Gift Hamper", category: "Hampers", link: "#shop-hampers" }
-];
-
-// Open/Close Search
-searchIcon.addEventListener('click', (e) => {
-    e.preventDefault();
-    searchModal.classList.add('active');
-    searchInput.focus();
-});
-
-closeSearchBtn.addEventListener('click', () => {
-    searchModal.classList.remove('active');
-    searchInput.value = '';
-    searchResults.innerHTML = '';
-});
-
-// Live Search Filtering
-searchInput.addEventListener('input', (e) => {
-    const term = e.target.value.toLowerCase();
-    searchResults.innerHTML = '';
-
-    if (term.length < 2) return; // Only search after 2 characters
-
-    const filtered = products.filter(p => p.name.toLowerCase().includes(term));
-
-    if (filtered.length > 0) {
-        filtered.forEach(p => {
-            const div = document.createElement('div');
-            div.style.padding = "10px 0";
-            div.style.borderBottom = "1px solid #ECEAE6";
-            div.innerHTML = `<a href="${p.link}" onclick="searchModal.classList.remove('active')">${p.name} <span>(${p.category})</span></a>`;
-            searchResults.appendChild(div);
-        });
-    } else {
-        searchResults.innerHTML = "<p>No products found.</p>";
-    }
-});
         // --- UI Modal Toggle Logic ---
         const accountIconBtn = document.getElementById('accountIconBtn');
         const profilePic = document.getElementById('profilePic');
@@ -2076,18 +2014,5 @@ searchInput.addEventListener('input', (e) => {
             });
         }
     </script>
-    <div class="modal-overlay" id="searchModal">
-    <div class="modal-content" style="max-width: 600px;">
-        <button class="modal-close" id="closeSearchBtn" aria-label="Close Search">&times;</button>
-        <h2 class="modal-title">Search Collection</h2>
-        
-        <div class="input-group">
-            <input type="text" id="searchInput" placeholder="Search for Abayas, Niqabs..." style="margin-bottom: 0;">
-        </div>
-
-        <div id="searchResults" style="text-align: left; margin-top: 20px; max-height: 300px; overflow-y: auto;">
-            </div>
-    </div>
-</div>
 </body>
-</html>
+</html>   
