@@ -185,33 +185,36 @@
         .header-actions {
             display: flex;
             align-items: center;
-            gap: 28px;
+            gap: 32px; /* Slightly increased gap for better breathing room */
             font-size: 15px;
             color: rgba(28, 27, 26, 0.8);
             z-index: 2100;
         }
 
-        .header-actions a, .header-actions button {
+      .header-actions a, .header-actions button {
             display: inline-flex;
             align-items: center;
+            justify-content: center; /* Ensures icons are centered if buttons have extra padding */
             position: relative;
             background: none;
             border: none;
             color: inherit;
             cursor: pointer;
             transition: var(--transition-smooth);
+            padding: 5px; /* Added padding so the click area is larger */
         }
 
         .header-actions svg {
-            width: 17px;
-            height: 17px;
+            /* Increased icon size from 17px to 22px for better visibility */
+            width: 22px;
+            height: 22px;
             fill: currentColor;
             transition: var(--transition-smooth);
         }
 
         .header-actions a:hover, .header-actions button:hover {
             color: var(--accent-gold);
-            transform: translate3d(0, -3px, 0);
+            transform: scale(1.1); /* Added a subtle scale effect for interaction */
         }
 
         .cart-icon {
@@ -1312,7 +1315,15 @@
             .category-content { padding: 15px 5px 10px 5px; }
             .category-name { font-size: 14px; }
             
-            .header-container { padding: 12px 20px; }
+            .header-container {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    max-width: 1440px;
+    margin: 0 auto;
+    padding: 18px 40px; /* Reduced from 22px to 18px if you need more vertical space */
+    transition: var(--transition-smooth);
+}
             .header-actions { gap: 15px; }
             .brand-identity { min-width: 120px; display: flex; align-items: center; justify-content: center; }
             .brand-logo-img { height: 120px; position: relative; top: auto; left: auto; transform: none; } 
