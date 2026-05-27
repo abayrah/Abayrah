@@ -13,12 +13,12 @@
     <style>
         /* --- Luxury Design Tokens & Variables --- */
         :root {
-            --primary-bg: #FFFFFF;       /* Pure white luxury background */
-            --dark-text: #1C1B1A;        /* Premium charcoal black */
-            --muted-gray: #7A7571;       /* Editorial soft taupe */
-            --border-color: #ECEAE6;     /* Delicate divider line color */
-            --accent-gold: #C5A880;      /* Subtle muted gold accent */
-            --success-green: #4A5D4E;    /* Soft elegant luxury green */
+            --primary-bg: #FFFFFF;       
+            --dark-text: #1C1B1A;        
+            --muted-gray: #7A7571;       
+            --border-color: #ECEAE6;     
+            --accent-gold: #C5A880;      
+            --success-green: #4A5D4E;    
             --font-serif: 'Cormorant Garamond', serif;
             --font-sans: 'Montserrat', sans-serif;
             --font-premium: 'Playfair Display', serif; 
@@ -114,6 +114,17 @@
             transition: var(--transition-smooth);
         }
 
+        /* Mobile Hamburger Button */
+        .hamburger-btn {
+            display: none;
+            background: none;
+            border: none;
+            color: var(--dark-text);
+            cursor: pointer;
+            z-index: 2100;
+            padding: 5px;
+        }
+
         .nav-links {
             display: flex;
             gap: 35px;
@@ -177,6 +188,7 @@
             gap: 28px;
             font-size: 15px;
             color: rgba(28, 27, 26, 0.8);
+            z-index: 2100;
         }
 
         .header-actions a, .header-actions button {
@@ -347,6 +359,8 @@
             background-position: center;
             background-size: cover; 
             background-repeat: no-repeat;
+            /* Default to desktop image via CSS variable */
+            background-image: var(--desktop-img);
         }
 
         .carousel-slide.active-slide {
@@ -745,7 +759,7 @@
             letter-spacing: 5px;
         }
         
-        /* --- Premium Store Collections System (5 Cards in 1 Row) --- */
+        /* --- Premium Store Collections System --- */
         .collections-section {
             max-width: 1560px;
             margin: 80px auto 100px auto;
@@ -1205,20 +1219,41 @@
 
         /* 📱 STRICT MOBILE PREMIUM VIEW */
         @media (max-width: 768px) {
+            /* Switch Hero Images to Mobile Ratios using the CSS Variable */
+            .carousel-slide { background-image: var(--mobile-img); }
+
+            /* Show Hamburger & Setup Slide Out Menu */
+            .hamburger-btn { display: block; }
+            
+            .nav-links {
+                position: fixed;
+                top: 0; left: 0;
+                width: 100%; height: 100vh;
+                background-color: var(--primary-bg);
+                flex-direction: column;
+                justify-content: center;
+                align-items: center;
+                gap: 40px;
+                z-index: 2050;
+                transform: translateY(-100%);
+                transition: transform 0.5s cubic-bezier(0.25, 1, 0.5, 1);
+            }
+            .nav-links.active { transform: translateY(0); }
+            .nav-links a { font-size: 18px; }
+
             /* Fix Categories Squishing */
             .category-grid { grid-template-columns: repeat(2, 1fr); gap: 12px; }
-            .category-card:nth-child(5) { grid-column: span 2; } /* Center 5th item */
+            .category-card:nth-child(5) { grid-column: span 2; } 
             .category-content { padding: 15px 5px 10px 5px; }
             .category-name { font-size: 14px; }
             
             /* Clean Up Header */
-            .nav-links { display: none; }
             .header-container { padding: 12px 20px; }
             .header-actions { gap: 15px; }
             .brand-identity { min-width: 120px; display: flex; align-items: center; justify-content: center; }
             .brand-logo-img { height: 120px; position: relative; top: auto; left: auto; transform: none; } 
             
-            /* Fix Hero - Portrait framing instead of Boxy */
+            /* Fix Hero - Portrait framing */
             .hero-section { aspect-ratio: 3 / 4; min-height: 65vh; }
             .hero-content-container { padding-bottom: 40px; }
             .hero-btn { padding: 14px 30px; font-size: 10px; }
@@ -1256,7 +1291,13 @@
     <header class="main-header">
         <div class="header-container">
             
-            <nav class="nav-links">
+            <button class="hamburger-btn" id="hamburgerBtn" aria-label="Toggle Menu">
+                <svg viewBox="0 0 24 24" width="24" height="24" fill="currentColor">
+                    <path d="M3 18h18v-2H3v2zm0-5h18v-2H3v2zm0-7v2h18V6H3z"/>
+                </svg>
+            </button>
+
+            <nav class="nav-links" id="navLinks">
                 <a href="#home">Home</a>
                 <a href="#catalogs" onclick="document.getElementById('catalogs').scrollIntoView({behavior: 'smooth'});">Catalogs</a>
                 <a href="#contact" onclick="document.querySelector('.premium-footer').scrollIntoView({behavior: 'smooth'});">Contact</a>
@@ -1276,12 +1317,12 @@
                         <svg viewBox="0 0 24 24"><path d="M12 12c2.21 0 4-1.79 4-4s-1.79-4-4-4-4 1.79-4 4 1.79 4 4 4zm0 2c-2.67 0-8 1.34-8 4v2h16v-2c0-2.66-5.33-4-8-4z"/></svg>
                     </button>
                     
-                    <img src="https://ui-avatars.com/api/?name=Anam+Siddiqua&background=C5A880&color=fff&bold=true&font-size=0.4" alt="Profile" id="profilePic" class="profile-pic" style="display: none;">
+                    <img src="" alt="Profile" id="profilePic" class="profile-pic" style="display: none;">
 
                     <div class="profile-dropdown" id="profileDropdown">
                         <div class="dropdown-user-info">
-                            <h4>Anam Siddiqua</h4>
-                            <p>name@gmail.com</p>
+                            <h4 id="profileName">Guest</h4>
+                            <p id="profileEmail">guest@abayrah.com</p>
                         </div>
                         <button class="logout-btn" id="logoutBtn">Log Out</button>
                     </div>
@@ -1297,12 +1338,12 @@
 
     <section class="hero-section">
         <div class="carousel-track-wrapper" id="heroCarouselTrack">
-            <div class="carousel-slide active-slide" style="background-image: url('images/hero-background.png');"></div>
-            <div class="carousel-slide" style="background-image: url('images/abaya.png');"></div>
-            <div class="carousel-slide" style="background-image: url('images/naqabs.png');"></div>
-            <div class="carousel-slide" style="background-image: url('images/hijabs.png');"></div>
-            <div class="carousel-slide" style="background-image: url('images/accessiories.png');"></div>
-            <div class="carousel-slide" style="background-image: url('images/hampers.png');"></div>
+            <div class="carousel-slide active-slide" style="--desktop-img: url('images/hero-background.png'); --mobile-img: url('images/mobile-hero-1.png');"></div>
+            <div class="carousel-slide" style="--desktop-img: url('images/abaya.png'); --mobile-img: url('images/mobile-abaya.png');"></div>
+            <div class="carousel-slide" style="--desktop-img: url('images/naqabs.png'); --mobile-img: url('images/mobile-naqabs.png');"></div>
+            <div class="carousel-slide" style="--desktop-img: url('images/hijabs.png'); --mobile-img: url('images/mobile-hijabs.png');"></div>
+            <div class="carousel-slide" style="--desktop-img: url('images/accessiories.png'); --mobile-img: url('images/mobile-accessories.png');"></div>
+            <div class="carousel-slide" style="--desktop-img: url('images/hampers.png'); --mobile-img: url('images/mobile-hampers.png');"></div>
         </div>
         
         <div class="carousel-overlay-shadow"></div>
@@ -1490,7 +1531,6 @@
         </div>
     </footer>
 
-
     <div class="modal-overlay" id="loginModal">
         <div class="modal-content">
             <button class="modal-close" id="closeModalBtn" aria-label="Close Modal">&times;</button>
@@ -1530,6 +1570,28 @@
     </div>
     
     <script>
+        // --- Hamburger Menu Logic ---
+        const hamburgerBtn = document.getElementById('hamburgerBtn');
+        const navLinks = document.getElementById('navLinks');
+        
+        hamburgerBtn.addEventListener('click', () => {
+            navLinks.classList.toggle('active');
+            
+            if(navLinks.classList.contains('active')) {
+                hamburgerBtn.innerHTML = `<svg viewBox="0 0 24 24" width="24" height="24" fill="currentColor"><path d="M19 6.41L17.59 5 12 10.59 6.41 5 5 6.41 10.59 12 5 17.59 6.41 19 12 13.41 17.59 19 19 17.59 13.41 12z"/></svg>`;
+            } else {
+                hamburgerBtn.innerHTML = `<svg viewBox="0 0 24 24" width="24" height="24" fill="currentColor"><path d="M3 18h18v-2H3v2zm0-5h18v-2H3v2zm0-7v2h18V6H3z"/></svg>`;
+            }
+        });
+
+        const mobileLinks = navLinks.querySelectorAll('a');
+        mobileLinks.forEach(link => {
+            link.addEventListener('click', () => {
+                navLinks.classList.remove('active');
+                hamburgerBtn.innerHTML = `<svg viewBox="0 0 24 24" width="24" height="24" fill="currentColor"><path d="M3 18h18v-2H3v2zm0-5h18v-2H3v2zm0-7v2h18V6H3z"/></svg>`;
+            });
+        });
+
         // --- Luxury Carousel System Core ---
         const slides = document.querySelectorAll('.carousel-slide');
         const dots = document.querySelectorAll('.indicator-dot');
@@ -1582,79 +1644,135 @@
         }
 
 
-        // --- 🌟 LOGIN MODAL & ACCOUNT LOGIC 🌟 ---
+        // --- UI Modal Toggle Logic (Auth logic is handled in the module below) ---
         const accountIconBtn = document.getElementById('accountIconBtn');
         const profilePic = document.getElementById('profilePic');
         const profileDropdown = document.getElementById('profileDropdown');
         const loginModal = document.getElementById('loginModal');
         const closeModalBtn = document.getElementById('closeModalBtn');
-        const googleSignInBtn = document.getElementById('googleSignInBtn');
-        const signInVaultBtn = document.getElementById('signInVaultBtn');
-        const logoutBtn = document.getElementById('logoutBtn');
 
-        let isLoggedIn = false;
+        // We use a global variable to track state between the standard script and the module
+        window.isAppLoggedIn = false; 
 
-        // Open Modal (If not logged in)
         accountIconBtn.addEventListener('click', () => {
-            if(!isLoggedIn) {
+            if(!window.isAppLoggedIn) {
                 loginModal.classList.add('active');
             }
         });
 
-        // Close Modal
         closeModalBtn.addEventListener('click', () => {
             loginModal.classList.remove('active');
         });
 
-        // Close modal when clicking outside the content box
         loginModal.addEventListener('click', (e) => {
             if (e.target === loginModal) {
                 loginModal.classList.remove('active');
             }
         });
 
-        // Toggle Dropdown when clicking Profile Picture
         profilePic.addEventListener('click', (e) => {
-            e.stopPropagation(); // Prevents instant closing
+            e.stopPropagation(); 
             profileDropdown.classList.toggle('active');
         });
 
-        // Close dropdown when clicking anywhere else on the page
         document.addEventListener('click', (e) => {
-            if (isLoggedIn && !profileDropdown.contains(e.target) && e.target !== profilePic) {
+            if (window.isAppLoggedIn && !profileDropdown.contains(e.target) && e.target !== profilePic) {
                 profileDropdown.classList.remove('active');
             }
         });
+    </script>
 
-        // Simulate Login Function
-        function simulateLogin(e) {
-            e.preventDefault(); // Prevent form jumping
-            isLoggedIn = true;
-            
-            // Hide Modal
-            loginModal.classList.remove('active');
-            
-            // Switch Icons
-            accountIconBtn.style.display = 'none';
-            profilePic.style.display = 'block';
+    <script type="module">
+        // Import the functions you need from the SDKs
+        import { initializeApp } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-app.js";
+        import { getAuth, signInWithPopup, GoogleAuthProvider, signOut, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-auth.js";
+
+        // IMPORTANT: REPLACE THIS CONFIG WITH YOUR OWN FIREBASE PROJECT DETAILS
+        // Go to console.firebase.google.com -> Create Project -> Web App -> Copy keys
+        const firebaseConfig = {
+            apiKey: "YOUR_API_KEY_HERE",
+            authDomain: "your-project-id.firebaseapp.com",
+            projectId: "your-project-id",
+            storageBucket: "your-project-id.appspot.com",
+            messagingSenderId: "1234567890",
+            appId: "1:1234567890:web:abcdef123456"
+        };
+
+        let app, auth, provider;
+
+        try {
+            app = initializeApp(firebaseConfig);
+            auth = getAuth(app);
+            provider = new GoogleAuthProvider();
+        } catch (error) {
+            console.error("Firebase not configured correctly yet. Replace placeholder keys.");
         }
 
-        // Apply login simulation to both buttons
-        googleSignInBtn.addEventListener('click', simulateLogin);
-        signInVaultBtn.addEventListener('click', simulateLogin);
+        const googleSignInBtn = document.getElementById('googleSignInBtn');
+        const logoutBtn = document.getElementById('logoutBtn');
+        const loginModal = document.getElementById('loginModal');
+        const accountIconBtn = document.getElementById('accountIconBtn');
+        const profilePic = document.getElementById('profilePic');
+        const profileName = document.getElementById('profileName');
+        const profileEmail = document.getElementById('profileEmail');
+        const profileDropdown = document.getElementById('profileDropdown');
 
-        // Simulate Logout Function
-        logoutBtn.addEventListener('click', () => {
-            isLoggedIn = false;
-            
-            // Hide Dropdown and Profile Pic
-            profileDropdown.classList.remove('active');
-            profilePic.style.display = 'none';
-            
-            // Show default account icon
-            accountIconBtn.style.display = 'inline-flex';
-        });
+        // Handle Google Sign-In Click
+        if (googleSignInBtn) {
+            googleSignInBtn.addEventListener('click', () => {
+                if(!auth) {
+                    alert("Developer Note: Please configure Firebase Keys in the HTML code to enable real Google Login.");
+                    return;
+                }
+                signInWithPopup(auth, provider)
+                    .then((result) => {
+                        console.log("Logged in successfully!");
+                    }).catch((error) => {
+                        console.error("Error signing in:", error.message);
+                    });
+            });
+        }
 
+        // Handle Log Out Click
+        if (logoutBtn) {
+            logoutBtn.addEventListener('click', () => {
+                if(!auth) return;
+                signOut(auth).then(() => {
+                    console.log("Logged out successfully.");
+                }).catch((error) => {
+                    console.error("Error signing out:", error);
+                });
+            });
+        }
+
+        // Listen for Authentication State Changes
+        if (auth) {
+            onAuthStateChanged(auth, (user) => {
+                if (user) {
+                    // User is signed in.
+                    window.isAppLoggedIn = true;
+                    
+                    // Update UI
+                    loginModal.classList.remove('active');
+                    accountIconBtn.style.display = 'none';
+                    
+                    profilePic.style.display = 'block';
+                    profilePic.src = user.photoURL || `https://ui-avatars.com/api/?name=${user.displayName || 'Guest'}&background=C5A880&color=fff&bold=true&font-size=0.4`;
+                    
+                    profileName.textContent = user.displayName || "Guest Profile";
+                    profileEmail.textContent = user.email || "";
+
+                } else {
+                    // User is signed out.
+                    window.isAppLoggedIn = false;
+                    
+                    // Revert UI
+                    profileDropdown.classList.remove('active');
+                    profilePic.style.display = 'none';
+                    accountIconBtn.style.display = 'inline-flex';
+                }
+            });
+        }
     </script>
 </body>
 </html>
