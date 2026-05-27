@@ -1006,7 +1006,7 @@
             font-weight: 300;
         }
 
-        /* 🌟 PREMIUM LOGIN MODAL 🌟 */
+        /* 🌟 PREMIUM LOGIN MODAL & FORMS 🌟 */
         .modal-overlay {
             position: fixed;
             top: 0;
@@ -1041,6 +1041,9 @@
             transform: translateY(20px);
             transition: transform 0.4s cubic-bezier(0.16, 1, 0.3, 1);
             text-align: center;
+            /* Allow scrolling inside modal if content gets too long (especially on mobile) */
+            max-height: 90vh;
+            overflow-y: auto;
         }
 
         .modal-overlay.active .modal-content {
@@ -1137,6 +1140,29 @@
             margin-bottom: 20px;
         }
 
+        /* Dynamically hide/show fields depending on "Sign In" vs "Register" */
+        .register-field {
+            display: none;
+        }
+        
+        .modal-content.is-registering .register-field {
+            display: block;
+        }
+
+        /* Adjust margin when registering to save space */
+        .modal-content.is-registering .input-group {
+            margin-bottom: 15px;
+        }
+
+        .form-row {
+            display: flex;
+            gap: 15px;
+        }
+
+        .form-row .input-group {
+            flex: 1;
+        }
+
         .input-group label {
             display: block;
             font-size: 10px;
@@ -1156,6 +1182,7 @@
             color: var(--dark-text);
             outline: none;
             transition: border-color 0.3s ease;
+            box-sizing: border-box;
         }
 
         .input-group input:focus {
@@ -1164,6 +1191,15 @@
 
         .input-group input::placeholder {
             color: #C2BFBB;
+        }
+
+        .auth-error-msg {
+            color: #E24C4C;
+            font-size: 12px;
+            font-weight: 500;
+            margin-bottom: 15px;
+            display: none;
+            text-align: left;
         }
 
         .submit-btn {
@@ -1202,6 +1238,7 @@
             text-decoration-color: var(--border-color);
             text-underline-offset: 4px;
             transition: text-decoration-color 0.3s ease;
+            cursor: pointer;
         }
 
         .modal-links a:hover {
@@ -1219,10 +1256,7 @@
 
         /* 📱 STRICT MOBILE PREMIUM VIEW */
         @media (max-width: 768px) {
-            /* Switch Hero Images to Mobile Ratios using the CSS Variable */
             .carousel-slide { background-image: var(--mobile-img); }
-
-            /* Show Hamburger & Setup Slide Out Menu */
             .hamburger-btn { display: block; }
             
             .nav-links {
@@ -1241,31 +1275,25 @@
             .nav-links.active { transform: translateY(0); }
             .nav-links a { font-size: 18px; }
 
-            /* Fix Categories Squishing */
             .category-grid { grid-template-columns: repeat(2, 1fr); gap: 12px; }
             .category-card:nth-child(5) { grid-column: span 2; } 
             .category-content { padding: 15px 5px 10px 5px; }
             .category-name { font-size: 14px; }
             
-            /* Clean Up Header */
             .header-container { padding: 12px 20px; }
             .header-actions { gap: 15px; }
             .brand-identity { min-width: 120px; display: flex; align-items: center; justify-content: center; }
             .brand-logo-img { height: 120px; position: relative; top: auto; left: auto; transform: none; } 
             
-            /* Fix Hero - Portrait framing */
             .hero-section { aspect-ratio: 3 / 4; min-height: 65vh; }
             .hero-content-container { padding-bottom: 40px; }
             .hero-btn { padding: 14px 30px; font-size: 10px; }
             
-            /* Fix Value Pillars Squishing */
             .value-pillars-ribbon-row { grid-template-columns: 1fr; gap: 25px; padding: 0 10px; }
             .manifest-section-header h2 { font-size: 24px; }
             
-            /* Footer adjustments */
             .footer-grid { grid-template-columns: 1fr; gap: 40px; }
             
-            /* Promo Vault */
             .vault-sale-section { padding: 0 15px; margin-top: 60px; }
             .vault-sale-banner { padding: 30px 15px; }
             .vault-promo-content { padding: 40px 15px; align-items: center; text-align: center; }
@@ -1276,9 +1304,10 @@
             .vault-value-text { font-size: 24px; letter-spacing: 4px; }
             .vault-desc { max-width: 100%; font-size: 13px; }
             
-            /* Modal Fixes */
+            /* Modal Form Mobile Fixes */
             .modal-content { padding: 40px 20px; width: 95%; }
             .modal-title { font-size: 24px; }
+            .form-row { flex-direction: column; gap: 0; }
         }
     </style>
 </head>
@@ -1392,7 +1421,6 @@
                     <p>Every roll of fabric undergoes strict friction and density checks to guarantee comfort.</p>
                 </div>
             </div>
-
             <div class="pillar-ribbon-card" onclick="document.getElementById('catalogs').scrollIntoView({behavior: 'smooth'});">
                 <span class="pillar-number">02</span>
                 <div class="pillar-body">
@@ -1400,7 +1428,6 @@
                     <p>Our patterns are cut by luxury couturiers to ensure elegant drape dynamics across screen viewpoints.</p>
                 </div>
             </div>
-
             <div class="pillar-ribbon-card" onclick="document.getElementById('catalogs').scrollIntoView({behavior: 'smooth'});">
                 <span class="pillar-number">03</span>
                 <div class="pillar-body">
@@ -1431,7 +1458,6 @@
             <h2>Store Categories</h2>
             <p>Timeless silhouettes engineered with premium fabrics for everyday dignity.</p>
         </div>
-
         <div class="category-grid">
             <div class="category-card" id="abayas" onclick="location.href='#shop-abayas'">
                 <div class="img-wrapper"><img src="abayas 2.png" alt="Premium Abayas Collection" class="category-img" loading="eager"></div>
@@ -1473,11 +1499,9 @@
 
     <footer class="premium-footer">
         <div class="footer-grid">
-            
             <div class="footer-brand-column">
                 <h3>ABAYRAH</h3>
                 <p>Redefining modern elegance through premium, premium-cut modest wardrobe statements.</p>
-                
                 <div class="footer-socials">
                     <a href="https://instagram.com/yourusername" target="_blank" rel="noopener" class="social-icon-btn" aria-label="Follow Abayrah on Instagram">
                         <svg viewBox="0 0 24 24"><path d="M12 2.163c3.204 0 3.584.012 4.85.07 3.252.148 4.771 1.691 4.919 4.919.058 1.265.069 1.645.069 4.849 0 3.205-.012 3.584-.069 4.849-.149 3.225-1.664 4.771-4.919 4.919-1.266.058-1.644.07-4.85.07-3.204 0-3.584-.012-4.849-.07-3.26-.149-4.771-1.699-4.919-4.92-.058-1.265-.07-1.644-.07-4.849 0-3.204.013-3.583.07-4.849.149-3.227 1.664-4.771 4.919-4.919 1.266-.057 1.645-.069 4.849-.069zM12 0C8.741 0 8.333.014 7.053.072 2.695.272.273 2.69.073 7.051.014 8.333 0 8.741 0 12c0 3.259.014 3.668.072 4.948.2 4.358 2.618 6.78 6.98 6.98 1.281.058 1.689.072 4.948.072 3.259 0 3.668-.014 4.948-.072 4.354-.2 6.782-2.618 6.979-6.98.059-1.28.073-1.689.073-4.948 0-3.259-.014-3.667-.072-4.947-.196-4.354-2.617-6.78-6.979-6.98C15.668.014 15.259 0 12 0zm0 5.838a6.162 6.162 0 100 12.324 6.162 6.162 0 000-12.324zM12 16a4 4 0 110-8 4 4 0 010 8zm6.406-11.845a1.44 1.44 0 100 2.881 1.44 1.44 0 000-2.881z"/></svg>
@@ -1485,46 +1509,32 @@
                     <a href="https://facebook.com/yourusername" target="_blank" rel="noopener" class="social-icon-btn" aria-label="Follow Abayrah on Facebook">
                         <svg viewBox="0 0 24 24"><path d="M22.675 0h-21.35c-.732 0-1.325.593-1.325 1.325v21.351c0 .731.593 1.324 1.325 1.324h11.495v-9.294h-3.128v-3.622h3.128v-2.671c0-3.1 1.893-4.788 4.659-4.788 1.325 0 2.463.099 2.795.143v3.24l-1.918.001c-1.504 0-1.795.715-1.795 1.763v2.313h3.587l-.467 3.622h-3.12v9.293h6.116c.73 0 1.323-.593 1.323-1.325v-21.35c0-.732-.593-1.325-1.323-1.325z"/></svg>
                     </a>
-                    <a href="tel:+1234567890" class="social-icon-btn" aria-label="Call Abayrah Customer Service">
-                        <svg viewBox="0 0 24 24"><path d="M6.62 10.79c1.44 2.83 3.76 5.14 6.59 6.59l2.2-2.2c.27-.27.67-.36 1.02-.24 1.12.37 2.33.57 3.57.57.55 0 1 .45 1 1V20c0 .55-.45 1-1 1-9.39 0-17-7.61-17-17 0-.55.45-1 1-1h3.5c.55 0 1 .45 1 1 0 1.25.2 2.45.57 3.57.11.35.03.74-.25 1.02l-2.2 2.2z"/></svg>
-                    </a>
-                    <a href="mailto:info@abayrah.com" class="social-icon-btn" aria-label="Email Abayrah Concierge">
-                        <svg viewBox="0 0 24 24"><path d="M20 4H4c-1.1 0-1.99.9-1.99 2L2 18c0 1.1.9 2 2 2h16c1.1 0 2-.9 2-2V6c0-1.1-.9-2-2-2zm0 4l-8 5-8-5V6l8 5 8-5v2z"/></svg>
-                    </a>
                 </div>
             </div>
-
             <div class="footer-column">
                 <h4>Boutique</h4>
                 <ul class="footer-links">
                     <li><a href="#abayas">All Abayas</a></li>
                     <li><a href="#niqabs">Signature Niqabs</a></li>
                     <li><a href="#hijabs">Chiffon Essentials</a></li>
-                    <li><a href="#new">New Arrivals</a></li>
                 </ul>
             </div>
-
             <div class="footer-column">
                 <h4>Assistance</h4>
                 <ul class="footer-links">
                     <li><a href="#shipping">Shipping & Delivery</a></li>
                     <li><a href="#returns">Returns & Exchanges</a></li>
-                    <li><a href="#size-guide">Size Registry</a></li>
                     <li><a href="#contact">Contact Concierge</a></li>
                 </ul>
             </div>
-
             <div class="footer-column">
                 <h4>Our House</h4>
                 <ul class="footer-links">
                     <li><a href="#story">Our Philosophy</a></li>
-                    <li><a href="#sustainability">Textile Sourcing</a></li>
                     <li><a href="#privacy">Privacy Terms</a></li>
                 </ul>
             </div>
-
         </div>
-
         <div class="footer-bottom">
             <p>&copy; 2026 ABAYRAH. All Rights Reserved.</p>
             <p>Designed with Intent • Crafted for Modesty</p>
@@ -1535,10 +1545,10 @@
         <div class="modal-content">
             <button class="modal-close" id="closeModalBtn" aria-label="Close Modal">&times;</button>
             
-            <h2 class="modal-title">Sign In</h2>
-            <p class="modal-subtitle">Access your exclusive ABAYRAH profile vault</p>
+            <h2 class="modal-title" id="modalTitle">Sign In</h2>
+            <p class="modal-subtitle" id="modalSubtitle">Access your exclusive ABAYRAH profile vault</p>
 
-            <button class="google-btn" id="googleSignInBtn">
+            <button class="google-btn" id="googleSignInBtn" type="button">
                 <svg viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
                     <path d="M22.56 12.25c0-.78-.07-1.53-.2-2.25H12v4.26h5.92c-.26 1.37-1.04 2.53-2.21 3.31v2.77h3.57c2.08-1.92 3.28-4.74 3.28-8.09z" fill="#4285F4"/>
                     <path d="M12 23c2.97 0 5.46-.98 7.28-2.66l-3.57-2.77c-.98.66-2.23 1.06-3.71 1.06-2.86 0-5.29-1.93-6.16-4.53H2.18v2.84C3.99 20.53 7.7 23 12 23z" fill="#34A853"/>
@@ -1550,21 +1560,44 @@
 
             <div class="modal-divider">Or use email credential entry</div>
 
-            <div class="input-group">
-                <label>Google Gmail Account Address</label>
-                <input type="email" placeholder="name@gmail.com">
-            </div>
+            <form id="authForm">
+                <div class="auth-error-msg" id="authErrorMsg"></div>
 
-            <div class="input-group">
-                <label>Password</label>
-                <input type="password" placeholder="............">
-            </div>
+                <div class="form-row register-field">
+                    <div class="input-group">
+                        <label>First Name</label>
+                        <input type="text" id="firstNameInput" placeholder="Jane">
+                    </div>
+                    <div class="input-group">
+                        <label>Last Name</label>
+                        <input type="text" id="lastNameInput" placeholder="Doe">
+                    </div>
+                </div>
 
-            <button class="submit-btn" id="signInVaultBtn">Sign In To Vault</button>
+                <div class="input-group">
+                    <label>Email Address</label>
+                    <input type="email" id="emailInput" placeholder="name@email.com" required>
+                </div>
+
+                <div class="input-group">
+                    <label>Password</label>
+                    <input type="password" id="passwordInput" placeholder="Your Password" required minlength="6">
+                </div>
+
+                <div class="input-group register-field">
+                    <label>Confirm Password</label>
+                    <input type="password" id="confirmPasswordInput" placeholder="Confirm Your Password" minlength="6">
+                </div>
+
+                <button type="submit" class="submit-btn" id="submitAuthBtn">Sign In To Vault</button>
+            </form>
 
             <div class="modal-links">
-                <a href="#">Forgot Password?</a>
-                <p>New Guest? <a href="#">Create Account</a></p>
+                <a href="#" id="forgotPasswordLink">Forgot Password?</a>
+                <p>
+                    <span id="toggleAuthText">New Guest?</span> 
+                    <a id="toggleAuthBtn">Create Account</a>
+                </p>
             </div>
         </div>
     </div>
@@ -1576,7 +1609,6 @@
         
         hamburgerBtn.addEventListener('click', () => {
             navLinks.classList.toggle('active');
-            
             if(navLinks.classList.contains('active')) {
                 hamburgerBtn.innerHTML = `<svg viewBox="0 0 24 24" width="24" height="24" fill="currentColor"><path d="M19 6.41L17.59 5 12 10.59 6.41 5 5 6.41 10.59 12 5 17.59 6.41 19 12 13.41 17.59 19 19 17.59 13.41 12z"/></svg>`;
             } else {
@@ -1601,14 +1633,10 @@
         function showTargetSlide(index) {
             if (!slides.length) return;
             slides[currentSlideIndex].classList.remove('active-slide');
-            if (dots[currentSlideIndex]) {
-                dots[currentSlideIndex].classList.remove('active-dot');
-            }
+            if (dots[currentSlideIndex]) dots[currentSlideIndex].classList.remove('active-dot');
             currentSlideIndex = (index + slides.length) % slides.length;
             slides[currentSlideIndex].classList.add('active-slide');
-            if (dots[currentSlideIndex]) {
-                dots[currentSlideIndex].classList.add('active-dot');
-            }
+            if (dots[currentSlideIndex]) dots[currentSlideIndex].classList.add('active-dot');
         }
 
         function runAutoRotationPipeline() { showTargetSlide(currentSlideIndex + 1); }
@@ -1623,35 +1651,15 @@
         });
         startSliderInterval();
 
-        // Parallax Effects for Hero
-        const heroSection = document.querySelector('.hero-section');
-        const heroContainer = document.getElementById('heroContainer');
-        if(heroSection && heroContainer) {
-            let ticking = false;
-            heroSection.addEventListener('mousemove', (e) => {
-                if (!ticking) {
-                    window.requestAnimationFrame(() => {
-                        const { width, height } = heroSection.getBoundingClientRect();
-                        const moveX = ((e.clientX - (heroSection.offsetLeft + width / 2)) / width) * 12;
-                        const moveY = ((e.clientY - (heroSection.offsetTop + height / 2)) / height) * 12;
-                        heroContainer.style.transform = `translate3d(${moveX}px, ${moveY}px, 0)`;
-                        ticking = false;
-                    });
-                    ticking = true;
-                }
-            }, { passive: true });
-            heroSection.addEventListener('mouseleave', () => { heroContainer.style.transform = 'translate3d(0, 0, 0)'; });
-        }
-
-
-        // --- UI Modal Toggle Logic (Auth logic is handled in the module below) ---
+        // --- UI Modal Toggle Logic ---
         const accountIconBtn = document.getElementById('accountIconBtn');
         const profilePic = document.getElementById('profilePic');
         const profileDropdown = document.getElementById('profileDropdown');
         const loginModal = document.getElementById('loginModal');
         const closeModalBtn = document.getElementById('closeModalBtn');
+        const authErrorMsg = document.getElementById('authErrorMsg');
+        const authForm = document.getElementById('authForm');
 
-        // We use a global variable to track state between the standard script and the module
         window.isAppLoggedIn = false; 
 
         accountIconBtn.addEventListener('click', () => {
@@ -1662,11 +1670,13 @@
 
         closeModalBtn.addEventListener('click', () => {
             loginModal.classList.remove('active');
+            authErrorMsg.style.display = 'none'; // Hide errors on close
         });
 
         loginModal.addEventListener('click', (e) => {
             if (e.target === loginModal) {
                 loginModal.classList.remove('active');
+                authErrorMsg.style.display = 'none';
             }
         });
 
@@ -1680,17 +1690,72 @@
                 profileDropdown.classList.remove('active');
             }
         });
+        
+        // --- Toggle between Login and Registration Modes ---
+        const toggleAuthBtn = document.getElementById('toggleAuthBtn');
+        const toggleAuthText = document.getElementById('toggleAuthText');
+        const modalContent = document.querySelector('.modal-content');
+        const modalTitle = document.getElementById('modalTitle');
+        const submitAuthBtn = document.getElementById('submitAuthBtn');
+        const forgotPasswordLink = document.getElementById('forgotPasswordLink');
+
+        let isRegisteringMode = false;
+
+        toggleAuthBtn.addEventListener('click', (e) => {
+            e.preventDefault();
+            isRegisteringMode = !isRegisteringMode;
+            authErrorMsg.style.display = 'none'; // clear errors when toggling
+            authForm.reset(); // clear form fields when toggling
+
+            if(isRegisteringMode) {
+                // Switch UI to Register Mode
+                modalContent.classList.add('is-registering');
+                modalTitle.textContent = "Create Account";
+                submitAuthBtn.textContent = "Register";
+                toggleAuthText.textContent = "Already registered?";
+                toggleAuthBtn.textContent = "Sign In";
+                forgotPasswordLink.style.display = 'none';
+                
+                // Add requirements to new fields
+                document.getElementById('firstNameInput').required = true;
+                document.getElementById('lastNameInput').required = true;
+                document.getElementById('confirmPasswordInput').required = true;
+            } else {
+                // Switch UI back to Sign In Mode
+                modalContent.classList.remove('is-registering');
+                modalTitle.textContent = "Sign In";
+                submitAuthBtn.textContent = "Sign In To Vault";
+                toggleAuthText.textContent = "New Guest?";
+                toggleAuthBtn.textContent = "Create Account";
+                forgotPasswordLink.style.display = 'block';
+
+                // Remove requirements from hidden fields
+                document.getElementById('firstNameInput').required = false;
+                document.getElementById('lastNameInput').required = false;
+                document.getElementById('confirmPasswordInput').required = false;
+            }
+        });
     </script>
 
     <script type="module">
-        // Import the functions you need from the SDKs
         import { initializeApp } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-app.js";
-        import { getAuth, signInWithPopup, GoogleAuthProvider, signOut, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-auth.js";
+        // Import all required Auth functions, including Email/Password and Profile update
+        import { 
+            getAuth, 
+            signInWithRedirect, 
+            getRedirectResult, 
+            GoogleAuthProvider, 
+            signOut, 
+            onAuthStateChanged,
+            createUserWithEmailAndPassword,
+            signInWithEmailAndPassword,
+            updateProfile
+        } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-auth.js";
 
-        // IMPORTANT: REPLACE THIS CONFIG WITH YOUR OWN FIREBASE PROJECT DETAILS
-        // Go to console.firebase.google.com -> Create Project -> Web App -> Copy keys
+        // IMPORTANT: PASTE YOUR REAL FIREBASE KEYS HERE 
+        // DO NOT LEAVE THESE AS "YOUR_REAL_API_KEY"
         const firebaseConfig = {
-            apiKey: "AIzaSyDxe9DeHRsCzD4vlNsknlDHN0w7txd51ic",
+           apiKey: "AIzaSyDxe9DeHRsCzD4vlNsknlDHN0w7txd51ic",
   authDomain: "abayrah-9df21.firebaseapp.com",
   projectId: "abayrah-9df21",
   storageBucket: "abayrah-9df21.firebasestorage.app",
@@ -1706,7 +1771,7 @@
             auth = getAuth(app);
             provider = new GoogleAuthProvider();
         } catch (error) {
-            console.error("Firebase not configured correctly yet. Replace placeholder keys.");
+            console.error("Firebase not configured correctly yet.");
         }
 
         const googleSignInBtn = document.getElementById('googleSignInBtn');
@@ -1717,24 +1782,103 @@
         const profileName = document.getElementById('profileName');
         const profileEmail = document.getElementById('profileEmail');
         const profileDropdown = document.getElementById('profileDropdown');
+        
+        const authForm = document.getElementById('authForm');
+        const authErrorMsg = document.getElementById('authErrorMsg');
 
-        // Handle Google Sign-In Click
+        // Helper function to show errors
+        function showError(message) {
+            authErrorMsg.textContent = message;
+            authErrorMsg.style.display = 'block';
+        }
+
+        // --- Handle Google Sign-In Click ---
         if (googleSignInBtn) {
             googleSignInBtn.addEventListener('click', () => {
-                if(!auth) {
-                    alert("Developer Note: Please configure Firebase Keys in the HTML code to enable real Google Login.");
-                    return;
-                }
-                signInWithPopup(auth, provider)
-                    .then((result) => {
-                        console.log("Logged in successfully!");
-                    }).catch((error) => {
-                        console.error("Error signing in:", error.message);
-                    });
+                if(!auth) return showError("Firebase not configured. Check code keys.");
+                signInWithRedirect(auth, provider);
             });
         }
 
-        // Handle Log Out Click
+        // --- Handle Manual Email/Password Form Submit ---
+        if (authForm) {
+            authForm.addEventListener('submit', (e) => {
+                e.preventDefault(); // Stop page from refreshing
+                
+                if(!auth) {
+                    showError("Firebase not configured. Please add your API keys.");
+                    return;
+                }
+
+                authErrorMsg.style.display = 'none'; // Clear previous errors
+                
+                const email = document.getElementById('emailInput').value.trim();
+                const password = document.getElementById('passwordInput').value;
+
+                // We check the same global boolean we defined in the standard script above
+                const isRegistering = document.querySelector('.modal-content').classList.contains('is-registering');
+
+                if (isRegistering) {
+                    // Registration Flow
+                    const firstName = document.getElementById('firstNameInput').value.trim();
+                    const lastName = document.getElementById('lastNameInput').value.trim();
+                    const confirmPassword = document.getElementById('confirmPasswordInput').value;
+
+                    if (password !== confirmPassword) {
+                        return showError("Passwords do not match.");
+                    }
+
+                    // 1. Create User
+                    createUserWithEmailAndPassword(auth, email, password)
+                        .then((userCredential) => {
+                            const user = userCredential.user;
+                            // 2. Add Name to Profile immediately after creation
+                            return updateProfile(user, {
+                                displayName: `${firstName} ${lastName}`
+                            });
+                        })
+                        .then(() => {
+                            console.log("Account created successfully!");
+                            authForm.reset();
+                            // Modal closes automatically via the Auth State Listener below
+                        })
+                        .catch((error) => {
+                            // Format Firebase errors neatly
+                            let msg = "An error occurred.";
+                            if(error.code === 'auth/email-already-in-use') msg = "This email is already registered.";
+                            if(error.code === 'auth/weak-password') msg = "Password must be at least 6 characters.";
+                            showError(msg);
+                        });
+
+                } else {
+                    // Sign In Flow
+                    signInWithEmailAndPassword(auth, email, password)
+                        .then((userCredential) => {
+                            console.log("Signed in successfully!");
+                            authForm.reset();
+                            // Modal closes automatically via the Auth State Listener below
+                        })
+                        .catch((error) => {
+                            let msg = "Login failed. Please check your credentials.";
+                            if(error.code === 'auth/invalid-credential') msg = "Incorrect email or password.";
+                            showError(msg);
+                        });
+                }
+            });
+        }
+
+        // --- Handle Google Redirect Login Catch ---
+        if (auth) {
+            getRedirectResult(auth).then((result) => {
+                if (result) {
+                    console.log("Logged in successfully via Google redirect!");
+                }
+            }).catch((error) => {
+                console.error("Error during redirect login:", error.message);
+            });
+        }
+
+        // --- Handle Log Out Click ---
         if (logoutBtn) {
             logoutBtn.addEventListener('click', () => {
                 if(!auth) return;
@@ -1746,7 +1890,7 @@
             });
         }
 
-        // Listen for Authentication State Changes
+        // --- Listen for Authentication State Changes (Updates the UI automatically) ---
         if (auth) {
             onAuthStateChanged(auth, (user) => {
                 if (user) {
