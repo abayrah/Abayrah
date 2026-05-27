@@ -359,7 +359,6 @@
             background-position: center;
             background-size: cover; 
             background-repeat: no-repeat;
-            /* Default to desktop image via CSS variable */
             background-image: var(--desktop-img);
         }
 
@@ -1820,8 +1819,7 @@
         import { initializeApp } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-app.js";
         import { 
             getAuth, 
-            signInWithRedirect, 
-            getRedirectResult, 
+            signInWithPopup, 
             GoogleAuthProvider, 
             signOut, 
             onAuthStateChanged,
@@ -1872,7 +1870,20 @@
         if (googleSignInBtn) {
             googleSignInBtn.addEventListener('click', () => {
                 if(!auth) return showError("Firebase not configured. Check code keys.");
-                signInWithRedirect(auth, provider);
+                
+                // Using signInWithPopup instead of signInWithRedirect to avoid blank screen routing issues
+                signInWithPopup(auth, provider)
+                    .then((result) => {
+                        console.log("Logged in via Google Popup!");
+                        // Modal will auto-close via onAuthStateChanged
+                    })
+                    .catch((error) => {
+                        console.error("Google Sign-In Error:", error);
+                        // Prevent the error message from overriding user cancellations
+                        if (error.code !== 'auth/popup-closed-by-user') {
+                            showError("Google login failed. Please ensure Firebase settings are fully configured.");
+                        }
+                    });
             });
         }
 
@@ -1936,17 +1947,6 @@
                             showError(msg);
                         });
                 }
-            });
-        }
-
-        // --- Handle Google Redirect Login Catch ---
-        if (auth) {
-            getRedirectResult(auth).then((result) => {
-                if (result) {
-                    console.log("Logged in successfully via Google redirect!");
-                }
-            }).catch((error) => {
-                console.error("Error during redirect login:", error.message);
             });
         }
 
