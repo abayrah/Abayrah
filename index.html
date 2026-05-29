@@ -185,7 +185,7 @@
         .header-actions {
             display: flex;
             align-items: center;
-            gap: 32px; /* Slightly increased gap for better breathing room */
+            gap: 32px;
             font-size: 15px;
             color: rgba(28, 27, 26, 0.8);
             z-index: 2100;
@@ -194,18 +194,17 @@
       .header-actions a, .header-actions button {
             display: inline-flex;
             align-items: center;
-            justify-content: center; /* Ensures icons are centered if buttons have extra padding */
+            justify-content: center;
             position: relative;
             background: none;
             border: none;
             color: inherit;
             cursor: pointer;
             transition: var(--transition-smooth);
-            padding: 5px; /* Added padding so the click area is larger */
+            padding: 5px;
         }
 
         .header-actions svg {
-            /* Increased icon size from 17px to 22px for better visibility */
             width: 22px;
             height: 22px;
             fill: currentColor;
@@ -214,7 +213,7 @@
 
         .header-actions a:hover, .header-actions button:hover {
             color: var(--accent-gold);
-            transform: scale(1.1); /* Added a subtle scale effect for interaction */
+            transform: scale(1.1); 
         }
 
         .cart-icon {
@@ -1280,6 +1279,60 @@
             text-decoration-color: var(--dark-text);
         }
 
+        /* --- Premium Search Overlay --- */
+        .search-overlay {
+            position: fixed;
+            top: 0; left: 0; width: 100%; height: 100%;
+            background-color: rgba(255, 255, 255, 0.98);
+            backdrop-filter: blur(10px);
+            z-index: 9999;
+            display: flex;
+            justify-content: center;
+            align-items: flex-start;
+            opacity: 0;
+            pointer-events: none;
+            transition: opacity 0.4s ease;
+        }
+
+        .search-overlay.active {
+            opacity: 1;
+            pointer-events: auto;
+        }
+
+        .search-container {
+            width: 100%;
+            max-width: 800px;
+            padding: 120px 40px;
+            position: relative;
+            text-align: center;
+        }
+
+        #searchInput {
+            width: 100%;
+            padding: 15px 0;
+            font-size: 28px;
+            font-family: var(--font-serif);
+            border: none;
+            border-bottom: 2px solid var(--dark-text);
+            background: transparent;
+            outline: none;
+            color: var(--dark-text);
+            text-align: center;
+        }
+
+        #searchInput::placeholder {
+            color: var(--muted-gray);
+            font-weight: 300;
+        }
+
+        .no-results-msg {
+            margin-top: 40px;
+            font-size: 16px;
+            color: var(--muted-gray);
+            font-family: var(--font-sans);
+            letter-spacing: 1px;
+        }
+
         /* 📱 TABLET VIEW */
         @media (max-width: 1024px) {
             .category-grid { grid-template-columns: repeat(3, 1fr); }
@@ -1316,14 +1369,14 @@
             .category-name { font-size: 14px; }
             
             .header-container {
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
-    max-width: 1440px;
-    margin: 0 auto;
-    padding: 18px 40px; /* Reduced from 22px to 18px if you need more vertical space */
-    transition: var(--transition-smooth);
-}
+                display: flex;
+                justify-content: space-between;
+                align-items: center;
+                max-width: 1440px;
+                margin: 0 auto;
+                padding: 18px 40px; 
+                transition: var(--transition-smooth);
+            }
             .header-actions { gap: 15px; }
             .brand-identity { min-width: 120px; display: flex; align-items: center; justify-content: center; }
             .brand-logo-img { height: 120px; position: relative; top: auto; left: auto; transform: none; } 
@@ -1350,6 +1403,9 @@
             .modal-content { padding: 40px 20px; width: 95%; }
             .modal-title { font-size: 24px; }
             .form-row { flex-direction: column; gap: 0; }
+            
+            #searchInput { font-size: 20px; padding: 10px 0; }
+            .search-container { padding: 80px 20px; }
         }
     </style>
 </head>
@@ -1379,9 +1435,9 @@
             </div>
 
             <div class="header-actions">
-                <a href="#search" aria-label="Search Boutique Catalog Collection">
+                <button id="searchTriggerBtn" aria-label="Open Search">
                     <svg viewBox="0 0 24 24"><path d="M15.5 14h-.79l-.28-.27C15.41 12.59 16 11.11 16 9.5 16 5.91 13.09 3 9.5 3S3 5.91 3 9.5 5.91 16 9.5 16c1.61 0 3.09-.59 4.23-1.57l.27.28v.79l5 4.99L20.49 19l-4.99-5zm-6 0C7.01 14 5 11.99 5 9.5S7.01 5 5 9.5 7.01 5 9.5 5 14 7.01 14 9.5 11.99 14 9.5 14z"/></svg>
-                </a>
+                </button>
                 
                 <div class="account-wrapper">
                     <button id="accountIconBtn" aria-label="Sign In to Vault">
@@ -1501,35 +1557,35 @@
             <p>Timeless silhouettes engineered with premium fabrics for everyday dignity.</p>
         </div>
         <div class="category-grid">
-            <div class="category-card" id="abayas" onclick="location.href='#shop-abayas'">
+            <div class="category-card" id="abayas" data-keywords="dress, gown, modest, maxi, burqa" onclick="location.href='#shop-abayas'">
                 <div class="img-wrapper"><img src="abayas 2.png" alt="Premium Abayas Collection" class="category-img" loading="eager"></div>
                 <div class="category-content">
                     <h3 class="category-name">Luxury Abayas</h3>
                     <div class="category-link">View Collection</div>
                 </div>
             </div>
-            <div class="category-card" id="niqabs" onclick="location.href='#shop-niqabs'">
+            <div class="category-card" id="niqabs" data-keywords="face cover, veil, headpiece" onclick="location.href='#shop-niqabs'">
                 <div class="img-wrapper"><img src="naqabs 2.png" alt="Elegant Niqabs Collection" class="category-img" loading="eager"></div>
                 <div class="category-content">
                     <h3 class="category-name">Premium Niqabs</h3>
                     <div class="category-link">View Collection</div>
                 </div>
             </div>
-            <div class="category-card" id="hijabs" onclick="location.href='#shop-hijabs'">
+            <div class="category-card" id="hijabs" data-keywords="scarf, scarves, wrap, head cover, pashmina" onclick="location.href='#shop-hijabs'">
                 <div class="img-wrapper"><img src="hijabs 2.png" alt="Essential Hijabs Collection" class="category-img" loading="eager"></div>
                 <div class="category-content">
                     <h3 class="category-name">Essential Hijabs</h3>
                     <div class="category-link">View Collection</div>
                 </div>
             </div>
-            <div class="category-card" id="accessories" onclick="location.href='#shop-accessories'">
+            <div class="category-card" id="accessories" data-keywords="pins, brooches, jewelry, undercap" onclick="location.href='#shop-accessories'">
                 <div class="img-wrapper"><img src="accessiories 2.png" alt="Luxury Accessories Collection" class="category-img" loading="lazy"></div>
                 <div class="category-content">
                     <h3 class="category-name">Signature Accessories</h3>
                     <div class="category-link">Explore Finery</div>
                 </div>
             </div>
-            <div class="category-card" id="hampers" onclick="location.href='#shop-hampers'">
+            <div class="category-card" id="hampers" data-keywords="gifts, bundles, sets, presents" onclick="location.href='#shop-hampers'">
                 <div class="img-wrapper"><img src="hampers 2.png" alt="Curated Gift Hampers Collection" class="category-img" loading="lazy"></div>
                 <div class="category-content">
                     <h3 class="category-name">Curated Hampers</h3>
@@ -1598,6 +1654,14 @@
             <p>-BY ANAM SIDDIQUA-</p>
         </div>
     </footer>
+
+    <div class="search-overlay" id="searchOverlay">
+        <div class="search-container">
+            <button class="modal-close" id="closeSearchBtn" aria-label="Close Search">&times;</button>
+            <input type="text" id="searchInput" placeholder="Search for Abayas, Niqabs, or accessories..." autocomplete="off">
+            <div id="noResultsMsg" class="no-results-msg" style="display:none;"></div>
+        </div>
+    </div>
 
     <div class="modal-overlay" id="loginModal">
         <div class="modal-content">
@@ -1679,6 +1743,74 @@
     </div>
     
     <script>
+        // --- Search Functionality ---
+        const searchTriggerBtn = document.getElementById('searchTriggerBtn');
+        const searchOverlay = document.getElementById('searchOverlay');
+        const closeSearchBtn = document.getElementById('closeSearchBtn');
+        const searchInput = document.getElementById('searchInput');
+        const noResultsMsg = document.getElementById('noResultsMsg');
+        const categoryCards = document.querySelectorAll('.category-card');
+        const collectionsSection = document.getElementById('catalogs');
+
+        // Open Search
+        searchTriggerBtn.addEventListener('click', (e) => {
+            e.preventDefault();
+            searchOverlay.classList.add('active');
+            setTimeout(() => searchInput.focus(), 100); // Focus input automatically
+        });
+
+        // Close Search
+        closeSearchBtn.addEventListener('click', closeSearch);
+        searchOverlay.addEventListener('click', (e) => {
+            if (e.target === searchOverlay) closeSearch();
+        });
+
+        function closeSearch() {
+            searchOverlay.classList.remove('active');
+            searchInput.value = '';
+            filterProducts(''); // Reset products view
+        }
+
+        // Live Typing Filter
+        searchInput.addEventListener('input', (e) => filterProducts(e.target.value));
+
+        function filterProducts(term) {
+            const searchTerm = term.toLowerCase().trim();
+            let matchCount = 0;
+
+            // Scroll to the catalog section automatically so the user sees the filtering
+            if (searchTerm.length > 0) {
+                collectionsSection.scrollIntoView({behavior: 'smooth', block: 'start'});
+            }
+
+            categoryCards.forEach(card => {
+                // Get the title and the hidden related keywords
+                const title = card.querySelector('.category-name').textContent.toLowerCase();
+                const keywords = card.getAttribute('data-keywords') ? card.getAttribute('data-keywords').toLowerCase() : '';
+                
+                // Check if the user's search matches the title OR the related keywords
+                if (title.includes(searchTerm) || keywords.includes(searchTerm)) {
+                    card.style.display = 'flex'; // Show match
+                    matchCount++;
+                } else {
+                    card.style.display = 'none'; // Hide non-match
+                }
+            });
+
+            // Handle "No Results" dynamic message
+            if (matchCount === 0 && searchTerm !== '') {
+                noResultsMsg.style.display = 'block';
+                noResultsMsg.innerHTML = `No results found for "<strong>${term}</strong>"`;
+            } else {
+                noResultsMsg.style.display = 'none';
+            }
+
+            // If search box is cleared, ensure everything is visible again
+            if (searchTerm === '') {
+                categoryCards.forEach(card => card.style.display = 'flex');
+            }
+        }
+
         // --- Hamburger Menu Logic ---
         const hamburgerBtn = document.getElementById('hamburgerBtn');
         const navLinks = document.getElementById('navLinks');
@@ -1858,12 +1990,12 @@
         // IMPORTANT: PASTE YOUR REAL FIREBASE KEYS HERE 
         const firebaseConfig = {
            apiKey: "AIzaSyDxe9DeHRsCzD4vlNsknlDHN0w7txd51ic",
-  authDomain: "abayrah-9df21.firebaseapp.com",
-  projectId: "abayrah-9df21",
-  storageBucket: "abayrah-9df21.firebasestorage.app",
-  messagingSenderId: "789725334313",
-  appId: "1:789725334313:web:b37408f42add9611730538",
-  measurementId: "G-NLJJVVE32M"
+           authDomain: "abayrah-9df21.firebaseapp.com",
+           projectId: "abayrah-9df21",
+           storageBucket: "abayrah-9df21.firebasestorage.app",
+           messagingSenderId: "789725334313",
+           appId: "1:789725334313:web:b37408f42add9611730538",
+           measurementId: "G-NLJJVVE32M"
         };
 
         let app, auth, provider;
@@ -2015,4 +2147,4 @@
         }
     </script>
 </body>
-</html>   
+</html>
