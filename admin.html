@@ -3,222 +3,191 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>ABAYRAH | Admin Vault Dashboard</title>
-    <link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:wght@400;500&family=Montserrat:wght@300;400;500&display=swap" rel="stylesheet">
+    <title>Store Admin Dashboard | ABAYRAH</title>
     <style>
-        :root {
-            --primary-bg: #FFFFFF;       
-            --dark-text: #1C1B1A;        
-            --muted-gray: #7A7571;       
-            --border-color: #ECEAE6;     
-            --accent-gold: #C5A880;      
-            --font-serif: 'Cormorant Garamond', serif;
-            --font-sans: 'Montserrat', sans-serif;
-        }
-
-        * { margin: 0; padding: 0; box-sizing: border-box; }
-
-        body {
-            background-color: #FAFAFA;
-            color: var(--dark-text);
-            font-family: var(--font-sans);
-            letter-spacing: 0.5px;
-            padding: 60px 20px;
-        }
-
-        .admin-container {
-            max-width: 600px;
-            margin: 0 auto;
-            background: var(--primary-bg);
-            padding: 40px;
-            border: 1px solid var(--border-color);
-            box-shadow: 0 10px 30px rgba(0,0,0,0.02);
-            border-radius: 2px;
-        }
-
-        h1 {
-            font-family: var(--font-serif);
-            font-size: 32px;
-            font-weight: 400;
-            text-transform: uppercase;
-            letter-spacing: 3px;
-            margin-bottom: 10px;
-            text-align: center;
-        }
-
-        .subtitle {
-            font-size: 12px;
-            color: var(--muted-gray);
-            text-transform: uppercase;
-            letter-spacing: 2px;
-            text-align: center;
-            margin-bottom: 40px;
-        }
-
-        .input-group {
-            margin-bottom: 25px;
-            display: flex;
-            flex-direction: column;
-        }
-
-        .input-group label {
-            font-size: 11px;
-            font-weight: 500;
-            text-transform: uppercase;
-            letter-spacing: 1.5px;
-            margin-bottom: 8px;
-        }
-
-        .input-group input, .input-group textarea, .input-group select {
-            width: 100%;
-            padding: 14px 15px;
-            border: 1px solid var(--border-color);
-            font-family: var(--font-sans);
-            font-size: 13px;
-            color: var(--dark-text);
-            outline: none;
-            background: #FFF;
-            transition: border-color 0.3s ease;
-        }
-
-        .input-group input:focus, .input-group textarea:focus, .input-group select:focus {
-            border-color: var(--accent-gold);
-        }
-
-        .input-group textarea {
-            resize: vertical;
-            min-height: 100px;
-        }
-
-        .submit-btn {
-            width: 100%;
-            background-color: var(--dark-text);
-            color: #FFFFFF;
-            border: none;
-            padding: 16px;
-            font-size: 11px;
-            font-family: var(--font-sans);
-            font-weight: 500;
-            letter-spacing: 2px;
-            text-transform: uppercase;
-            cursor: pointer;
-            transition: all 0.4s ease;
-            margin-top: 10px;
-        }
-
-        .submit-btn:hover {
-            background-color: var(--accent-gold);
-        }
-
-        .status-msg {
-            margin-top: 20px;
-            font-size: 13px;
-            text-align: center;
-            font-weight: 500;
-            display: none;
-        }
-        .status-success { color: #4A5D4E; }
-        .status-error { color: #E24C4C; }
+        body { font-family: 'Helvetica Neue', Helvetica, Arial, sans-serif; background-color: #f4f4f4; padding: 40px; margin: 0; }
+        
+        /* Loading Screen Styles */
+        #loading-screen { text-align: center; padding-top: 100px; font-size: 18px; color: #666; letter-spacing: 1px; text-transform: uppercase; }
+        
+        /* Admin Dashboard Styles */
+        .admin-container { max-width: 600px; background: #fff; padding: 30px; border-radius: 8px; box-shadow: 0 4px 15px rgba(0,0,0,0.1); margin: 0 auto; }
+        .admin-header { display: flex; justify-content: space-between; align-items: center; border-bottom: 1px solid #eee; padding-bottom: 15px; margin-bottom: 25px; }
+        .admin-header h2 { margin: 0; color: #111; text-transform: uppercase; letter-spacing: 1px; font-size: 22px; }
+        .welcome-text { color: #666; font-size: 14px; margin-bottom: 20px; text-align: center; }
+        
+        .form-group { margin-bottom: 15px; }
+        label { display: block; font-weight: bold; margin-bottom: 5px; font-size: 12px; text-transform: uppercase; letter-spacing: 1px; color: #333; }
+        input[type="text"], input[type="number"], textarea { width: 100%; padding: 12px; border: 1px solid #ddd; border-radius: 4px; font-size: 14px; box-sizing: border-box; }
+        
+        button { width: 100%; padding: 15px; background-color: #111; color: #fff; border: none; font-size: 14px; font-weight: bold; cursor: pointer; text-transform: uppercase; letter-spacing: 2px; border-radius: 4px; transition: 0.3s; margin-top: 10px;}
+        button:hover { background-color: #C5A880; }
+        button:disabled { background-color: #999; cursor: not-allowed; }
+        
+        .logout-btn { background-color: transparent; color: #e24c4c; border: 1px solid #e24c4c; padding: 8px 15px; width: auto; margin: 0; font-size: 11px; }
+        .logout-btn:hover { background-color: #e24c4c; color: #fff; }
+        
+        .success-msg { color: #4A5D4E; text-align: center; font-weight: bold; margin-top: 15px; display: none; padding: 10px; background: #e9f2ea; border-radius: 4px; }
     </style>
 </head>
 <body>
 
-    <div class="admin-container">
-        <h1>Product Management</h1>
-        <div class="subtitle">Add items to the ABAYRAH Catalog Vault</div>
+    <div id="loading-screen">
+        Verifying Secure Vault Access...
+    </div>
 
-        <form id="productForm">
-            <div class="input-group">
-                <label for="productCategory">Store Category Placement</label>
-                <select id="productCategory" required>
-                    <option value="" disabled selected>Select a collection...</option>
-                    <option value="Luxury Abayas">Luxury Abayas</option>
-                    <option value="Premium Niqabs">Premium Niqabs</option>
-                    <option value="Essential Hijabs">Essential Hijabs</option>
-                    <option value="Signature Accessories">Signature Accessories</option>
-                    <option value="Curated Hampers">Curated Hampers</option>
-                </select>
+    <div id="admin-content" style="display: none;">
+        <div class="admin-container">
+            <div class="admin-header">
+                <h2>Admin Vault</h2>
+                <button id="logoutBtn" class="logout-btn">Log Out</button>
+            </div>
+            
+            <p class="welcome-text">Welcome, <strong id="adminName">Admin</strong>. Add a new product to the live store below.</p>
+            
+            <div class="form-group">
+                <label>Product Title</label>
+                <input type="text" id="prod-title" placeholder="e.g., Emerald Green Silk Abaya" required>
+            </div>
+            
+            <div class="form-group">
+                <label>Price (Numbers Only)</label>
+                <input type="number" id="prod-price" placeholder="e.g., 150" required>
             </div>
 
-            <div class="input-group">
-                <label for="productTitle">Product Name / Title</label>
-                <input type="text" id="productTitle" placeholder="e.g., Silk Embellished Open Abaya" required>
+            <div class="form-group">
+                <label>Google Drive Image Link</label>
+                <input type="text" id="prod-image-url" placeholder="Paste the 'Anyone with the link can view' URL here" required>
             </div>
 
-            <div class="input-group">
-                <label for="productPrice">Price ($ USD)</label>
-                <input type="number" id="productPrice" step="0.01" placeholder="0.00" required>
+            <div class="form-group">
+                <label>Product Description</label>
+                <textarea id="prod-desc" rows="4" placeholder="Describe the fabric, style, and fit..." required></textarea>
             </div>
 
-            <div class="input-group">
-                <label for="productImage">Image URL Path</label>
-                <input type="text" id="productImage" placeholder="e.g., images/products/abaya-silk-1.png" required>
-            </div>
-
-            <div class="input-group">
-                <label for="productDesc">Product Details & Fabric Specifications</label>
-                <textarea id="productDesc" placeholder="Describe the silhouette, drape dynamics, texture density, and care instructions..." required></textarea>
-            </div>
-
-            <button type="submit" class="submit-btn">Upload to Storefront Vault</button>
-            <div id="statusMsg" class="status-msg"></div>
-        </form>
+            <button id="submit-btn" onclick="uploadProduct()">Push to Live Store</button>
+            <p id="success-msg" class="success-msg">Product Successfully Added to Database!</p>
+        </div>
     </div>
 
     <script type="module">
-        import { initializeApp } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-app.js";
-        import { getFirestore, collection, addDoc } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-firestore.js";
+        import { initializeApp } from "https://www.gstatic.com/firebasejs/10.8.1/firebase-app.js";
+        import { getAuth, onAuthStateChanged, signOut } from "https://www.gstatic.com/firebasejs/10.8.1/firebase-auth.js";
+        import { getFirestore, doc, getDoc, collection, addDoc } from "https://www.gstatic.com/firebasejs/10.8.1/firebase-firestore.js";
 
-        // Your exact Firebase configuration parameters
+        // Your Firebase Configuration
         const firebaseConfig = {
-           apiKey: "AIzaSyDxe9DeHRsCzD4vlNsknlDHN0w7txd51ic",
-           authDomain: "abayrah-9df21.firebaseapp.com",
-           projectId: "abayrah-9df21",
-           storageBucket: "abayrah-9df21.firebasestorage.app",
-           messagingSenderId: "789725334313",
-           appId: "1:789725334313:web:b37408f42add9611730538",
-           measurementId: "G-NLJJVVE32M"
+            apiKey: "AIzaSyDxe9DeHRsCzD4vlNsknlDHN0w7txd51ic",
+            authDomain: "abayrah-9df21.firebaseapp.com",
+            projectId: "abayrah-9df21",
+            storageBucket: "abayrah-9df21.firebasestorage.app",
+            messagingSenderId: "789725334313",
+            appId: "1:789725334313:web:b37408f42add9611730538",
+            measurementId: "G-NLJJVVE32M"
         };
 
         const app = initializeApp(firebaseConfig);
+        const auth = getAuth(app);
         const db = getFirestore(app);
 
-        const productForm = document.getElementById('productForm');
-        const statusMsg = document.getElementById('statusMsg');
+        const adminContent = document.getElementById('admin-content');
+        const loadingScreen = document.getElementById('loading-screen');
+        const logoutBtn = document.getElementById('logoutBtn');
+        const adminNameLabel = document.getElementById('adminName');
 
-        productForm.addEventListener('submit', async (e) => {
-            e.preventDefault();
-            statusMsg.style.display = 'none';
+        // --- SECURITY GATEKEEPER ---
+        onAuthStateChanged(auth, async (user) => {
+            if (user) {
+                try {
+                    // Check if this specific user exists in the 'admins' collection
+                    const adminDocRef = doc(db, "admins", user.uid);
+                    const adminDocSnap = await getDoc(adminDocRef);
 
-            const category = document.getElementById('productCategory').value;
-            const title = document.getElementById('productTitle').value.trim();
-            const price = parseFloat(document.getElementById('productPrice').value);
-            const image = document.getElementById('productImage').value.trim();
-            const description = document.getElementById('productDesc').value.trim();
-
-            try {
-                // Upload document containing the category field to Firestore
-                await addDoc(collection(db, "products"), {
-                    category: category,
-                    title: title,
-                    price: price,
-                    image: image,
-                    description: description,
-                    createdAt: new Date()
-                });
-
-                statusMsg.className = "status-msg status-success";
-                statusMsg.textContent = `"${title}" successfully saved into ${category}!`;
-                statusMsg.style.display = 'block';
-                productForm.reset();
-
-            } catch (error) {
-                console.error("Error writing to database: ", error);
-                statusMsg.className = "status-msg status-error";
-                statusMsg.textContent = "Database transaction failed. Verify configuration values.";
-                statusMsg.style.display = 'block';
+                    if (adminDocSnap.exists() && adminDocSnap.data().role === "superadmin") {
+                        // Access Granted
+                        loadingScreen.style.display = 'none';
+                        adminContent.style.display = 'block';
+                        adminNameLabel.innerText = user.displayName || "Admin";
+                    } else {
+                        // Logged in, but NOT an admin
+                        alert("Access Denied: You do not have administrative privileges.");
+                        window.location.href = 'index.html';
+                    }
+                } catch (error) {
+                    console.error("Error verifying admin status:", error);
+                    window.location.href = 'index.html';
+                }
+            } else {
+                // Not logged in at all
+                window.location.href = 'index.html';
             }
         });
+
+        // --- LOGOUT LOGIC ---
+        logoutBtn.addEventListener('click', () => {
+            signOut(auth).then(() => {
+                window.location.href = 'index.html';
+            });
+        });
+
+        // --- PRODUCT UPLOAD LOGIC ---
+        function convertDriveLink(url) {
+            const match = url.match(/\/d\/(.+?)\//);
+            if (match && match[1]) {
+                return `https://drive.google.com/uc?export=view&id=${match[1]}`;
+            }
+            return url; 
+        }
+
+        window.uploadProduct = async function() {
+            const title = document.getElementById('prod-title').value.trim();
+            const price = parseFloat(document.getElementById('prod-price').value);
+            const rawImageUrl = document.getElementById('prod-image-url').value.trim();
+            const desc = document.getElementById('prod-desc').value.trim();
+            
+            const submitBtn = document.getElementById('submit-btn');
+            const successMsg = document.getElementById('success-msg');
+
+            if(!title || !price || !rawImageUrl || !desc) {
+                alert("Please fill in all fields before pushing to the store.");
+                return;
+            }
+
+            submitBtn.disabled = true;
+            submitBtn.innerText = "Uploading...";
+
+            try {
+                const directImageUrl = convertDriveLink(rawImageUrl);
+
+                // Push to Firestore
+                await addDoc(collection(db, "products"), {
+                    title: title,
+                    price: price,
+                    image: directImageUrl, 
+                    description: desc,
+                    createdAt: new Date().toISOString()
+                });
+
+                // Show Success
+                successMsg.style.display = 'block';
+                submitBtn.disabled = false;
+                submitBtn.innerText = "Push to Live Store";
+                
+                // Clear the form
+                document.getElementById('prod-title').value = '';
+                document.getElementById('prod-price').value = '';
+                document.getElementById('prod-image-url').value = '';
+                document.getElementById('prod-desc').value = '';
+
+                setTimeout(() => { successMsg.style.display = 'none'; }, 4000);
+
+            } catch (error) {
+                console.error("Error adding product: ", error);
+                alert("Error adding product. Please try again.");
+                submitBtn.disabled = false;
+                submitBtn.innerText = "Push to Live Store";
+            }
+        };
     </script>
 </body>
 </html>
