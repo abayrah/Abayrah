@@ -994,7 +994,7 @@
     <script type="module">
         import { initializeApp } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-app.js";
         import { getAuth, signInWithPopup, GoogleAuthProvider, signOut, onAuthStateChanged, createUserWithEmailAndPassword, signInWithEmailAndPassword, updateProfile } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-auth.js";
-        import { getFirestore, doc, setDoc, onSnapshot, collection, getDoc, getDocs, deleteDoc } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-firestore.js";
+        import { getFirestore, doc, setDoc, onSnapshot, collection, getDoc, getDocs, deleteDoc, query, where } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-firestore.js";
 
         const firebaseConfig = {
            apiKey: "AIzaSyDxe9DeHRsCzD4vlNsknlDHN0w7txd51ic",
@@ -1245,11 +1245,19 @@
         async function loadProducts(categoryFilter) {
             const productsContainer = document.getElementById('collection-view');
             try {
-                const querySnapshot = await getDocs(collection(db, "products"));
+                // 1. Create a reference to the products collection
+                const productsRef = collection(db, "products");
+                
+                // 2. Create a query against the collection filtering by category
+                const q = query(productsRef, where("category", "==", categoryFilter));
+                
+                // 3. Execute the filtered query
+                const querySnapshot = await getDocs(q);
+                
                 productsContainer.innerHTML = ''; 
 
                 if(querySnapshot.empty) {
-                    productsContainer.innerHTML = '<p style="text-align: center; width: 100%; color: var(--muted-gray);">No products available right now.</p>';
+                    productsContainer.innerHTML = `<p style="text-align: center; width: 100%; color: var(--muted-gray);">No products available in ${escapeHTML(categoryFilter)} right now.</p>`;
                     return;
                 }
 
