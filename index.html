@@ -814,27 +814,35 @@
             transform: translate3d(0,0,0);
             transition: all 0.7s cubic-bezier(0.16, 1, 0.3, 1);
         }
-
+        
+        /* UPDATED: Mini Carousel wrapper styles */
         .img-wrapper {
             width: 100%;
             aspect-ratio: 3 / 4;
             overflow: hidden;
             position: relative;
             background-color: #FAFAFA;
-            display: flex;
-            align-items: center;
-            justify-content: center;
         }
 
         .category-img {
+            position: absolute;
+            top: 0;
+            left: 0;
             width: 100%;
             height: 100%;
             display: block;
             object-fit: contain;
-            will-change: transform;
-            transition: transform 1.2s cubic-bezier(0.16, 1, 0.3, 1);
+            opacity: 0;
+            will-change: transform, opacity;
+            transition: opacity 1s cubic-bezier(0.16, 1, 0.3, 1), transform 1.2s cubic-bezier(0.16, 1, 0.3, 1);
+            z-index: 0;
         }
         
+        .category-img.active-mini-slide {
+            opacity: 1;
+            z-index: 1;
+        }
+
         .category-card:hover {
             transform: translate3d(0, -10px, 0);
             box-shadow: 0 25px 50px rgba(28, 27, 26, 0.08);
@@ -853,6 +861,8 @@
             align-items: center;
             justify-content: center;
             background-color: var(--primary-bg);
+            position: relative;
+            z-index: 2; /* Ensures content stays above absolute images */
         }
 
         .category-name {
@@ -1280,64 +1290,64 @@
         }
 
        /* --- Premium Search Overlay (UPDATED FOR VISIBILITY) --- */
-.search-overlay {
-    position: fixed;
-    top: 0; left: 0; 
-    width: 100%; 
-    height: auto; /* Changed from 100% so it doesn't cover the screen */
-    background-color: rgba(255, 255, 255, 0.98);
-    backdrop-filter: blur(10px);
-    z-index: 9999;
-    display: flex;
-    justify-content: center;
-    align-items: flex-start;
-    opacity: 0;
-    pointer-events: none;
-    transition: all 0.4s ease;
-    transform: translateY(-100%); /* Slides down from the top */
-    box-shadow: 0 10px 30px rgba(0, 0, 0, 0.08); /* Adds a nice shadow */
-    padding-bottom: 20px;
-}
+        .search-overlay {
+            position: fixed;
+            top: 0; left: 0; 
+            width: 100%; 
+            height: auto; 
+            background-color: rgba(255, 255, 255, 0.98);
+            backdrop-filter: blur(10px);
+            z-index: 9999;
+            display: flex;
+            justify-content: center;
+            align-items: flex-start;
+            opacity: 0;
+            pointer-events: none;
+            transition: all 0.4s ease;
+            transform: translateY(-100%); 
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.08); 
+            padding-bottom: 20px;
+        }
 
-.search-overlay.active {
-    opacity: 1;
-    pointer-events: auto;
-    transform: translateY(0);
-}
+        .search-overlay.active {
+            opacity: 1;
+            pointer-events: auto;
+            transform: translateY(0);
+        }
 
-.search-container {
-    width: 100%;
-    max-width: 800px;
-    padding: 60px 40px 20px 40px; /* Reduced top padding */
-    position: relative;
-    text-align: center;
-}
+        .search-container {
+            width: 100%;
+            max-width: 800px;
+            padding: 60px 40px 20px 40px; 
+            position: relative;
+            text-align: center;
+        }
 
-#searchInput {
-    width: 100%;
-    padding: 15px 0;
-    font-size: 28px;
-    font-family: var(--font-serif);
-    border: none;
-    border-bottom: 2px solid var(--dark-text);
-    background: transparent;
-    outline: none;
-    color: var(--dark-text);
-    text-align: center;
-}
+        #searchInput {
+            width: 100%;
+            padding: 15px 0;
+            font-size: 28px;
+            font-family: var(--font-serif);
+            border: none;
+            border-bottom: 2px solid var(--dark-text);
+            background: transparent;
+            outline: none;
+            color: var(--dark-text);
+            text-align: center;
+        }
 
-#searchInput::placeholder {
-    color: var(--muted-gray);
-    font-weight: 300;
-}
+        #searchInput::placeholder {
+            color: var(--muted-gray);
+            font-weight: 300;
+        }
 
-.no-results-msg {
-    margin-top: 20px;
-    font-size: 16px;
-    color: #E24C4C; /* Changed to red for better visibility */
-    font-family: var(--font-sans);
-    letter-spacing: 1px;
-}
+        .no-results-msg {
+            margin-top: 20px;
+            font-size: 16px;
+            color: #E24C4C; 
+            font-family: var(--font-sans);
+            letter-spacing: 1px;
+        }
 
         /* 📱 TABLET VIEW */
         @media (max-width: 1024px) {
@@ -1563,41 +1573,77 @@
             <p>Timeless silhouettes engineered with premium fabrics for everyday dignity.</p>
         </div>
         <div class="category-grid">
+            
             <div class="category-card" id="abayas" data-keywords="dress, gown, modest, maxi, burqa" onclick="location.href='#shop-abayas'">
-                <div class="img-wrapper"><img src="abayas 2.png" alt="Premium Abayas Collection" class="category-img" loading="eager"></div>
+                <div class="img-wrapper mini-carousel">
+                    <img src="abayas 2.png" alt="Premium Abayas Collection" class="category-img active-mini-slide" loading="eager">
+                    <img src="abayas 3.png" alt="Premium Abayas Collection Alternative" class="category-img" loading="lazy">
+                    <img src="abayas 4.png" alt="Premium Abayas Collection Style" class="category-img" loading="lazy">
+                    <img src="abayas 5.png" alt="Premium Abayas Collection Style" class="category-img" loading="lazy">
+                    <img src="abayas 6.png" alt="Premium Abayas Collection Style" class="category-img" loading="lazy">
+                </div>
                 <div class="category-content">
                     <h3 class="category-name">Luxury Abayas</h3>
                     <div class="category-link">View Collection</div>
                 </div>
             </div>
+
             <div class="category-card" id="niqabs" data-keywords="face cover, veil, headpiece" onclick="location.href='#shop-niqabs'">
-                <div class="img-wrapper"><img src="naqabs 2.png" alt="Elegant Niqabs Collection" class="category-img" loading="eager"></div>
+                <div class="img-wrapper mini-carousel">
+                    <img src="naqabs 2.png" alt="Elegant Niqabs Collection" class="category-img active-mini-slide" loading="eager">
+                    <img src="naqabs 3.png" alt="Elegant Niqabs Close-up" class="category-img" loading="lazy">
+                    <img src="naqabs 4.png" alt="Elegant Niqabs Flow" class="category-img" loading="lazy">
+                     <img src="naqabs 5.png" alt="Elegant Niqabs Flow" class="category-img" loading="lazy">
+                     <img src="naqabs 6.png" alt="Elegant Niqabs Flow" class="category-img" loading="lazy">
+                </div>
                 <div class="category-content">
                     <h3 class="category-name">Premium Niqabs</h3>
                     <div class="category-link">View Collection</div>
                 </div>
             </div>
+
             <div class="category-card" id="hijabs" data-keywords="scarf, scarves, wrap, head cover, pashmina" onclick="location.href='#shop-hijabs'">
-                <div class="img-wrapper"><img src="hijabs 2.png" alt="Essential Hijabs Collection" class="category-img" loading="eager"></div>
+                <div class="img-wrapper mini-carousel">
+                    <img src="hijabs 2.png" alt="Essential Hijabs Collection" class="category-img active-mini-slide" loading="eager">
+                    <img src="hijabs 3.png" alt="Essential Hijabs Detail" class="category-img" loading="lazy">
+                    <img src="hijabs 4.png" alt="Essential Hijabs Drape" class="category-img" loading="lazy">
+                    <img src="hijabs 5.png" alt="Essential Hijabs Drape" class="category-img" loading="lazy">
+                    <img src="hijabs 6.png" alt="Essential Hijabs Drape" class="category-img" loading="lazy">
+                </div>
                 <div class="category-content">
                     <h3 class="category-name">Essential Hijabs</h3>
                     <div class="category-link">View Collection</div>
                 </div>
             </div>
+
             <div class="category-card" id="accessories" data-keywords="pins, brooches, jewelry, undercap" onclick="location.href='#shop-accessories'">
-                <div class="img-wrapper"><img src="accessiories 2.png" alt="Luxury Accessories Collection" class="category-img" loading="lazy"></div>
+                <div class="img-wrapper mini-carousel">
+                    <img src="accessiories 2.png" alt="Luxury Accessories Collection" class="category-img active-mini-slide" loading="lazy">
+                    <img src="accessiories 3.png" alt="Accessories Highlight" class="category-img" loading="lazy">
+                    <img src="accessiories 4.png" alt="Jewelry Detailing" class="category-img" loading="lazy">
+                    <img src="accessiories 5.png" alt="Jewelry Detailing" class="category-img" loading="lazy">
+                    <img src="accessiories 6.png" alt="Jewelry Detailing" class="category-img" loading="lazy">
+                </div>
                 <div class="category-content">
                     <h3 class="category-name">Signature Accessories</h3>
                     <div class="category-link">Explore Finery</div>
                 </div>
             </div>
+
             <div class="category-card" id="hampers" data-keywords="gifts, bundles, sets, presents" onclick="location.href='#shop-hampers'">
-                <div class="img-wrapper"><img src="hampers 2.png" alt="Curated Gift Hampers Collection" class="category-img" loading="lazy"></div>
+                <div class="img-wrapper mini-carousel">
+                    <img src="hampers 2.png" alt="Curated Gift Hampers Collection" class="category-img active-mini-slide" loading="lazy">
+                    <img src="hampers 3.png" alt="Gift Hampers Inside" class="category-img" loading="lazy">
+                    <img src="hampers 4.png" alt="Gift Hampers Ribbon" class="category-img" loading="lazy">
+                    <img src="hampers 5.png" alt="Gift Hampers Ribbon" class="category-img" loading="lazy">
+                    <img src="hampers 6.png" alt="Gift Hampers Ribbon" class="category-img" loading="lazy">
+                </div>
                 <div class="category-content">
                     <h3 class="category-name">Curated Hampers</h3>
                     <div class="category-link">Explore Gifting</div>
                 </div>
             </div>
+            
         </div>
     </section>
 
@@ -1762,7 +1808,7 @@
         searchTriggerBtn.addEventListener('click', (e) => {
             e.preventDefault();
             searchOverlay.classList.add('active');
-            setTimeout(() => searchInput.focus(), 100); // Focus input automatically
+            setTimeout(() => searchInput.focus(), 100); 
         });
 
         // Close Search
@@ -1774,7 +1820,7 @@
         function closeSearch() {
             searchOverlay.classList.remove('active');
             searchInput.value = '';
-            filterProducts(''); // Reset products view
+            filterProducts(''); 
         }
 
         // Live Typing Filter
@@ -1784,26 +1830,22 @@
             const searchTerm = term.toLowerCase().trim();
             let matchCount = 0;
 
-            // Scroll to the catalog section automatically so the user sees the filtering
             if (searchTerm.length > 0) {
                 collectionsSection.scrollIntoView({behavior: 'smooth', block: 'start'});
             }
 
             categoryCards.forEach(card => {
-                // Get the title and the hidden related keywords
                 const title = card.querySelector('.category-name').textContent.toLowerCase();
                 const keywords = card.getAttribute('data-keywords') ? card.getAttribute('data-keywords').toLowerCase() : '';
                 
-                // Check if the user's search matches the title OR the related keywords
                 if (title.includes(searchTerm) || keywords.includes(searchTerm)) {
-                    card.style.display = 'flex'; // Show match
+                    card.style.display = 'flex'; 
                     matchCount++;
                 } else {
-                    card.style.display = 'none'; // Hide non-match
+                    card.style.display = 'none'; 
                 }
             });
 
-            // Handle "No Results" dynamic message
             if (matchCount === 0 && searchTerm !== '') {
                 noResultsMsg.style.display = 'block';
                 noResultsMsg.innerHTML = `No results found for "<strong>${term}</strong>"`;
@@ -1811,7 +1853,6 @@
                 noResultsMsg.style.display = 'none';
             }
 
-            // If search box is cleared, ensure everything is visible again
             if (searchTerm === '') {
                 categoryCards.forEach(card => card.style.display = 'flex');
             }
@@ -1838,7 +1879,7 @@
             });
         });
 
-        // --- Luxury Carousel System Core ---
+        // --- Luxury Carousel System Core (Main Hero) ---
         const slides = document.querySelectorAll('.carousel-slide');
         const dots = document.querySelectorAll('.indicator-dot');
         let currentSlideIndex = 0;
@@ -1865,21 +1906,39 @@
         });
         startSliderInterval();
 
+        // --- NEW: Category Card Mini-Carousels ---
+        const miniCarousels = document.querySelectorAll('.mini-carousel');
+        
+        miniCarousels.forEach(carousel => {
+            const miniSlides = carousel.querySelectorAll('.category-img');
+            
+            // Skip logic if there's only 1 image provided inside the category wrapper
+            if(miniSlides.length <= 1) return;
+            
+            let currentMiniIndex = 0;
+            // Add a slight randomization to interval time so they don't all cycle at the exact identical millisecond
+            const intervalTime = 3000 + (Math.random() * 1500);
+            
+            setInterval(() => {
+                miniSlides[currentMiniIndex].classList.remove('active-mini-slide');
+                currentMiniIndex = (currentMiniIndex + 1) % miniSlides.length;
+                miniSlides[currentMiniIndex].classList.add('active-mini-slide');
+            }, intervalTime);
+        });
+
         // --- Toggle Password Visibility Logic ---
         const togglePasswordBtns = document.querySelectorAll('.toggle-password-btn');
         togglePasswordBtns.forEach(btn => {
             btn.addEventListener('click', function() {
-                // Find the input field right next to this button
                 const input = this.previousElementSibling;
-                // Find the slash line in the SVG
                 const eyeSlash = this.querySelector('.eye-slash');
                 
                 if (input.getAttribute('type') === 'password') {
                     input.setAttribute('type', 'text');
-                    eyeSlash.style.display = 'none'; // Hide slash (eye is open)
+                    eyeSlash.style.display = 'none'; 
                 } else {
                     input.setAttribute('type', 'password');
-                    eyeSlash.style.display = 'block'; // Show slash (eye is closed)
+                    eyeSlash.style.display = 'block'; 
                 }
             });
         });
@@ -1905,7 +1964,6 @@
             loginModal.classList.remove('active');
             authErrorMsg.style.display = 'none'; 
             
-            // Optional: reset password fields back to 'password' type if they were left as 'text'
             const pwInputs = document.querySelectorAll('.password-wrapper input');
             const eyeSlashes = document.querySelectorAll('.eye-slash');
             pwInputs.forEach(input => input.setAttribute('type', 'password'));
@@ -1946,12 +2004,10 @@
             authErrorMsg.style.display = 'none'; 
             authForm.reset(); 
 
-            // Reset password toggles visually
             document.querySelectorAll('.password-wrapper input').forEach(input => input.setAttribute('type', 'password'));
             document.querySelectorAll('.eye-slash').forEach(slash => slash.style.display = 'block');
 
             if(isRegisteringMode) {
-                // Switch UI to Register Mode
                 modalContent.classList.add('is-registering');
                 modalTitle.textContent = "Create Account";
                 submitAuthBtn.textContent = "Register";
@@ -1959,12 +2015,10 @@
                 toggleAuthBtn.textContent = "Sign In";
                 forgotPasswordLink.style.display = 'none';
                 
-                // Add requirements to new fields
                 document.getElementById('firstNameInput').required = true;
                 document.getElementById('lastNameInput').required = true;
                 document.getElementById('confirmPasswordInput').required = true;
             } else {
-                // Switch UI back to Sign In Mode
                 modalContent.classList.remove('is-registering');
                 modalTitle.textContent = "Sign In";
                 submitAuthBtn.textContent = "Sign In To Vault";
@@ -1972,7 +2026,6 @@
                 toggleAuthBtn.textContent = "Create Account";
                 forgotPasswordLink.style.display = 'block';
 
-                // Remove requirements from hidden fields
                 document.getElementById('firstNameInput').required = false;
                 document.getElementById('lastNameInput').required = false;
                 document.getElementById('confirmPasswordInput').required = false;
@@ -2036,15 +2089,12 @@
             googleSignInBtn.addEventListener('click', () => {
                 if(!auth) return showError("Firebase not configured. Check code keys.");
                 
-                // Using signInWithPopup instead of signInWithRedirect to avoid blank screen routing issues
                 signInWithPopup(auth, provider)
                     .then((result) => {
                         console.log("Logged in via Google Popup!");
-                        // Modal will auto-close via onAuthStateChanged
                     })
                     .catch((error) => {
                         console.error("Google Sign-In Error:", error);
-                        // Prevent the error message from overriding user cancellations
                         if (error.code !== 'auth/popup-closed-by-user') {
                             showError("Google login failed. Please ensure Firebase settings are fully configured.");
                         }
@@ -2100,7 +2150,7 @@
                         });
 
                 } else {
-                    // Sign In Flow (No First/Last name required)
+                    // Sign In Flow
                     signInWithEmailAndPassword(auth, email, password)
                         .then((userCredential) => {
                             console.log("Signed in successfully!");
