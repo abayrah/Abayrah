@@ -24,10 +24,10 @@
 
         body { font-family: var(--font-sans); background-color: #f8f8f8; margin: 0; color: var(--dark-text); }
         
-        /* --- HEADER & NAVIGATION --- */
+/* --- HEADER & NAVIGATION --- */
         .site-header { 
             background: var(--primary-bg); 
-            padding: 15px 40px; 
+            padding: 10px 40px; /* Reduced vertical padding from 15px to 10px to keep it slim */
             border-bottom: 1px solid var(--border-color); 
             display: grid; 
             grid-template-columns: 0.5fr auto 1.5fr; 
@@ -36,9 +36,8 @@
             top: 0; 
             z-index: 100;
         }
-        
+
         .header-left {
-            /* Empty placeholder to balance the grid */
         }
 
         .brand-logo-wrapper {
@@ -47,9 +46,10 @@
         }
 
         .brand-logo-img { 
-            height: 95px; /* Adjust this value to make your logo bigger or smaller */
+            height: 45px; /* Keep this small so the white header stays thin */
             width: auto;
             object-fit: contain;
+            transform: scale(1.8); /* This is the magic! Increase or decrease 1.8 to zoom in/out */
         }
         
         .admin-nav { 
