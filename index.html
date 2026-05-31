@@ -7,6 +7,15 @@
     
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    
+    <link rel="preload" as="image" href="header.png">
+    <link rel="preload" as="image" href="images/hero-background.png" media="(min-width: 769px)">
+    <link rel="preload" as="image" href="images/mobile-hero-1.png" media="(max-width: 768px)">
+    
+    <link rel="modulepreload" href="https://www.gstatic.com/firebasejs/10.8.0/firebase-app.js">
+    <link rel="modulepreload" href="https://www.gstatic.com/firebasejs/10.8.0/firebase-auth.js">
+    <link rel="modulepreload" href="https://www.gstatic.com/firebasejs/10.8.0/firebase-firestore.js">
+
     <link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,300;0,400;0,500;1,300&family=Montserrat:wght@200;300;400;500&family=Playfair+Display:ital,wght@0,400;0,500;0,600;1,400&display=swap" rel="stylesheet">
     <link rel="icon" type="image/png" href="star-logo.png">
 
@@ -365,7 +374,7 @@
             </nav>
 
             <div class="brand-identity">
-                <img src="header.png" alt="ABAYRAH Logo" class="brand-logo-img">
+                <img src="header.png" alt="ABAYRAH Logo" class="brand-logo-img" decoding="async">
             </div>
 
             <div class="header-actions">
@@ -378,7 +387,7 @@
                         <svg viewBox="0 0 24 24"><path d="M12 12c2.21 0 4-1.79 4-4s-1.79-4-4-4-4 1.79-4 4 1.79 4 4 4zm0 2c-2.67 0-8 1.34-8 4v2h16v-2c0-2.66-5.33-4-8-4z"/></svg>
                     </button>
                     
-                    <img src="" alt="Profile" id="profilePic" class="profile-pic" style="display: none;">
+                    <img src="" alt="Profile" id="profilePic" class="profile-pic" style="display: none;" decoding="async">
 
                     <div class="profile-dropdown" id="profileDropdown">
                         <div class="dropdown-user-info">
@@ -496,11 +505,11 @@
                 
                 <div class="category-card" id="abayas" data-keywords="dress, gown, modest, maxi, burqa" onclick="openCategoryStore('Luxury Abayas', 'The Complete Collection')">
                     <div class="img-wrapper mini-carousel">
-                        <img src="abayas 2.png" alt="Premium Abayas Collection" class="category-img active-mini-slide" loading="eager">
-                        <img src="abayas 3.png" alt="Premium Abayas Collection Alternative" class="category-img" loading="lazy">
-                        <img src="abayas 4.png" alt="Premium Abayas Collection Style" class="category-img" loading="lazy">
-                        <img src="abayas 5.png" alt="Premium Abayas Collection Style" class="category-img" loading="lazy">
-                        <img src="abayas 6.png" alt="Premium Abayas Collection Style" class="category-img" loading="lazy">
+                        <img src="abayas 2.png" alt="Premium Abayas Collection" class="category-img active-mini-slide" loading="lazy" decoding="async">
+                        <img src="abayas 3.png" alt="Premium Abayas Collection Alternative" class="category-img" loading="lazy" decoding="async">
+                        <img src="abayas 4.png" alt="Premium Abayas Collection Style" class="category-img" loading="lazy" decoding="async">
+                        <img src="abayas 5.png" alt="Premium Abayas Collection Style" class="category-img" loading="lazy" decoding="async">
+                        <img src="abayas 6.png" alt="Premium Abayas Collection Style" class="category-img" loading="lazy" decoding="async">
                     </div>
                     <div class="category-content">
                         <h3 class="category-name">Luxury Abayas</h3>
@@ -510,11 +519,11 @@
 
                 <div class="category-card" id="niqabs" data-keywords="face cover, veil, headpiece" onclick="openCategoryStore('Premium Niqabs', 'The Complete Collection')">
                     <div class="img-wrapper mini-carousel">
-                        <img src="naqabs 2.png" alt="Elegant Niqabs Collection" class="category-img active-mini-slide" loading="eager">
-                        <img src="naqabs 3.png" alt="Elegant Niqabs Close-up" class="category-img" loading="lazy">
-                        <img src="naqabs 4.png" alt="Elegant Niqabs Flow" class="category-img" loading="lazy">
-                         <img src="naqabs 5.png" alt="Elegant Niqabs Flow" class="category-img" loading="lazy">
-                         <img src="naqabs 6.png" alt="Elegant Niqabs Flow" class="category-img" loading="lazy">
+                        <img src="naqabs 2.png" alt="Elegant Niqabs Collection" class="category-img active-mini-slide" loading="lazy" decoding="async">
+                        <img src="naqabs 3.png" alt="Elegant Niqabs Close-up" class="category-img" loading="lazy" decoding="async">
+                        <img src="naqabs 4.png" alt="Elegant Niqabs Flow" class="category-img" loading="lazy" decoding="async">
+                         <img src="naqabs 5.png" alt="Elegant Niqabs Flow" class="category-img" loading="lazy" decoding="async">
+                         <img src="naqabs 6.png" alt="Elegant Niqabs Flow" class="category-img" loading="lazy" decoding="async">
                     </div>
                     <div class="category-content">
                         <h3 class="category-name">Premium Niqabs</h3>
@@ -524,11 +533,11 @@
 
                 <div class="category-card" id="hijabs" data-keywords="scarf, scarves, wrap, head cover, pashmina" onclick="openCategoryStore('Essential Hijabs', 'The Complete Collection')">
                     <div class="img-wrapper mini-carousel">
-                        <img src="hijabs 2.png" alt="Essential Hijabs Collection" class="category-img active-mini-slide" loading="eager">
-                        <img src="hijabs 3.png" alt="Essential Hijabs Detail" class="category-img" loading="lazy">
-                        <img src="hijabs 4.png" alt="Essential Hijabs Drape" class="category-img" loading="lazy">
-                        <img src="hijabs 5.png" alt="Essential Hijabs Drape" class="category-img" loading="lazy">
-                        <img src="hijabs 6.png" alt="Essential Hijabs Drape" class="category-img" loading="lazy">
+                        <img src="hijabs 2.png" alt="Essential Hijabs Collection" class="category-img active-mini-slide" loading="lazy" decoding="async">
+                        <img src="hijabs 3.png" alt="Essential Hijabs Detail" class="category-img" loading="lazy" decoding="async">
+                        <img src="hijabs 4.png" alt="Essential Hijabs Drape" class="category-img" loading="lazy" decoding="async">
+                        <img src="hijabs 5.png" alt="Essential Hijabs Drape" class="category-img" loading="lazy" decoding="async">
+                        <img src="hijabs 6.png" alt="Essential Hijabs Drape" class="category-img" loading="lazy" decoding="async">
                     </div>
                     <div class="category-content">
                         <h3 class="category-name">Essential Hijabs</h3>
@@ -538,11 +547,11 @@
 
                 <div class="category-card" id="accessories" data-keywords="pins, brooches, jewelry, undercap" onclick="openCategoryStore('Signature Accessories', 'Explore Finery')">
                     <div class="img-wrapper mini-carousel">
-                        <img src="accessiories 2.png" alt="Luxury Accessories Collection" class="category-img active-mini-slide" loading="lazy">
-                        <img src="accessiories 3.png" alt="Accessories Highlight" class="category-img" loading="lazy">
-                        <img src="accessiories 4.png" alt="Jewelry Detailing" class="category-img" loading="lazy">
-                        <img src="accessiories 5.png" alt="Jewelry Detailing" class="category-img" loading="lazy">
-                        <img src="accessiories 6.png" alt="Jewelry Detailing" class="category-img" loading="lazy">
+                        <img src="accessiories 2.png" alt="Luxury Accessories Collection" class="category-img active-mini-slide" loading="lazy" decoding="async">
+                        <img src="accessiories 3.png" alt="Accessories Highlight" class="category-img" loading="lazy" decoding="async">
+                        <img src="accessiories 4.png" alt="Jewelry Detailing" class="category-img" loading="lazy" decoding="async">
+                        <img src="accessiories 5.png" alt="Jewelry Detailing" class="category-img" loading="lazy" decoding="async">
+                        <img src="accessiories 6.png" alt="Jewelry Detailing" class="category-img" loading="lazy" decoding="async">
                     </div>
                     <div class="category-content">
                         <h3 class="category-name">Signature Accessories</h3>
@@ -552,11 +561,11 @@
 
                 <div class="category-card" id="hampers" data-keywords="gifts, bundles, sets, presents" onclick="openCategoryStore('Curated Hampers', 'Explore Gifting')">
                     <div class="img-wrapper mini-carousel">
-                        <img src="hampers 2.png" alt="Curated Gift Hampers Collection" class="category-img active-mini-slide" loading="lazy">
-                        <img src="hampers 3.png" alt="Gift Hampers Inside" class="category-img" loading="lazy">
-                        <img src="hampers 4.png" alt="Gift Hampers Ribbon" class="category-img" loading="lazy">
-                        <img src="hampers 5.png" alt="Gift Hampers Ribbon" class="category-img" loading="lazy">
-                        <img src="hampers 6.png" alt="Gift Hampers Ribbon" class="category-img" loading="lazy">
+                        <img src="hampers 2.png" alt="Curated Gift Hampers Collection" class="category-img active-mini-slide" loading="lazy" decoding="async">
+                        <img src="hampers 3.png" alt="Gift Hampers Inside" class="category-img" loading="lazy" decoding="async">
+                        <img src="hampers 4.png" alt="Gift Hampers Ribbon" class="category-img" loading="lazy" decoding="async">
+                        <img src="hampers 5.png" alt="Gift Hampers Ribbon" class="category-img" loading="lazy" decoding="async">
+                        <img src="hampers 6.png" alt="Gift Hampers Ribbon" class="category-img" loading="lazy" decoding="async">
                     </div>
                     <div class="category-content">
                         <h3 class="category-name">Curated Hampers</h3>
@@ -587,7 +596,7 @@
             
             <div style="display: flex; gap: 60px; background: #fff; padding: 50px; border: 1px solid var(--border-color); border-radius: 2px; flex-wrap: wrap;">
                 <div style="flex: 1; min-width: 300px; background: #FAFAFA; display:flex; align-items:center; justify-content:center;">
-                    <img id="detail-image" src="" alt="Product Image" style="width: 100%; max-height: 600px; object-fit: contain;">
+                    <img id="detail-image" src="" alt="Product Image" style="width: 100%; max-height: 600px; object-fit: contain;" decoding="async">
                 </div>
                 
                 <div style="flex: 1; display: flex; flex-direction: column; min-width: 300px; justify-content: center;">
@@ -1083,7 +1092,7 @@
 
                         const itemHTML = `
                             <div class="cart-item">
-                                <img src="${item.image}" alt="${item.title}" class="cart-item-img">
+                                <img src="${item.image}" alt="${item.title}" class="cart-item-img" decoding="async">
                                 <div class="cart-item-details">
                                     <div>
                                         <h4 class="cart-item-title">${item.title}</h4>
@@ -1183,7 +1192,7 @@
                     const productCardHTML = `
                         <div class="category-card" onclick="openProduct('${productId}', '${safeTitle}', ${price}, '${safeDesc}', '${safeImage}')" style="background: var(--primary-bg); border: 1px solid var(--border-color); padding: 12px; border-radius: 2px; text-align: center; cursor: pointer; transition: all 0.4s ease;">
                             <div style="width: 100%; aspect-ratio: 3/4; background: #FAFAFA; overflow: hidden; margin-bottom: 15px; position:relative;">
-                                <img src="${safeImage}" alt="${safeTitle}" style="position:absolute; top:0; left:0; width: 100%; height: 100%; object-fit: contain; transition: transform 0.6s ease;" onmouseover="this.style.transform='scale(1.06)'" onmouseout="this.style.transform='scale(1)'">
+                                <img src="${safeImage}" alt="${safeTitle}" style="position:absolute; top:0; left:0; width: 100%; height: 100%; object-fit: contain; transition: transform 0.6s ease;" onmouseover="this.style.transform='scale(1.06)'" onmouseout="this.style.transform='scale(1)'" decoding="async" loading="lazy">
                             </div>
                             <h3 style="font-family: var(--font-serif); font-size: 16px; margin-bottom: 5px; color: var(--dark-text); text-transform: uppercase; letter-spacing: 1.5px;">${safeTitle}</h3>
                             <p style="font-size: 11px; color: var(--muted-gray); font-weight: 500; letter-spacing: 1px;">$${parseFloat(price).toFixed(2)}</p>
