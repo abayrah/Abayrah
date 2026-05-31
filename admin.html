@@ -10,7 +10,7 @@
     <link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,300;0,400;0,500;1,300&family=Montserrat:wght@200;300;400;500&display=swap" rel="stylesheet">
 
     <style>
-        /* --- Core Admin Variables (Matching Storefront) --- */
+        /* --- Core Admin Variables --- */
         :root {
             --primary-bg: #FFFFFF;       
             --dark-text: #1C1B1A;        
@@ -21,18 +21,30 @@
             --font-sans: 'Montserrat', sans-serif;
         }
 
-        body { font-family: var(--font-sans); background-color: #f8f8f8; padding: 40px; margin: 0; color: var(--dark-text); }
+        body { font-family: var(--font-sans); background-color: #f8f8f8; margin: 0; color: var(--dark-text); }
         
+        /* --- HEADER & NAVIGATION --- */
+        .site-header { background: var(--primary-bg); padding: 20px 40px; border-bottom: 1px solid var(--border-color); display: flex; justify-content: space-between; align-items: center; position: sticky; top: 0; z-index: 100;}
+        .brand-logo { font-family: var(--font-serif); font-size: 28px; letter-spacing: 4px; text-transform: uppercase; margin: 0; font-weight: 400; }
+        
+        .admin-nav { display: flex; gap: 30px; align-items: center; }
+        .nav-btn { background: none; border: none; font-family: var(--font-sans); text-transform: uppercase; letter-spacing: 1.5px; font-size: 11px; cursor: pointer; padding-bottom: 5px; color: var(--muted-gray); transition: 0.3s; }
+        .nav-btn:hover { color: var(--dark-text); }
+        .nav-btn.active { color: var(--dark-text); border-bottom: 1px solid var(--dark-text); font-weight: 500; }
+        
+        .logout-btn { background-color: transparent; color: #e24c4c; border: none; font-size: 11px; text-transform: uppercase; letter-spacing: 1px; cursor: pointer; text-decoration: underline; text-underline-offset: 3px; }
+        .logout-btn:hover { color: var(--dark-text); }
+
         /* Loading Screen */
         #loading-screen { text-align: center; padding-top: 15vh; font-size: 16px; color: var(--muted-gray); letter-spacing: 2px; text-transform: uppercase; }
         
-        /* Layout Structure */
-        .admin-layout { display: flex; gap: 40px; max-width: 1100px; margin: 0 auto; align-items: flex-start; }
-        .admin-form-section { flex: 1.2; background: #fff; padding: 40px; border-radius: 4px; box-shadow: 0 10px 30px rgba(0,0,0,0.05); }
-        .admin-preview-section { flex: 0.8; position: sticky; top: 40px; }
+        /* --- LAYOUT STRUCTURE --- */
+        .admin-container { padding: 40px; max-width: 1200px; margin: 0 auto; }
+        .admin-layout { display: flex; gap: 40px; align-items: flex-start; }
+        .admin-form-section { flex: 1.2; background: #fff; padding: 40px; border-radius: 2px; box-shadow: 0 10px 30px rgba(0,0,0,0.02); border: 1px solid var(--border-color); }
+        .admin-preview-section { flex: 0.8; position: sticky; top: 100px; }
         
-        .admin-header { display: flex; justify-content: space-between; align-items: center; border-bottom: 1px solid var(--border-color); padding-bottom: 15px; margin-bottom: 25px; }
-        .admin-header h2 { margin: 0; font-family: var(--font-serif); text-transform: uppercase; letter-spacing: 2px; font-size: 28px; font-weight: 400; }
+        .admin-header h2 { margin: 0 0 10px 0; font-family: var(--font-serif); text-transform: uppercase; letter-spacing: 2px; font-size: 24px; font-weight: 400; }
         .welcome-text { color: var(--muted-gray); font-size: 13px; margin-bottom: 30px; line-height: 1.6; }
         
         /* Form Styles */
@@ -45,12 +57,9 @@
         button.submit-btn:hover { background-color: var(--accent-gold); }
         button.submit-btn:disabled { background-color: var(--border-color); color: var(--muted-gray); cursor: not-allowed; }
         
-        .logout-btn { background-color: transparent; color: #e24c4c; border: none; padding: 8px 0; font-size: 11px; text-transform: uppercase; letter-spacing: 1px; cursor: pointer; text-decoration: underline; text-underline-offset: 3px; }
-        .logout-btn:hover { color: var(--dark-text); }
-        
         .success-msg { color: #4A5D4E; text-align: center; font-size: 12px; font-weight: 500; margin-top: 20px; display: none; padding: 12px; background: #e9f2ea; border: 1px solid #c3d8c5; border-radius: 2px; letter-spacing: 1px; text-transform: uppercase; }
 
-        /* --- LIVE PREVIEW CARD STYLES (Mirrored from Storefront) --- */
+        /* --- PREVIEW CARD --- */
         .preview-header { font-size: 12px; font-weight: 500; text-transform: uppercase; letter-spacing: 2px; margin-bottom: 20px; color: var(--muted-gray); border-bottom: 1px solid var(--border-color); padding-bottom: 10px; }
         .category-card { position: relative; width: 100%; max-width: 320px; background-color: var(--primary-bg); border: 1px solid var(--border-color); padding: 12px; border-radius: 2px; display: flex; flex-direction: column; margin: 0 auto; box-shadow: 0 15px 35px rgba(0,0,0,0.05); }
         .img-wrapper { width: 100%; aspect-ratio: 3 / 4; background-color: #FAFAFA; position: relative; overflow: hidden; margin-bottom: 15px; display: flex; align-items: center; justify-content: center; }
@@ -60,9 +69,33 @@
         .category-name { font-family: var(--font-serif); font-size: 18px; font-weight: 400; margin-bottom: 5px; text-transform: uppercase; letter-spacing: 1.5px; color: var(--dark-text); text-align: center; }
         .category-price { font-size: 11px; color: var(--muted-gray); font-weight: 500; letter-spacing: 1px; text-align: center; }
 
+        /* --- INVENTORY MANAGEMENT STYLES --- */
+        .inventory-list { display: flex; flex-direction: column; gap: 15px; margin-top: 20px;}
+        .inv-item { display: flex; align-items: center; justify-content: space-between; background: #fff; padding: 15px; border: 1px solid var(--border-color); border-radius: 2px; transition: 0.3s;}
+        .inv-item.out-of-stock { background: #fafafa; border-color: #e0e0e0; }
+        .inv-item.out-of-stock .inv-img { opacity: 0.5; filter: grayscale(100%); }
+        .inv-item.out-of-stock .inv-title { color: var(--muted-gray); text-decoration: line-through; }
+        
+        .inv-info { display: flex; align-items: center; gap: 20px; flex: 1; }
+        .inv-img { width: 60px; height: 80px; object-fit: cover; background: #f0f0f0; border-radius: 2px; }
+        .inv-details { display: flex; flex-direction: column; gap: 5px; }
+        .inv-title { font-family: var(--font-serif); font-size: 18px; text-transform: uppercase; letter-spacing: 1px; margin: 0; }
+        .inv-price { font-size: 12px; color: var(--muted-gray); font-weight: 500; }
+        .status-badge { display: inline-block; padding: 4px 8px; font-size: 9px; text-transform: uppercase; letter-spacing: 1px; border-radius: 2px; margin-top: 5px; background: #e9f2ea; color: #4A5D4E; width: fit-content;}
+        .out-of-stock .status-badge { background: #fce8e8; color: #c9302c; }
+
+        .inv-actions { display: flex; gap: 10px; }
+        .action-btn { background: #fff; border: 1px solid var(--border-color); padding: 10px 15px; font-family: var(--font-sans); font-size: 10px; text-transform: uppercase; letter-spacing: 1px; cursor: pointer; transition: 0.2s; border-radius: 2px; }
+        .action-btn:hover { border-color: var(--dark-text); }
+        .btn-delete { color: #c9302c; }
+        .btn-delete:hover { background: #c9302c; color: #fff; border-color: #c9302c; }
+
         @media (max-width: 900px) {
             .admin-layout { flex-direction: column; }
             .admin-preview-section { width: 100%; position: static; }
+            .inv-item { flex-direction: column; align-items: flex-start; gap: 15px; }
+            .inv-actions { width: 100%; justify-content: flex-start; }
+            .site-header { flex-direction: column; gap: 20px; padding: 20px; }
         }
     </style>
 </head>
@@ -73,50 +106,71 @@
     </div>
 
     <div id="admin-content" style="display: none;">
-        <div class="admin-layout">
+        
+        <header class="site-header">
+            <h1 class="brand-logo">ABAYRAH</h1>
+            <nav class="admin-nav">
+                <button class="nav-btn active" id="tab-add" onclick="switchTab('add')">Add New Product</button>
+                <button class="nav-btn" id="tab-manage" onclick="switchTab('manage')">Manage Inventory</button>
+                <button id="logoutBtn" class="logout-btn">Log Out</button>
+            </nav>
+        </header>
+
+        <div class="admin-container">
             
-            <div class="admin-form-section">
-                <div class="admin-header">
-                    <h2>Admin Vault</h2>
-                    <button id="logoutBtn" class="logout-btn">Log Out</button>
-                </div>
-                
-                <p class="welcome-text">Welcome, <strong id="adminName">Admin</strong>.<br>Enter product details below. The preview card on the right will update in real-time. Once satisfied, push it to the live database.</p>
-                
-                <div class="form-group">
-                    <label>Product Title</label>
-                    <input type="text" id="prod-title" placeholder="e.g., Emerald Green Silk Abaya" required>
-                </div>
-                
-                <div class="form-group">
-                    <label>Price (Numbers Only)</label>
-                    <input type="number" id="prod-price" placeholder="e.g., 150.00" step="0.01" required>
+            <div id="view-add" class="admin-layout">
+                <div class="admin-form-section">
+                    <div class="admin-header">
+                        <h2>Vault Entry</h2>
+                    </div>
+                    <p class="welcome-text">Welcome, <strong id="adminName">Admin</strong>. Add new products here. They will automatically be marked as "In Stock" and pushed to the live storefront.</p>
+                    
+                    <div class="form-group">
+                        <label>Product Title</label>
+                        <input type="text" id="prod-title" placeholder="e.g., Emerald Green Silk Abaya" required>
+                    </div>
+                    
+                    <div class="form-group">
+                        <label>Price (Numbers Only)</label>
+                        <input type="number" id="prod-price" placeholder="e.g., 150.00" step="0.01" required>
+                    </div>
+
+                    <div class="form-group">
+                        <label>Google Drive Image Link</label>
+                        <input type="text" id="prod-image-url" placeholder="Paste the 'Anyone with the link can view' URL here" required>
+                    </div>
+
+                    <div class="form-group">
+                        <label>Product Description</label>
+                        <textarea id="prod-desc" rows="4" placeholder="Describe the fabric, style, and fit..." required></textarea>
+                    </div>
+
+                    <button id="submit-btn" class="submit-btn" onclick="uploadProduct()">Push to Live Store</button>
+                    <p id="success-msg" class="success-msg">Product Successfully Added to Database!</p>
                 </div>
 
-                <div class="form-group">
-                    <label>Google Drive Image Link</label>
-                    <input type="text" id="prod-image-url" placeholder="Paste the 'Anyone with the link can view' URL here" required>
+                <div class="admin-preview-section">
+                    <div class="preview-header">Live Storefront Preview</div>
+                    <div class="category-card">
+                        <div class="img-wrapper">
+                            <span class="img-placeholder-text" id="preview-img-text">Image Preview</span>
+                            <img id="preview-image" src="" alt="" class="category-img" style="display: none;">
+                        </div>
+                        <h3 class="category-name" id="preview-title">Product Title</h3>
+                        <p class="category-price" id="preview-price">₹0.00</p>
+                    </div>
                 </div>
-
-                <div class="form-group">
-                    <label>Product Description</label>
-                    <textarea id="prod-desc" rows="4" placeholder="Describe the fabric, style, and fit..." required></textarea>
-                </div>
-
-                <button id="submit-btn" class="submit-btn" onclick="uploadProduct()">Push to Live Store</button>
-                <p id="success-msg" class="success-msg">Product Successfully Added to Database!</p>
             </div>
 
-            <div class="admin-preview-section">
-                <div class="preview-header">Live Storefront Preview</div>
-                
-                <div class="category-card">
-                    <div class="img-wrapper">
-                        <span class="img-placeholder-text" id="preview-img-text">Image Preview</span>
-                        <img id="preview-image" src="" alt="" class="category-img" style="display: none;">
+            <div id="view-manage" style="display: none;">
+                <div class="admin-form-section" style="width: 100%;">
+                    <div class="admin-header">
+                        <h2>Inventory Management</h2>
                     </div>
-                    <h3 class="category-name" id="preview-title">Product Title</h3>
-                    <p class="category-price" id="preview-price">$0.00</p>
+                    <p class="welcome-text">View all live products, toggle their availability, or permanently remove them from the store.</p>
+                    
+                    <div id="inventory-list" class="inventory-list">
+                        </div>
                 </div>
             </div>
 
@@ -126,9 +180,9 @@
     <script type="module">
         import { initializeApp } from "https://www.gstatic.com/firebasejs/10.8.1/firebase-app.js";
         import { getAuth, onAuthStateChanged, signOut } from "https://www.gstatic.com/firebasejs/10.8.1/firebase-auth.js";
-        import { getFirestore, doc, getDoc, collection, addDoc } from "https://www.gstatic.com/firebasejs/10.8.1/firebase-firestore.js";
+        // Added getDocs, updateDoc, and deleteDoc to handle inventory features
+        import { getFirestore, doc, getDoc, collection, addDoc, getDocs, updateDoc, deleteDoc } from "https://www.gstatic.com/firebasejs/10.8.1/firebase-firestore.js";
 
-        // Your Firebase Configuration
         const firebaseConfig = {
             apiKey: "AIzaSyDxe9DeHRsCzD4vlNsknlDHN0w7txd51ic",
             authDomain: "abayrah-9df21.firebaseapp.com",
@@ -143,6 +197,7 @@
         const auth = getAuth(app);
         const db = getFirestore(app);
 
+        // UI Elements
         const adminContent = document.getElementById('admin-content');
         const loadingScreen = document.getElementById('loading-screen');
         const logoutBtn = document.getElementById('logoutBtn');
@@ -156,17 +211,14 @@
                     const adminDocSnap = await getDoc(adminDocRef);
 
                     if (adminDocSnap.exists() && adminDocSnap.data().role === "superadmin") {
-                        // Access Granted
                         loadingScreen.style.display = 'none';
                         adminContent.style.display = 'block';
                         adminNameLabel.innerText = user.displayName || "Admin";
                     } else {
-                        // Logged in, but NOT an admin
                         alert("Access Denied: You do not have administrative privileges.");
                         window.location.href = 'index.html';
                     }
                 } catch (error) {
-                    console.error("Error verifying admin status:", error);
                     window.location.href = 'index.html';
                 }
             } else {
@@ -176,12 +228,23 @@
 
         // --- LOGOUT LOGIC ---
         logoutBtn.addEventListener('click', () => {
-            signOut(auth).then(() => {
-                window.location.href = 'index.html';
-            });
+            signOut(auth).then(() => { window.location.href = 'index.html'; });
         });
 
-        // --- GOOGLE DRIVE LINK CONVERTER ---
+        // --- TAB NAVIGATION ---
+        window.switchTab = function(tabName) {
+            document.getElementById('view-add').style.display = tabName === 'add' ? 'flex' : 'none';
+            document.getElementById('view-manage').style.display = tabName === 'manage' ? 'block' : 'none';
+            
+            document.getElementById('tab-add').classList.toggle('active', tabName === 'add');
+            document.getElementById('tab-manage').classList.toggle('active', tabName === 'manage');
+
+            // If switching to manage tab, fetch fresh data
+            if(tabName === 'manage') {
+                loadInventory();
+            }
+        };
+
         function convertDriveLink(url) {
             if (!url) return '';
             const match = url.match(/\/d\/(.+?)\//);
@@ -191,35 +254,24 @@
             return url; 
         }
 
-        // --- LIVE PREVIEW LOGIC ---
-        // Grab form inputs
+        // --- LIVE PREVIEW ---
         const titleInput = document.getElementById('prod-title');
         const priceInput = document.getElementById('prod-price');
         const imageInput = document.getElementById('prod-image-url');
-        
-        // Grab preview elements
         const previewTitle = document.getElementById('preview-title');
         const previewPrice = document.getElementById('preview-price');
         const previewImage = document.getElementById('preview-image');
         const previewImgText = document.getElementById('preview-img-text');
 
-        // Update Title on type
-        titleInput.addEventListener('input', (e) => {
-            previewTitle.textContent = e.target.value || 'Product Title';
-        });
-
-        // Update Price on type (formatted with 2 decimal places)
+        titleInput.addEventListener('input', (e) => previewTitle.textContent = e.target.value || 'Product Title');
         priceInput.addEventListener('input', (e) => {
             const val = parseFloat(e.target.value);
-            previewPrice.textContent = isNaN(val) ? '$0.00' : `$${val.toFixed(2)}`;
+            previewPrice.textContent = isNaN(val) ? '₹0.00' : `₹${val.toFixed(2)}`;
         });
-
-        // Update Image immediately when URL is pasted
         imageInput.addEventListener('input', (e) => {
             const rawUrl = e.target.value.trim();
             if (rawUrl) {
-                const directUrl = convertDriveLink(rawUrl);
-                previewImage.src = directUrl;
+                previewImage.src = convertDriveLink(rawUrl);
                 previewImage.style.display = 'block';
                 previewImgText.style.display = 'none';
             } else {
@@ -229,13 +281,12 @@
             }
         });
 
-        // --- PRODUCT UPLOAD LOGIC ---
+        // --- UPLOAD PRODUCT ---
         window.uploadProduct = async function() {
             const title = titleInput.value.trim();
             const price = parseFloat(priceInput.value);
             const rawImageUrl = imageInput.value.trim();
             const desc = document.getElementById('prod-desc').value.trim();
-            
             const submitBtn = document.getElementById('submit-btn');
             const successMsg = document.getElementById('success-msg');
 
@@ -248,44 +299,103 @@
             submitBtn.innerText = "Pushing to Vault...";
 
             try {
-                const directImageUrl = convertDriveLink(rawImageUrl);
-
-                // Push to Firestore
+                // Added "inStock: true" as default for new products
                 await addDoc(collection(db, "products"), {
                     title: title,
                     price: price,
-                    image: directImageUrl, 
+                    image: convertDriveLink(rawImageUrl), 
                     description: desc,
+                    inStock: true, 
                     createdAt: new Date().toISOString()
                 });
 
-                // Show Success
                 successMsg.style.display = 'block';
                 submitBtn.disabled = false;
                 submitBtn.innerText = "Push to Live Store";
                 
-                // Clear the form
-                titleInput.value = '';
-                priceInput.value = '';
-                imageInput.value = '';
-                document.getElementById('prod-desc').value = '';
-
-                // Reset Previews
-                previewTitle.textContent = 'Product Title';
-                previewPrice.textContent = '$0.00';
-                previewImage.src = '';
-                previewImage.style.display = 'none';
-                previewImgText.style.display = 'block';
+                titleInput.value = ''; priceInput.value = ''; imageInput.value = ''; document.getElementById('prod-desc').value = '';
+                previewTitle.textContent = 'Product Title'; previewPrice.textContent = '₹0.00';
+                previewImage.src = ''; previewImage.style.display = 'none'; previewImgText.style.display = 'block';
 
                 setTimeout(() => { successMsg.style.display = 'none'; }, 4000);
-
             } catch (error) {
-                console.error("Error adding product: ", error);
                 alert("Error adding product. Please try again.");
                 submitBtn.disabled = false;
                 submitBtn.innerText = "Push to Live Store";
             }
         };
+
+        // --- FETCH & RENDER INVENTORY ---
+        window.loadInventory = async function() {
+            const listContainer = document.getElementById('inventory-list');
+            listContainer.innerHTML = '<p style="color:var(--muted-gray); font-size: 12px; text-transform:uppercase;">Loading Database...</p>';
+            
+            try {
+                const querySnapshot = await getDocs(collection(db, "products"));
+                listContainer.innerHTML = ''; // clear
+
+                if (querySnapshot.empty) {
+                    listContainer.innerHTML = '<p style="color:var(--muted-gray); font-size: 12px;">No products found in the database.</p>';
+                    return;
+                }
+
+                querySnapshot.forEach((docSnap) => {
+                    const data = docSnap.data();
+                    const id = docSnap.id;
+                    // Treat legacy products (without inStock field) as in-stock by default
+                    const inStock = data.inStock !== false; 
+                    
+                    const itemHTML = `
+                        <div class="inv-item ${!inStock ? 'out-of-stock' : ''}">
+                            <div class="inv-info">
+                                <img src="${data.image}" alt="${data.title}" class="inv-img">
+                                <div class="inv-details">
+                                    <h4 class="inv-title">${data.title}</h4>
+                                    <span class="inv-price">₹${parseFloat(data.price).toFixed(2)}</span>
+                                    <span class="status-badge">${inStock ? 'Live - In Stock' : 'Out of Stock'}</span>
+                                </div>
+                            </div>
+                            <div class="inv-actions">
+                                <button class="action-btn" onclick="toggleStockStatus('${id}', ${inStock})">
+                                    ${inStock ? 'Mark Out of Stock' : 'Mark In Stock'}
+                                </button>
+                                <button class="action-btn btn-delete" onclick="deleteProduct('${id}')">Remove</button>
+                            </div>
+                        </div>
+                    `;
+                    listContainer.insertAdjacentHTML('beforeend', itemHTML);
+                });
+            } catch (error) {
+                console.error("Error fetching inventory:", error);
+                listContainer.innerHTML = '<p style="color:red; font-size:12px;">Error loading products.</p>';
+            }
+        };
+
+        // --- TOGGLE STOCK STATUS ---
+        window.toggleStockStatus = async function(docId, currentStatus) {
+            try {
+                const docRef = doc(db, "products", docId);
+                // Flip the boolean
+                await updateDoc(docRef, { inStock: !currentStatus });
+                // Reload the view to reflect changes
+                loadInventory();
+            } catch (error) {
+                alert("Error updating product status.");
+            }
+        };
+
+        // --- DELETE PRODUCT ---
+        window.deleteProduct = async function(docId) {
+            if(confirm("WARNING: Are you sure you want to permanently remove this product from the storefront?")) {
+                try {
+                    await deleteDoc(doc(db, "products", docId));
+                    loadInventory(); // Refresh view
+                } catch (error) {
+                    alert("Error deleting product.");
+                }
+            }
+        };
+
     </script>
 </body>
 </html>
