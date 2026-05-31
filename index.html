@@ -344,25 +344,27 @@
         }
 
         .carousel-track-wrapper {
-            position: absolute;
-            inset: 0;
-            width: 100%;
-            height: 100%;
-            z-index: 1;
-        }
+    position: absolute;
+    inset: 0;
+    width: 100%;
+    height: 100%;
+    z-index: 1;
+    /* ADD THESE 2 LINES: */
+    display: flex;
+    transition: transform 1.2s cubic-bezier(0.25, 1, 0.5, 1);
+}
 
-        .carousel-slide {
-            position: absolute;
-            inset: 0;
-            width: 100%;
-            height: 100%;
-            opacity: 0;
-            transition: opacity 1.2s cubic-bezier(0.25, 1, 0.5, 1);
-            background-position: center;
-            background-size: cover; 
-            background-repeat: no-repeat;
-            background-image: var(--desktop-img);
-        }
+       .carousel-slide {
+
+    flex: 0 0 100%;
+    
+    width: 100%;
+    height: 100%;
+    background-position: center;
+    background-size: cover; 
+    background-repeat: no-repeat;
+    background-image: var(--desktop-img);
+}
 
         .carousel-slide.active-slide {
             opacity: 1;
@@ -1886,13 +1888,21 @@
         let carouselIntervalId = null;
 
         function showTargetSlide(index) {
-            if (!slides.length) return;
-            slides[currentSlideIndex].classList.remove('active-slide');
-            if (dots[currentSlideIndex]) dots[currentSlideIndex].classList.remove('active-dot');
-            currentSlideIndex = (index + slides.length) % slides.length;
-            slides[currentSlideIndex].classList.add('active-slide');
-            if (dots[currentSlideIndex]) dots[currentSlideIndex].classList.add('active-dot');
-        }
+    if (!slides.length) return;
+    
+    // 1. Remove the active state from the current dot
+    if (dots[currentSlideIndex]) dots[currentSlideIndex].classList.remove('active-dot');
+    
+    // 2. Update the index
+    currentSlideIndex = (index + slides.length) % slides.length;
+    
+    // 3. SLIDE THE TRACK (This is the new sliding logic)
+    const track = document.getElementById('heroCarouselTrack');
+    track.style.transform = `translateX(-${currentSlideIndex * 100}%)`;
+    
+    // 4. Add the active state to the new dot
+    if (dots[currentSlideIndex]) dots[currentSlideIndex].classList.add('active-dot');
+}
 
         function runAutoRotationPipeline() { showTargetSlide(currentSlideIndex + 1); }
         function startSliderInterval() { if(slides.length) carouselIntervalId = setInterval(runAutoRotationPipeline, 3000); }
