@@ -123,7 +123,7 @@
         .logout-btn { width: 100%; text-align: left; font-size: 11px; font-weight: 500; letter-spacing: 2px; text-transform: uppercase; color: var(--dark-text); background: none; border: none; cursor: pointer; transition: color 0.3s ease; }
         .logout-btn:hover { color: var(--accent-gold); }
 
-        /* --- UPDATED: Seamless Circular Hero Section --- */
+        /* --- Seamless Circular Hero Section --- */
         .hero-section { position: relative; width: 100%; max-width: 100%; aspect-ratio: 16 / 5; height: auto; overflow: hidden; background-color: #0D0C0B; contain: content; }
         
         .carousel-track-wrapper { position: absolute; inset: 0; width: 100%; height: 100%; z-index: 1; overflow: hidden; }
@@ -142,15 +142,8 @@
             z-index: 0;
         }
 
-        .carousel-slide.active-hero-slide {
-            left: 0; 
-            z-index: 1;
-        }
-
-        .carousel-slide.previous-hero-slide {
-            left: -100%; 
-            z-index: 0;
-        }
+        .carousel-slide.active-hero-slide { left: 0; z-index: 1; }
+        .carousel-slide.previous-hero-slide { left: -100%; z-index: 0; }
 
         .carousel-overlay-shadow { position: absolute; inset: 0; background: linear-gradient(to bottom, rgba(13,12,11,0.1) 0%, rgba(13,12,11,0.42) 100%); z-index: 2; pointer-events: none; }
         .ambient-glow { position: absolute; inset: 0; background: linear-gradient(135deg, rgba(197, 168, 128, 0.1) 0%, transparent 50%, rgba(13,12,11,0) 100%); z-index: 2; pointer-events: none; mix-blend-mode: overlay; animation: lightShimmer 8s ease-in-out infinite alternate; }
@@ -216,7 +209,7 @@
         .category-img { 
             position: absolute; 
             top: 0; 
-            left: 100%; 
+            left: 100%;
             width: 100%; 
             height: 100%; 
             display: block; 
@@ -226,17 +219,8 @@
             z-index: 0; 
         }
         
-        .category-img.active-mini-slide { 
-            left: 0; 
-            opacity: 1; 
-            z-index: 1; 
-        }
-
-        .category-img.previous-mini-slide {
-            left: -100%; 
-            opacity: 0;
-            z-index: 0;
-        }
+        .category-img.active-mini-slide { left: 0; opacity: 1; z-index: 1; }
+        .category-img.previous-mini-slide { left: -100%; opacity: 0; z-index: 0; }
 
         .category-card:hover { transform: translate3d(0, -10px, 0); box-shadow: 0 25px 50px rgba(28, 27, 26, 0.08); border-color: rgba(197, 168, 128, 0.4); }
         .category-card:hover .category-img { transform: scale(1.06); }
@@ -418,9 +402,6 @@
                             <h4 id="profileName">Guest</h4>
                             <p id="profileEmail">guest@abayrah.com</p>
                         </div>
-                        
-                        <a href="admin.html" id="adminVaultBtn" class="logout-btn" style="display: none; margin-bottom: 15px; border-bottom: 1px solid var(--border-color); padding-bottom: 15px;">Admin Vault</a>
-                        
                         <button class="logout-btn" id="logoutBtn">Log Out</button>
                     </div>
                 </div>
@@ -509,7 +490,7 @@
         </section>
 
         <section class="vault-sale-section" id="shop-sale">
-            <div class="vault-sale-banner" onclick="addSecureProductToCart('archive_sale', 'The Archive Collection Abaya', 145.00, 'sale-image.png')">
+            <div class="vault-sale-banner" onclick="addSecureProductToCart('archive_sale', 1)">
                 <div class="vault-ambient-light"></div>
                 <div class="vault-promo-content">
                     <span class="vault-subtitle">The Archive Event</span>
@@ -803,6 +784,19 @@
         const categoryCards = document.querySelectorAll('.category-card');
         const collectionsSection = document.getElementById('catalogs');
 
+        // Security Utility for mitigating XSS
+        function escapeHTML(str) {
+            return String(str).replace(/[&<>'"]/g, 
+                tag => ({
+                    '&': '&amp;',
+                    '<': '&lt;',
+                    '>': '&gt;',
+                    "'": '&#39;',
+                    '"': '&quot;'
+                }[tag] || tag)
+            );
+        }
+
         searchTriggerBtn.addEventListener('click', (e) => { e.preventDefault(); searchOverlay.classList.add('active'); setTimeout(() => searchInput.focus(), 100); });
         closeSearchBtn.addEventListener('click', closeSearch);
         searchOverlay.addEventListener('click', (e) => { if (e.target === searchOverlay) closeSearch(); });
@@ -811,7 +805,7 @@
         searchInput.addEventListener('input', (e) => filterProducts(e.target.value));
 
         function filterProducts(term) {
-            const searchTerm = term.toLowerCase().trim();
+            const searchTerm = escapeHTML(term.toLowerCase().trim());
             let matchCount = 0;
             if (searchTerm.length > 0) collectionsSection.scrollIntoView({behavior: 'smooth', block: 'start'});
 
@@ -822,7 +816,7 @@
                 else { card.style.display = 'none'; }
             });
 
-            if (matchCount === 0 && searchTerm !== '') { noResultsMsg.style.display = 'block'; noResultsMsg.innerHTML = `No results found for "<strong>${term}</strong>"`; } 
+            if (matchCount === 0 && searchTerm !== '') { noResultsMsg.style.display = 'block'; noResultsMsg.innerHTML = `No results found for "<strong>${searchTerm}</strong>"`; } 
             else { noResultsMsg.style.display = 'none'; }
             if (searchTerm === '') { categoryCards.forEach(card => card.style.display = 'flex'); }
         }
@@ -879,7 +873,7 @@
         
         function startSliderInterval() { 
             if(slides.length) {
-                carouselIntervalId = setInterval(runAutoRotationPipeline, 4500);
+                carouselIntervalId = setInterval(runAutoRotationPipeline, 4500); 
             } 
         }
 
@@ -909,7 +903,6 @@
 
                     miniSlides[prevIndex].classList.remove('active-mini-slide');
                     miniSlides[prevIndex].classList.add('previous-mini-slide');
-
                     miniSlides[globalMiniIndex].classList.add('active-mini-slide');
 
                     setTimeout(() => {
@@ -1001,7 +994,7 @@
     <script type="module">
         import { initializeApp } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-app.js";
         import { getAuth, signInWithPopup, GoogleAuthProvider, signOut, onAuthStateChanged, createUserWithEmailAndPassword, signInWithEmailAndPassword, updateProfile } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-auth.js";
-        import { getFirestore, doc, setDoc, onSnapshot, collection, getDoc, getDocs, deleteDoc, query, where } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-firestore.js";
+        import { getFirestore, doc, setDoc, onSnapshot, collection, getDoc, getDocs, deleteDoc } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-firestore.js";
 
         const firebaseConfig = {
            apiKey: "AIzaSyDxe9DeHRsCzD4vlNsknlDHN0w7txd51ic",
@@ -1024,7 +1017,6 @@
         // --- Firebase UI Elements ---
         const googleSignInBtn = document.getElementById('googleSignInBtn');
         const logoutBtn = document.getElementById('logoutBtn');
-        const loginModal = document.getElementById('loginModal');
         const accountIconBtn = document.getElementById('accountIconBtn');
         const profilePic = document.getElementById('profilePic');
         const profileName = document.getElementById('profileName');
@@ -1040,7 +1032,7 @@
         const cartSubtotalAmount = document.getElementById('cartSubtotalAmount');
         const cartCountBadge = document.getElementById('cart-count-badge');
 
-        function showError(message) { authErrorMsg.textContent = message; authErrorMsg.style.display = 'block'; }
+        function showError(message) { authErrorMsg.textContent = escapeHTML(message); authErrorMsg.style.display = 'block'; }
 
         // --- AUTH LOGIC ---
         if (googleSignInBtn) {
@@ -1060,8 +1052,8 @@
                 const isRegistering = document.querySelector('.modal-content').classList.contains('is-registering');
 
                 if (isRegistering) {
-                    const firstName = document.getElementById('firstNameInput').value.trim();
-                    const lastName = document.getElementById('lastNameInput').value.trim();
+                    const firstName = escapeHTML(document.getElementById('firstNameInput').value.trim());
+                    const lastName = escapeHTML(document.getElementById('lastNameInput').value.trim());
                     const confirmPassword = document.getElementById('confirmPasswordInput').value;
                     if (password !== confirmPassword) return showError("Passwords do not match.");
 
@@ -1088,37 +1080,21 @@
 
         if (logoutBtn) logoutBtn.addEventListener('click', () => signOut(auth));
 
-        // --- FIRESTORE SECURE AUTH & ADMIN SYNC ---
-        onAuthStateChanged(auth, async (user) => {
+        // --- FIRESTORE SECURE CART SYNC ---
+        onAuthStateChanged(auth, (user) => {
             if (user) {
                 window.isAppLoggedIn = true;
                 currentUser = user;
                 
-                loginModal.classList.remove('active');
+                document.getElementById('loginModal').classList.remove('active');
                 accountIconBtn.style.display = 'none';
                 profilePic.style.display = 'block';
-                profilePic.src = user.photoURL || `https://ui-avatars.com/api/?name=${user.displayName || 'Guest'}&background=C5A880&color=fff&bold=true&font-size=0.4`;
-                profileName.textContent = user.displayName || "Guest Profile";
-                profileEmail.textContent = user.email || "";
+                const safeName = escapeHTML(user.displayName || 'Guest');
+                profilePic.src = user.photoURL || `https://ui-avatars.com/api/?name=${safeName}&background=C5A880&color=fff&bold=true&font-size=0.4`;
+                profileName.textContent = safeName;
+                profileEmail.textContent = escapeHTML(user.email || "");
 
-                // 🔒 SECURE ADMIN CHECK 
-                const adminBtn = document.getElementById('adminVaultBtn');
-                if (adminBtn) adminBtn.style.display = 'none'; 
-                
-                try {
-                    const adminRef = doc(db, "admins", user.email.toLowerCase());
-                    const adminSnap = await getDoc(adminRef);
-                    
-                    if (adminSnap.exists() && adminBtn) {
-                        adminBtn.style.display = 'block';
-                    }
-                } catch (error) {
-                    console.log("Standard user session loaded.");
-                }
-
-                // Start listening to their live secure cart
                 listenToCart(user.uid);
-
             } else {
                 window.isAppLoggedIn = false;
                 currentUser = null;
@@ -1131,48 +1107,75 @@
 
         function listenToCart(userId) {
             const cartRef = collection(db, "users", userId, "cart");
-            onSnapshot(cartRef, (snapshot) => {
-                cartItemsWrapper.innerHTML = ''; 
+            onSnapshot(cartRef, async (snapshot) => {
                 let subtotal = 0;
                 let totalItems = 0;
+                let htmlBuffer = '';
 
                 if (snapshot.empty) {
                     emptyCartState.style.display = 'block';
                     cartItemsWrapper.style.display = 'none';
                     cartFooter.style.display = 'none';
                     cartCountBadge.style.display = 'none';
+                    cartItemsWrapper.innerHTML = ''; 
                 } else {
                     emptyCartState.style.display = 'none';
                     cartItemsWrapper.style.display = 'block';
                     cartFooter.style.display = 'block';
                     cartCountBadge.style.display = 'block';
 
-                    snapshot.forEach((doc) => {
-                        const item = doc.data();
+                    // Use Promise.all to fetch product details securely from the products collection
+                    const cartPromises = snapshot.docs.map(async (cartDoc) => {
+                        const item = cartDoc.data();
                         const qty = item.quantity || 1;
-                        totalItems += qty;
-                        // Important: in real life, price comes from products db. Using saved price for UI.
-                        const price = parseFloat(item.price) || 0; 
-                        subtotal += (price * qty);
-
-                        const itemHTML = `
-                            <div class="cart-item">
-                                <img src="${item.image}" alt="${item.title}" class="cart-item-img" decoding="async">
-                                <div class="cart-item-details">
-                                    <div>
-                                        <h4 class="cart-item-title">${item.title}</h4>
-                                        <div class="cart-item-price">$${price.toFixed(2)}</div>
-                                    </div>
-                                    <div class="cart-item-actions">
-                                        <span style="font-size: 11px; color: var(--muted-gray);">Qty: ${qty}</span>
-                                        <button class="remove-item-btn" onclick="removeSecureItem('${item.productId}')">Remove</button>
-                                    </div>
-                                </div>
-                            </div>
-                        `;
-                        cartItemsWrapper.innerHTML += itemHTML;
+                        const safeId = escapeHTML(cartDoc.id);
+                        
+                        try {
+                            const productRef = doc(db, "products", item.productId);
+                            const productSnap = await getDoc(productRef);
+                            
+                            if (productSnap.exists()) {
+                                const prodData = productSnap.data();
+                                const price = parseFloat(prodData.price) || 0; 
+                                const title = escapeHTML(prodData.title || "Archive Item");
+                                const image = escapeHTML(prodData.image || "placeholder.png");
+                                
+                                return { id: safeId, qty, price, title, image };
+                            }
+                        } catch (error) {
+                            console.error("Secure fetch failed for item:", item.productId, error);
+                        }
+                        
+                        // Fallback if product no longer exists
+                        return { id: safeId, qty, price: 0, title: "Item Unavailable", image: "" };
                     });
 
+                    const resolvedItems = await Promise.all(cartPromises);
+
+                    resolvedItems.forEach((prod) => {
+                        if (prod.price > 0) {
+                            totalItems += prod.qty;
+                            subtotal += (prod.price * prod.qty);
+                            
+                            htmlBuffer += `
+                                <div class="cart-item">
+                                    <img src="${prod.image}" alt="${prod.title}" class="cart-item-img" decoding="async">
+                                    <div class="cart-item-details">
+                                        <div>
+                                            <h4 class="cart-item-title">${prod.title}</h4>
+                                            <div class="cart-item-price">$${prod.price.toFixed(2)}</div>
+                                        </div>
+                                        <div class="cart-item-actions">
+                                            <span style="font-size: 11px; color: var(--muted-gray);">Qty: ${prod.qty}</span>
+                                            <button class="remove-item-btn" onclick="removeSecureItem('${prod.id}')">Remove</button>
+                                        </div>
+                                    </div>
+                                </div>
+                            `;
+                        }
+                    });
+
+                    cartItemsWrapper.innerHTML = htmlBuffer;
                     cartSubtotalAmount.textContent = `$${subtotal.toFixed(2)}`;
                     cartCountBadge.textContent = totalItems;
                 }
@@ -1182,33 +1185,41 @@
         window.removeSecureItem = async function(productId) {
             if(!currentUser) return;
             try {
-                await deleteDoc(doc(db, "users", currentUser.uid, "cart", productId));
+                await deleteDoc(doc(db, "users", currentUser.uid, "cart", escapeHTML(productId)));
             } catch (error) {
                 console.error("Error removing item: ", error);
             }
         };
 
-        // Standard direct add to cart (from Sale banner, etc)
-        window.addSecureProductToCart = async function(productId, title, price, image) {
+        // Security Update: We ONLY send the Product ID and Quantity to the Cart database. 
+        // Price and details are pulled directly from the Products collection securely during rendering.
+        window.addSecureProductToCart = async function(productId, quantityToAdd = 1) {
             if (!currentUser) {
+                const loginModal = document.getElementById('loginModal');
                 loginModal.classList.add('active');
                 document.getElementById('modalTitle').textContent = "Sign In Required";
                 document.getElementById('modalSubtitle').textContent = "Please sign in to add items to your vault.";
                 return;
             }
             try {
-                const cartItemRef = doc(db, "users", currentUser.uid, "cart", productId);
+                const safeProductId = escapeHTML(productId);
+                const cartItemRef = doc(db, "users", currentUser.uid, "cart", safeProductId);
                 const docSnap = await getDoc(cartItemRef);
-                let newQuantity = docSnap.exists() ? docSnap.data().quantity + 1 : 1;
+                let newQuantity = docSnap.exists() ? docSnap.data().quantity + quantityToAdd : quantityToAdd;
 
-                await setDoc(cartItemRef, { productId: productId, quantity: newQuantity, title: title, price: price, image: image }, { merge: true });
+                // Security: Do not append price/title data here to prevent client-side spoofing.
+                await setDoc(cartItemRef, { 
+                    productId: safeProductId, 
+                    quantity: newQuantity,
+                    updatedAt: new Date().toISOString()
+                }, { merge: true });
+
                 document.getElementById('cartOverlay').classList.add('active');
                 document.getElementById('cartDrawer').classList.add('active');
             } catch (error) { console.error("Cart error: ", error); }
         };
 
         // --- SINGLE PAGE APPLICATION NAVIGATION LOGIC ---
-        // Dynamically Open ANY category instead of just Abayas
         window.openCategoryStore = function(title, subtitle) {
             document.getElementById('main-storefront').style.display = 'none';
             document.getElementById('dynamic-shopping-section').style.display = 'block';
@@ -1217,54 +1228,51 @@
             document.getElementById('collection-view').style.display = 'grid';
             document.getElementById('dynamic-main-title').style.display = 'block';
             
-            // Set Dynamic Text Headers
-            document.getElementById('store-category-title').innerText = title;
-            document.getElementById('store-category-subtitle').innerText = subtitle;
+            document.getElementById('store-category-title').textContent = escapeHTML(title);
+            document.getElementById('store-category-subtitle').textContent = escapeHTML(subtitle);
             
             window.scrollTo({ top: 0, behavior: 'smooth' });
-            loadProducts(title); // Pass title as an argument for potential future Firebase filtering
+            loadProducts(title); 
         };
 
          window.backToCatalogs = function() {
-             document.getElementById('dynamic-shopping-section').style.display = 'none';
+            document.getElementById('dynamic-shopping-section').style.display = 'none';
             document.getElementById('main-storefront').style.display = 'block';
             document.getElementById('catalogs').scrollIntoView({ behavior: 'smooth' });
         };
-        
+
         // --- FIRESTORE PRODUCT LOADING ---
         async function loadProducts(categoryFilter) {
             const productsContainer = document.getElementById('collection-view');
             try {
-                const productsRef = collection(db, "products");
-                const q = query(productsRef, where("category", "==", categoryFilter));
-                const querySnapshot = await getDocs(q);
-                
+                const querySnapshot = await getDocs(collection(db, "products"));
                 productsContainer.innerHTML = ''; 
 
                 if(querySnapshot.empty) {
-                    productsContainer.innerHTML = `<p style="text-align: center; width: 100%; color: var(--muted-gray); font-style: italic; margin-top: 40px;">No premium pieces currently available in the ${categoryFilter} collection.</p>`;
+                    productsContainer.innerHTML = '<p style="text-align: center; width: 100%; color: var(--muted-gray);">No products available right now.</p>';
                     return;
                 }
 
                 querySnapshot.forEach((docSnap) => {
                     const product = docSnap.data();
-                    const productId = docSnap.id; 
+                    const productId = escapeHTML(docSnap.id); 
                     
-                    const safeTitle = product.title ? product.title.replace(/'/g, "\\'") : '';
-                    const safeDesc = product.description ? product.description.replace(/'/g, "\\'") : '';
-                    const safeImage = product.image ? product.image.replace(/'/g, "\\'") : '';
-                    const price = product.price || 0;
+                    const safeTitle = escapeHTML(product.title || '');
+                    const safeDesc = escapeHTML(product.description || '');
+                    const safeImage = escapeHTML(product.image || '');
+                    const price = parseFloat(product.price) || 0;
 
+                    // Ensure parameters passed to openProduct are properly escaped strings for the onclick handler
                     const productCardHTML = `
-                        <div class="category-card" onclick="openProduct('${productId}', '${safeTitle}', ${price}, '${safeDesc}', '${safeImage}')" style="background: var(--primary-bg); border: 1px solid var(--border-color); padding: 12px; border-radius: 2px; text-align: center; cursor: pointer; transition: all 0.4s ease;">
+                        <div class="category-card" onclick="openProduct('${productId}', '${safeTitle.replace(/'/g, "\\'")}', ${price}, '${safeDesc.replace(/'/g, "\\'")}', '${safeImage}')" style="background: var(--primary-bg); border: 1px solid var(--border-color); padding: 12px; border-radius: 2px; text-align: center; cursor: pointer; transition: all 0.4s ease;">
                             <div style="width: 100%; aspect-ratio: 3/4; background: #FAFAFA; overflow: hidden; margin-bottom: 15px; position:relative;">
                                 <img src="${safeImage}" alt="${safeTitle}" style="position:absolute; top:0; left:0; width: 100%; height: 100%; object-fit: contain; transition: transform 0.6s ease;" onmouseover="this.style.transform='scale(1.06)'" onmouseout="this.style.transform='scale(1)'" decoding="async" loading="lazy">
                             </div>
                             <h3 style="font-family: var(--font-serif); font-size: 16px; margin-bottom: 5px; color: var(--dark-text); text-transform: uppercase; letter-spacing: 1.5px;">${safeTitle}</h3>
-                            <p style="font-size: 11px; color: var(--muted-gray); font-weight: 500; letter-spacing: 1px;">$${parseFloat(price).toFixed(2)}</p>
+                            <p style="font-size: 11px; color: var(--muted-gray); font-weight: 500; letter-spacing: 1px;">$${price.toFixed(2)}</p>
                         </div>
                     `;
-                    productsContainer.innerHTML += productCardHTML;
+                    productsContainer.insertAdjacentHTML('beforeend', productCardHTML);
                 });
             } catch (error) {
                 console.error("Error loading products: ", error);
@@ -1278,9 +1286,9 @@
             document.getElementById('product-detail-view').style.display = 'block';
             document.getElementById('dynamic-main-title').style.display = 'none'; 
 
-            document.getElementById('detail-title').innerText = title;
-            document.getElementById('detail-price').innerText = "$" + parseFloat(price).toFixed(2);
-            document.getElementById('detail-desc').innerText = description;
+            document.getElementById('detail-title').textContent = title;
+            document.getElementById('detail-price').textContent = "$" + parseFloat(price).toFixed(2);
+            document.getElementById('detail-desc').textContent = description;
             document.getElementById('detail-image').src = imageSrc;
             
             window.scrollTo({ top: 0, behavior: 'smooth' });
@@ -1294,7 +1302,7 @@
         };
 
         window.addCurrentProductToCart = function() {
-            addSecureProductToCart(currentProductView.id, currentProductView.title, currentProductView.price, currentProductView.imageSrc);
+            addSecureProductToCart(currentProductView.id, 1);
         };
     </script>
 </body>
