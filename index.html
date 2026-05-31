@@ -233,6 +233,24 @@
         .category-card:hover .category-link { color: var(--dark-text); }
         .category-card:hover .category-link::after { width: 100%; }
 
+        /* --- ZOOM MAGNIFIER CSS --- */
+        .zoom-img-wrapper {
+            position: relative;
+            overflow: hidden;
+            width: 100%;
+            cursor: crosshair;
+            background: #FAFAFA;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+        .zoom-img {
+            width: 100%;
+            max-height: 600px;
+            object-fit: contain;
+            transition: transform 0.1s ease-out; /* Smooth follow */
+        }
+
         /* --- Editorial Footer --- */
         .premium-footer { background-color: #1C1B1A; color: #ECEAE6; padding: 80px 40px 30px 40px; margin-top: 120px; border-top: 1px solid var(--border-color); contain: layout style; }
         .footer-grid { max-width: 1440px; margin: 0 auto; display: grid; grid-template-columns: 2fr repeat(3, 1fr); gap: 60px; border-bottom: 1px solid #33312F; padding-bottom: 60px; }
@@ -363,7 +381,7 @@
 <body>
 
     <div class="announcement-bar">
-        Complimentary Worldwide Shipping on Orders Over $150
+        Complimentary Worldwide Shipping on Orders Over ₹150
     </div>
 
     <header class="main-header">
@@ -603,23 +621,44 @@
             <span onclick="closeProduct()" style="display: inline-block; margin-bottom: 30px; cursor: pointer; color: var(--muted-gray); text-decoration: underline; text-underline-offset: 4px;">← Back to Grid</span>
             
             <div style="display: flex; gap: 60px; background: #fff; padding: 50px; border: 1px solid var(--border-color); border-radius: 2px; flex-wrap: wrap;">
-                <div style="flex: 1; min-width: 300px; background: #FAFAFA; display:flex; align-items:center; justify-content:center;">
-                    <img id="detail-image" src="" alt="Product Image" style="width: 100%; max-height: 600px; object-fit: contain;" decoding="async">
+                
+                <div id="zoom-img-wrapper" class="zoom-img-wrapper" style="flex: 1; min-width: 300px; border-radius: 2px;">
+                    <img id="detail-image" src="" alt="Product Image" class="zoom-img" decoding="async">
                 </div>
                 
                 <div style="flex: 1; display: flex; flex-direction: column; min-width: 300px; justify-content: center;">
                     <h2 id="detail-title" style="font-family: var(--font-serif); font-size: 34px; font-weight: 400; margin-bottom: 15px; color: var(--dark-text); text-transform: uppercase; letter-spacing: 2px;">Product Title</h2>
-                    <div id="detail-price" style="font-size: 24px; font-weight: 400; color: var(--accent-gold); margin-bottom: 30px;">$0.00</div>
                     
+                    <div id="price-container" style="margin-bottom: 25px;">
+                        </div>
+                    
+                    <div style="display: flex; align-items: center; gap: 15px; margin-bottom: 25px;">
+                        <span style="font-size: 11px; font-weight: 500; text-transform: uppercase; letter-spacing: 1px;">Quantity</span>
+                        <div style="display: flex; align-items: center; border: 1px solid var(--border-color); border-radius: 2px;">
+                            <button onclick="changeQuantity(-1)" style="padding: 10px 15px; background: none; border: none; cursor: pointer; font-size: 16px; color: var(--muted-gray); transition: 0.3s;" onmouseover="this.style.color='var(--dark-text)'" onmouseout="this.style.color='var(--muted-gray)'">-</button>
+                            <input type="text" id="product-quantity" value="1" readonly style="width: 45px; text-align: center; border: none; font-family: var(--font-sans); font-size: 14px; font-weight: 500; color: var(--dark-text); background: transparent;">
+                            <button onclick="changeQuantity(1)" style="padding: 10px 15px; background: none; border: none; cursor: pointer; font-size: 16px; color: var(--muted-gray); transition: 0.3s;" onmouseover="this.style.color='var(--dark-text)'" onmouseout="this.style.color='var(--muted-gray)'">+</button>
+                        </div>
+                    </div>
+
                     <div style="display: flex; gap: 15px; margin-bottom: 30px;">
                         <button onclick="addCurrentProductToCart()" style="flex: 1; padding: 18px; font-size: 11px; font-family: var(--font-sans); font-weight: 500; background-color: var(--primary-bg); color: var(--dark-text); border: 1px solid var(--border-color); cursor: pointer; text-transform: uppercase; letter-spacing: 2px; transition: all 0.3s ease;" onmouseover="this.style.borderColor='var(--accent-gold)'" onmouseout="this.style.borderColor='var(--border-color)'">Add to Cart</button>
-                        <button onclick="addCurrentProductToCart(); document.getElementById('cartIconBtn').click();" style="flex: 1; padding: 18px; font-size: 11px; font-family: var(--font-sans); font-weight: 500; background-color: var(--dark-text); color: #fff; border: 1px solid var(--dark-text); cursor: pointer; text-transform: uppercase; letter-spacing: 2px; transition: all 0.3s ease;" onmouseover="this.style.backgroundColor='var(--accent-gold)'; this.style.borderColor='var(--accent-gold)';" onmouseout="this.style.backgroundColor='var(--dark-text)'; this.style.borderColor='var(--dark-text)';">Buy Now</button>
+                        <button onclick="addCurrentProductToCart(); setTimeout(() => document.getElementById('cartIconBtn').click(), 200);" style="flex: 1; padding: 18px; font-size: 11px; font-family: var(--font-sans); font-weight: 500; background-color: var(--dark-text); color: #fff; border: 1px solid var(--dark-text); cursor: pointer; text-transform: uppercase; letter-spacing: 2px; transition: all 0.3s ease;" onmouseover="this.style.backgroundColor='var(--accent-gold)'; this.style.borderColor='var(--accent-gold)';" onmouseout="this.style.backgroundColor='var(--dark-text)'; this.style.borderColor='var(--dark-text)';">Buy Now</button>
                     </div>
 
                     <div style="font-size: 13px; color: var(--muted-gray); line-height: 1.8; margin-bottom: 30px; border-top: 1px solid var(--border-color); padding-top: 30px;">
                         <strong style="color: var(--dark-text); text-transform: uppercase; letter-spacing: 1px; font-size: 11px; display:block; margin-bottom:10px;">Product Details</strong>
                         <span id="detail-desc"></span>
                     </div>
+
+                    <div style="font-size: 12px; color: var(--muted-gray); line-height: 1.6; border-top: 1px solid var(--border-color); padding-top: 20px;">
+                        <strong style="color: var(--dark-text); text-transform: uppercase; letter-spacing: 1px; font-size: 11px; display:flex; align-items:center; gap: 8px; margin-bottom:10px;">
+                            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 2v6h-6"></path><path d="M3 12a9 9 0 0 1 15-6.7L21 8"></path><path d="M3 22v-6h6"></path><path d="M21 12a9 9 0 0 1-15 6.7L3 16"></path></svg>
+                            Exchange & Return Policy
+                        </strong>
+                        <p>We offer a hassle-free 7-day exchange policy. Items must be unworn, unwashed, and retain all original tags. For hygiene and safety reasons, Niqabs and inner caps are non-returnable and non-exchangeable.</p>
+                    </div>
+
                 </div>
             </div>
         </div>
@@ -697,7 +736,7 @@
         <div class="cart-footer" id="cartFooter" style="display: none;">
             <div class="cart-subtotal">
                 <span>Subtotal</span>
-                <span class="subtotal-amount" id="cartSubtotalAmount">$0.00</span>
+                <span class="subtotal-amount" id="cartSubtotalAmount">₹0.00</span>
             </div>
             <p class="shipping-note">Taxes and shipping calculated at checkout.</p>
             <button class="submit-btn">Proceed to Checkout</button>
@@ -989,6 +1028,39 @@
         closeCartBtn.addEventListener('click', () => { cartOverlay.classList.remove('active'); cartDrawer.classList.remove('active'); });
         cartOverlay.addEventListener('click', () => { cartOverlay.classList.remove('active'); cartDrawer.classList.remove('active'); });
 
+        // --- NEW: Quantity & Image Zoom Logic ---
+        window.changeQuantity = function(amount) {
+            const qtyInput = document.getElementById('product-quantity');
+            let currentQty = parseInt(qtyInput.value) || 1;
+            let newQty = currentQty + amount;
+            if (newQty < 1) newQty = 1;
+            if (newQty > 10) newQty = 10; // Max 10 items
+            qtyInput.value = newQty;
+        };
+
+        const zoomWrapper = document.getElementById('zoom-img-wrapper');
+        const zoomImg = document.getElementById('detail-image');
+
+        if (zoomWrapper && zoomImg) {
+            zoomWrapper.addEventListener('mousemove', function(e) {
+                if (window.innerWidth <= 768) return; // Disable zoom on mobile
+
+                const rect = zoomWrapper.getBoundingClientRect();
+                const x = e.clientX - rect.left;
+                const y = e.clientY - rect.top;
+
+                const xPercent = (x / rect.width) * 100;
+                const yPercent = (y / rect.height) * 100;
+
+                zoomImg.style.transformOrigin = `${xPercent}% ${yPercent}%`;
+                zoomImg.style.transform = 'scale(2.2)'; // 2.2x Magnification
+            });
+
+            zoomWrapper.addEventListener('mouseleave', function() {
+                zoomImg.style.transformOrigin = 'center center';
+                zoomImg.style.transform = 'scale(1)';
+            });
+        }
     </script>
 
     <script type="module">
@@ -1124,7 +1196,6 @@
                     cartFooter.style.display = 'block';
                     cartCountBadge.style.display = 'block';
 
-                    // Use Promise.all to fetch product details securely from the products collection
                     const cartPromises = snapshot.docs.map(async (cartDoc) => {
                         const item = cartDoc.data();
                         const qty = item.quantity || 1;
@@ -1146,7 +1217,6 @@
                             console.error("Secure fetch failed for item:", item.productId, error);
                         }
                         
-                        // Fallback if product no longer exists
                         return { id: safeId, qty, price: 0, title: "Item Unavailable", image: "" };
                     });
 
@@ -1163,7 +1233,7 @@
                                     <div class="cart-item-details">
                                         <div>
                                             <h4 class="cart-item-title">${prod.title}</h4>
-                                            <div class="cart-item-price">$${prod.price.toFixed(2)}</div>
+                                            <div class="cart-item-price">₹${prod.price.toFixed(2)}</div>
                                         </div>
                                         <div class="cart-item-actions">
                                             <span style="font-size: 11px; color: var(--muted-gray);">Qty: ${prod.qty}</span>
@@ -1176,7 +1246,7 @@
                     });
 
                     cartItemsWrapper.innerHTML = htmlBuffer;
-                    cartSubtotalAmount.textContent = `$${subtotal.toFixed(2)}`;
+                    cartSubtotalAmount.textContent = `₹${subtotal.toFixed(2)}`;
                     cartCountBadge.textContent = totalItems;
                 }
             });
@@ -1191,8 +1261,6 @@
             }
         };
 
-        // Security Update: We ONLY send the Product ID and Quantity to the Cart database. 
-        // Price and details are pulled directly from the Products collection securely during rendering.
         window.addSecureProductToCart = async function(productId, quantityToAdd = 1) {
             if (!currentUser) {
                 const loginModal = document.getElementById('loginModal');
@@ -1207,7 +1275,6 @@
                 const docSnap = await getDoc(cartItemRef);
                 let newQuantity = docSnap.exists() ? docSnap.data().quantity + quantityToAdd : quantityToAdd;
 
-                // Security: Do not append price/title data here to prevent client-side spoofing.
                 await setDoc(cartItemRef, { 
                     productId: safeProductId, 
                     quantity: newQuantity,
@@ -1245,13 +1312,8 @@
         async function loadProducts(categoryFilter) {
             const productsContainer = document.getElementById('collection-view');
             try {
-                // 1. Create a reference to the products collection
                 const productsRef = collection(db, "products");
-                
-                // 2. Create a query against the collection filtering by category
                 const q = query(productsRef, where("category", "==", categoryFilter));
-                
-                // 3. Execute the filtered query
                 const querySnapshot = await getDocs(q);
                 
                 productsContainer.innerHTML = ''; 
@@ -1269,15 +1331,29 @@
                     const safeDesc = escapeHTML(product.description || '');
                     const safeImage = escapeHTML(product.image || '');
                     const price = parseFloat(product.price) || 0;
+                    
+                    // Checks if database has an "originalPrice" field for discounts
+                    const originalPrice = parseFloat(product.originalPrice) || null; 
 
-                    // Ensure parameters passed to openProduct are properly escaped strings for the onclick handler
+                    let priceDisplay = `<p style="font-size: 11px; color: var(--muted-gray); font-weight: 500; letter-spacing: 1px;">₹${price.toFixed(2)}</p>`;
+                    
+                    // Display discount format on Grid if M.R.P exists
+                    if (originalPrice && originalPrice > price) {
+                        priceDisplay = `
+                            <div style="display: flex; align-items: center; justify-content: center; gap: 6px;">
+                                <p style="font-size: 11px; color: var(--muted-gray); font-weight: 500; text-decoration: line-through;">₹${originalPrice.toFixed(2)}</p>
+                                <p style="font-size: 11px; color: #CC0C39; font-weight: 600; letter-spacing: 1px;">₹${price.toFixed(2)}</p>
+                            </div>
+                        `;
+                    }
+
                     const productCardHTML = `
-                        <div class="category-card" onclick="openProduct('${productId}', '${safeTitle.replace(/'/g, "\\'")}', ${price}, '${safeDesc.replace(/'/g, "\\'")}', '${safeImage}')" style="background: var(--primary-bg); border: 1px solid var(--border-color); padding: 12px; border-radius: 2px; text-align: center; cursor: pointer; transition: all 0.4s ease;">
+                        <div class="category-card" onclick="openProduct('${productId}', '${safeTitle.replace(/'/g, "\\'")}', ${price}, '${safeDesc.replace(/'/g, "\\'")}', '${safeImage}', ${originalPrice})" style="background: var(--primary-bg); border: 1px solid var(--border-color); padding: 12px; border-radius: 2px; text-align: center; cursor: pointer; transition: all 0.4s ease;">
                             <div style="width: 100%; aspect-ratio: 3/4; background: #FAFAFA; overflow: hidden; margin-bottom: 15px; position:relative;">
                                 <img src="${safeImage}" alt="${safeTitle}" style="position:absolute; top:0; left:0; width: 100%; height: 100%; object-fit: contain; transition: transform 0.6s ease;" onmouseover="this.style.transform='scale(1.06)'" onmouseout="this.style.transform='scale(1)'" decoding="async" loading="lazy">
                             </div>
                             <h3 style="font-family: var(--font-serif); font-size: 16px; margin-bottom: 5px; color: var(--dark-text); text-transform: uppercase; letter-spacing: 1.5px;">${safeTitle}</h3>
-                            <p style="font-size: 11px; color: var(--muted-gray); font-weight: 500; letter-spacing: 1px;">$${price.toFixed(2)}</p>
+                            ${priceDisplay}
                         </div>
                     `;
                     productsContainer.insertAdjacentHTML('beforeend', productCardHTML);
@@ -1288,16 +1364,40 @@
         }
 
         // --- PRODUCT DETAIL VIEW LOGIC ---
-        window.openProduct = function(id, title, price, description, imageSrc) {
+        window.openProduct = function(id, title, price, description, imageSrc, originalPrice) {
             currentProductView = { id, title, price, imageSrc };
             document.getElementById('collection-view').style.display = 'none';
             document.getElementById('product-detail-view').style.display = 'block';
             document.getElementById('dynamic-main-title').style.display = 'none'; 
+            
+            // Reset quantity to 1 when opening a new product
+            document.getElementById('product-quantity').value = 1;
 
             document.getElementById('detail-title').textContent = title;
-            document.getElementById('detail-price').textContent = "$" + parseFloat(price).toFixed(2);
             document.getElementById('detail-desc').textContent = description;
             document.getElementById('detail-image').src = imageSrc;
+            
+            // Dynamic Pricing Logic (Amazon Style)
+            let priceHTML = '';
+            if (originalPrice && originalPrice > price) {
+                const discountPercent = Math.round(((originalPrice - price) / originalPrice) * 100);
+                priceHTML = `
+                    <div style="display: flex; align-items: baseline; gap: 10px; margin-bottom: 5px;">
+                        <span style="color: #CC0C39; font-size: 28px; font-weight: 300;">-${discountPercent}%</span>
+                        <span style="font-size: 32px; font-weight: 500; color: var(--dark-text);">₹${parseFloat(price).toFixed(2)}</span>
+                    </div>
+                    <div style="font-size: 13px; color: var(--muted-gray);">
+                        M.R.P.: <span style="text-decoration: line-through;">₹${parseFloat(originalPrice).toFixed(2)}</span>
+                    </div>
+                    <div style="font-size: 13px; color: var(--dark-text); margin-top: 5px;">Inclusive of all taxes</div>
+                `;
+            } else {
+                priceHTML = `
+                    <div style="font-size: 32px; font-weight: 500; color: var(--dark-text); margin-bottom: 5px;">₹${parseFloat(price).toFixed(2)}</div>
+                    <div style="font-size: 13px; color: var(--dark-text);">Inclusive of all taxes</div>
+                `;
+            }
+            document.getElementById('price-container').innerHTML = priceHTML;
             
             window.scrollTo({ top: 0, behavior: 'smooth' });
         };
@@ -1310,7 +1410,8 @@
         };
 
         window.addCurrentProductToCart = function() {
-            addSecureProductToCart(currentProductView.id, 1);
+            const qty = parseInt(document.getElementById('product-quantity').value) || 1;
+            addSecureProductToCart(currentProductView.id, qty);
         };
     </script>
 </body>
