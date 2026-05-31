@@ -25,10 +25,40 @@
         body { font-family: var(--font-sans); background-color: #f8f8f8; margin: 0; color: var(--dark-text); }
         
         /* --- HEADER & NAVIGATION --- */
-        .site-header { background: var(--primary-bg); padding: 20px 40px; border-bottom: 1px solid var(--border-color); display: flex; justify-content: space-between; align-items: center; position: sticky; top: 0; z-index: 100;}
-        .brand-logo { font-family: var(--font-serif); font-size: 28px; letter-spacing: 4px; text-transform: uppercase; margin: 0; font-weight: 400; }
+        .site-header { 
+            background: var(--primary-bg); 
+            padding: 15px 40px; 
+            border-bottom: 1px solid var(--border-color); 
+            display: grid; 
+            grid-template-columns: 1fr auto 1fr; /* Forces perfect centering */
+            align-items: center; 
+            position: sticky; 
+            top: 0; 
+            z-index: 100;
+        }
         
-        .admin-nav { display: flex; gap: 30px; align-items: center; }
+        .header-left {
+            /* Empty placeholder to balance the grid */
+        }
+
+        .brand-logo-wrapper {
+            display: flex;
+            justify-content: center;
+        }
+
+        .brand-logo-img { 
+            height: 65px; /* Adjust this value to make your logo bigger or smaller */
+            width: auto;
+            object-fit: contain;
+        }
+        
+        .admin-nav { 
+            display: flex; 
+            gap: 30px; 
+            align-items: center; 
+            justify-content: flex-end; /* Aligns the admin buttons to the right */
+        }
+        
         .nav-btn { background: none; border: none; font-family: var(--font-sans); text-transform: uppercase; letter-spacing: 1.5px; font-size: 11px; cursor: pointer; padding-bottom: 5px; color: var(--muted-gray); transition: 0.3s; }
         .nav-btn:hover { color: var(--dark-text); }
         .nav-btn.active { color: var(--dark-text); border-bottom: 1px solid var(--dark-text); font-weight: 500; }
@@ -96,7 +126,7 @@
             .admin-preview-section { width: 100%; position: static; }
             .inv-item { flex-direction: column; align-items: flex-start; gap: 15px; }
             .inv-actions { width: 100%; justify-content: flex-start; }
-            .site-header { flex-direction: column; gap: 20px; padding: 20px; }
+            .site-header { display: flex; flex-direction: column; gap: 20px; padding: 20px; }
         }
     </style>
 </head>
@@ -109,7 +139,12 @@
     <div id="admin-content" style="display: none;">
         
         <header class="site-header">
-            <h1 class="brand-logo">ABAYRAH</h1>
+            <div class="header-left"></div>
+
+            <div class="brand-logo-wrapper">
+                <img src="header.png" alt="ABAYRAH Logo" class="brand-logo-img">
+            </div>
+
             <nav class="admin-nav">
                 <button class="nav-btn active" id="tab-add" onclick="switchTab('add')">Add New Product</button>
                 <button class="nav-btn" id="tab-manage" onclick="switchTab('manage')">Manage Inventory</button>
