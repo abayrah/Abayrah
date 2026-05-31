@@ -131,7 +131,7 @@
         .carousel-slide { 
             position: absolute; 
             top: 0; 
-            left: 100%; /* Start strictly off-screen to the right */
+            left: 100%; 
             width: 100%; 
             height: 100%; 
             background-position: center; 
@@ -143,12 +143,12 @@
         }
 
         .carousel-slide.active-hero-slide {
-            left: 0; /* Slide into view */
+            left: 0; 
             z-index: 1;
         }
 
         .carousel-slide.previous-hero-slide {
-            left: -100%; /* Slide out to the left */
+            left: -100%; 
             z-index: 0;
         }
 
@@ -216,25 +216,24 @@
         .category-img { 
             position: absolute; 
             top: 0; 
-            left: 100%; /* Start off-screen to the right */
+            left: 100%; 
             width: 100%; 
             height: 100%; 
             display: block; 
             object-fit: contain; 
             opacity: 0; 
-            /* Transition left for sliding, opacity for smoothness, transform for hover zoom */
             transition: left 0.8s cubic-bezier(0.25, 1, 0.5, 1), opacity 0.6s ease, transform 1.2s cubic-bezier(0.16, 1, 0.3, 1); 
             z-index: 0; 
         }
         
         .category-img.active-mini-slide { 
-            left: 0; /* Slide into the center */
+            left: 0; 
             opacity: 1; 
             z-index: 1; 
         }
 
         .category-img.previous-mini-slide {
-            left: -100%; /* Slide out to the left */
+            left: -100%; 
             opacity: 0;
             z-index: 0;
         }
@@ -419,6 +418,9 @@
                             <h4 id="profileName">Guest</h4>
                             <p id="profileEmail">guest@abayrah.com</p>
                         </div>
+                        
+                        <a href="admin.html" id="adminVaultBtn" class="logout-btn" style="display: none; margin-bottom: 15px; border-bottom: 1px solid var(--border-color); padding-bottom: 15px;">Admin Vault</a>
+                        
                         <button class="logout-btn" id="logoutBtn">Log Out</button>
                     </div>
                 </div>
@@ -848,32 +850,27 @@
         const dots = document.querySelectorAll('.indicator-dot');
         let currentSlideIndex = 0;
         let carouselIntervalId = null;
-        let isAnimating = false; // Prevents spam clicking the dots
+        let isAnimating = false;
 
         function showTargetSlide(index) {
             if (!slides.length || isAnimating || index === currentSlideIndex) return;
             isAnimating = true;
 
             const prevIndex = currentSlideIndex;
-            // Ensure index loops properly
             currentSlideIndex = (index + slides.length) % slides.length;
 
-            // Update Indicator Dots
             if (dots[prevIndex]) dots[prevIndex].classList.remove('active-dot');
             if (dots[currentSlideIndex]) dots[currentSlideIndex].classList.add('active-dot');
 
-            // Slide out the old image to the left
             slides[prevIndex].classList.remove('active-hero-slide');
             slides[prevIndex].classList.add('previous-hero-slide');
             
-            // Slide in the new image from the right
             slides[currentSlideIndex].classList.add('active-hero-slide');
 
-            // Clean up: Reset the old image back to the right side after it finishes sliding out
             setTimeout(() => {
                 slides[prevIndex].classList.remove('previous-hero-slide');
                 isAnimating = false;
-            }, 1200); // This must match the 1.2s transition time in the CSS
+            }, 1200); 
         }
 
         function runAutoRotationPipeline() { 
@@ -882,7 +879,7 @@
         
         function startSliderInterval() { 
             if(slides.length) {
-                carouselIntervalId = setInterval(runAutoRotationPipeline, 4500); // Slide changes every 4.5 seconds
+                carouselIntervalId = setInterval(runAutoRotationPipeline, 4500);
             } 
         }
 
@@ -901,7 +898,6 @@
         let globalMiniIndex = 0;
 
         if (miniCarousels.length > 0) {
-            // One master timer controls all cards at the exact same time
             setInterval(() => {
                 const numSlides = miniCarousels[0].querySelectorAll('.category-img').length;
                 const prevIndex = globalMiniIndex;
@@ -1005,7 +1001,7 @@
     <script type="module">
         import { initializeApp } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-app.js";
         import { getAuth, signInWithPopup, GoogleAuthProvider, signOut, onAuthStateChanged, createUserWithEmailAndPassword, signInWithEmailAndPassword, updateProfile } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-auth.js";
-        import { getFirestore, doc, setDoc, onSnapshot, collection, getDoc, getDocs, deleteDoc } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-firestore.js";
+        import { getFirestore, doc, setDoc, onSnapshot, collection, getDoc, getDocs, deleteDoc, query, where } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-firestore.js";
 
         const firebaseConfig = {
            apiKey: "AIzaSyDxe9DeHRsCzD4vlNsknlDHN0w7txd51ic",
@@ -1092,8 +1088,8 @@
 
         if (logoutBtn) logoutBtn.addEventListener('click', () => signOut(auth));
 
-        // --- FIRESTORE SECURE CART SYNC ---
-        onAuthStateChanged(auth, (user) => {
+        // --- FIRESTORE SECURE AUTH & ADMIN SYNC ---
+        onAuthStateChanged(auth, async (user) => {
             if (user) {
                 window.isAppLoggedIn = true;
                 currentUser = user;
@@ -1104,6 +1100,21 @@
                 profilePic.src = user.photoURL || `https://ui-avatars.com/api/?name=${user.displayName || 'Guest'}&background=C5A880&color=fff&bold=true&font-size=0.4`;
                 profileName.textContent = user.displayName || "Guest Profile";
                 profileEmail.textContent = user.email || "";
+
+                // 🔒 SECURE ADMIN CHECK 
+                const adminBtn = document.getElementById('adminVaultBtn');
+                if (adminBtn) adminBtn.style.display = 'none'; 
+                
+                try {
+                    const adminRef = doc(db, "admins", user.email.toLowerCase());
+                    const adminSnap = await getDoc(adminRef);
+                    
+                    if (adminSnap.exists() && adminBtn) {
+                        adminBtn.style.display = 'block';
+                    }
+                } catch (error) {
+                    console.log("Standard user session loaded.");
+                }
 
                 // Start listening to their live secure cart
                 listenToCart(user.uid);
@@ -1219,17 +1230,19 @@
             document.getElementById('main-storefront').style.display = 'block';
             document.getElementById('catalogs').scrollIntoView({ behavior: 'smooth' });
         };
+        
         // --- FIRESTORE PRODUCT LOADING ---
         async function loadProducts(categoryFilter) {
             const productsContainer = document.getElementById('collection-view');
             try {
-                // If you add categories to your Firebase in the future, you can filter here 
-                // e.g. query(collection(db, "products"), where("category", "==", categoryFilter));
-                const querySnapshot = await getDocs(collection(db, "products"));
+                const productsRef = collection(db, "products");
+                const q = query(productsRef, where("category", "==", categoryFilter));
+                const querySnapshot = await getDocs(q);
+                
                 productsContainer.innerHTML = ''; 
 
                 if(querySnapshot.empty) {
-                    productsContainer.innerHTML = '<p style="text-align: center; width: 100%; color: var(--muted-gray);">No products available right now.</p>';
+                    productsContainer.innerHTML = `<p style="text-align: center; width: 100%; color: var(--muted-gray); font-style: italic; margin-top: 40px;">No premium pieces currently available in the ${categoryFilter} collection.</p>`;
                     return;
                 }
 
