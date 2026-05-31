@@ -191,7 +191,7 @@
             z-index: 2100;
         }
 
-      .header-actions a, .header-actions button {
+        .header-actions a, .header-actions button {
             display: inline-flex;
             align-items: center;
             justify-content: center;
@@ -344,29 +344,23 @@
         }
 
         .carousel-track-wrapper {
-    position: absolute;
-    inset: 0;
-    width: 100%;
-    height: 100%;
-    z-index: 1;
-    display: flex; /* This lines all 6 images up in a row */
-    transition: transform 1.2s cubic-bezier(0.25, 1, 0.5, 1); /* This creates the smooth sliding motion */
-}
+            position: absolute;
+            inset: 0;
+            width: 100%;
+            height: 100%;
+            z-index: 1;
+            display: flex;
+            transition: transform 1.2s cubic-bezier(0.25, 1, 0.5, 1);
+        }
 
-     .carousel-slide {
-    flex: 0 0 100%; /* Forces each image to take up exactly 1 screen width */
-    width: 100%;
-    height: 100%;
-    background-position: center;
-    background-size: cover; 
-    background-repeat: no-repeat;
-    background-image: var(--desktop-img);
-    /* Notice we removed position: absolute and opacity! */
-}
-
-
-        .carousel-slide.active-slide {
-            opacity: 1;
+        .carousel-slide {
+            flex: 0 0 100%;
+            width: 100%;
+            height: 100%;
+            background-position: center;
+            background-size: cover; 
+            background-repeat: no-repeat;
+            background-image: var(--desktop-img);
         }
 
         .carousel-overlay-shadow {
@@ -623,21 +617,9 @@
         }
 
         @keyframes vaultBreathe {
-            0% {
-                transform: scale(1);
-                box-shadow: 0 0 10px rgba(197, 168, 128, 0.1);
-                border-color: rgba(42, 40, 38, 0.6);
-            }
-            50% {
-                transform: scale(1.01);
-                box-shadow: 0 0 25px rgba(197, 168, 128, 0.3);
-                border-color: rgba(197, 168, 128, 0.8);
-            }
-            100% {
-                transform: scale(1);
-                box-shadow: 0 0 10px rgba(197, 168, 128, 0.1);
-                border-color: rgba(42, 40, 38, 0.6);
-            }
+            0% { transform: scale(1); box-shadow: 0 0 10px rgba(197, 168, 128, 0.1); border-color: rgba(42, 40, 38, 0.6); }
+            50% { transform: scale(1.01); box-shadow: 0 0 25px rgba(197, 168, 128, 0.3); border-color: rgba(197, 168, 128, 0.8); }
+            100% { transform: scale(1); box-shadow: 0 0 10px rgba(197, 168, 128, 0.1); border-color: rgba(42, 40, 38, 0.6); }
         }
 
         .vault-sale-banner:hover {
@@ -816,7 +798,6 @@
             transition: all 0.7s cubic-bezier(0.16, 1, 0.3, 1);
         }
         
-        /* UPDATED: Mini Carousel wrapper styles */
         .img-wrapper {
             width: 100%;
             aspect-ratio: 3 / 4;
@@ -863,7 +844,7 @@
             justify-content: center;
             background-color: var(--primary-bg);
             position: relative;
-            z-index: 2; /* Ensures content stays above absolute images */
+            z-index: 2; 
         }
 
         .category-name {
@@ -1151,27 +1132,12 @@
             margin-bottom: 20px;
         }
 
-        /* Dynamically hide/show fields depending on "Sign In" vs "Register" */
-        .register-field {
-            display: none;
-        }
-        
-        .modal-content.is-registering .register-field {
-            display: block;
-        }
+        .register-field { display: none; }
+        .modal-content.is-registering .register-field { display: block; }
+        .modal-content.is-registering .input-group { margin-bottom: 15px; }
 
-        .modal-content.is-registering .input-group {
-            margin-bottom: 15px;
-        }
-
-        .form-row {
-            display: flex;
-            gap: 15px;
-        }
-
-        .form-row .input-group {
-            flex: 1;
-        }
+        .form-row { display: flex; gap: 15px; }
+        .form-row .input-group { flex: 1; }
 
         .input-group label {
             display: block;
@@ -1195,24 +1161,16 @@
             box-sizing: border-box;
         }
 
-        .input-group input:focus {
-            border-color: var(--accent-gold);
-        }
+        .input-group input:focus { border-color: var(--accent-gold); }
+        .input-group input::placeholder { color: #C2BFBB; }
 
-        .input-group input::placeholder {
-            color: #C2BFBB;
-        }
-
-        /* Password Input Wrapper for Eye Icon */
         .password-wrapper {
             position: relative;
             display: flex;
             align-items: center;
         }
 
-        .password-wrapper input {
-            padding-right: 40px; /* Leave space for the eye icon */
-        }
+        .password-wrapper input { padding-right: 40px; }
 
         .toggle-password-btn {
             position: absolute;
@@ -1228,15 +1186,8 @@
             transition: color 0.3s ease;
         }
 
-        .toggle-password-btn:hover {
-            color: var(--dark-text);
-        }
-
-        .toggle-password-btn svg {
-            width: 18px;
-            height: 18px;
-            fill: currentColor;
-        }
+        .toggle-password-btn:hover { color: var(--dark-text); }
+        .toggle-password-btn svg { width: 18px; height: 18px; fill: currentColor; }
 
         .auth-error-msg {
             color: #E24C4C;
@@ -1264,9 +1215,7 @@
             margin-bottom: 25px;
         }
 
-        .submit-btn:hover {
-            background-color: var(--accent-gold);
-        }
+        .submit-btn:hover { background-color: var(--accent-gold); }
 
         .modal-links {
             display: flex;
@@ -1286,11 +1235,9 @@
             cursor: pointer;
         }
 
-        .modal-links a:hover {
-            text-decoration-color: var(--dark-text);
-        }
+        .modal-links a:hover { text-decoration-color: var(--dark-text); }
 
-       /* --- Premium Search Overlay (UPDATED FOR VISIBILITY) --- */
+       /* --- Premium Search Overlay --- */
         .search-overlay {
             position: fixed;
             top: 0; left: 0; 
@@ -1350,6 +1297,169 @@
             letter-spacing: 1px;
         }
 
+        /* --- Luxury Cart Drawer --- */
+        .cart-overlay {
+            position: fixed;
+            top: 0; left: 0;
+            width: 100%; height: 100%;
+            background-color: rgba(13, 12, 11, 0.6);
+            backdrop-filter: blur(4px);
+            z-index: 3000;
+            opacity: 0;
+            visibility: hidden;
+            transition: var(--transition-smooth);
+        }
+
+        .cart-overlay.active {
+            opacity: 1;
+            visibility: visible;
+        }
+
+        .cart-drawer {
+            position: fixed;
+            top: 0; right: 0;
+            width: 100%;
+            max-width: 450px;
+            height: 100vh;
+            background-color: var(--primary-bg);
+            z-index: 3010;
+            box-shadow: -15px 0 40px rgba(0, 0, 0, 0.1);
+            transform: translateX(100%);
+            transition: transform 0.6s cubic-bezier(0.25, 1, 0.5, 1);
+            display: flex;
+            flex-direction: column;
+        }
+
+        .cart-drawer.active {
+            transform: translateX(0);
+        }
+
+        .cart-header {
+            padding: 30px 40px;
+            border-bottom: 1px solid var(--border-color);
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .cart-header h3 {
+            font-family: var(--font-serif);
+            font-size: 24px;
+            font-weight: 400;
+            text-transform: uppercase;
+            letter-spacing: 2px;
+            color: var(--dark-text);
+        }
+
+        .cart-header .modal-close {
+            position: static; 
+        }
+
+        .cart-body {
+            flex: 1;
+            overflow-y: auto;
+            padding: 40px;
+        }
+
+        .empty-cart-state {
+            text-align: center;
+            margin-top: 50px;
+        }
+
+        .empty-cart-state p {
+            font-size: 13px;
+            color: var(--muted-gray);
+            margin-bottom: 30px;
+            font-weight: 300;
+        }
+
+        .cart-item {
+            display: flex;
+            gap: 20px;
+            margin-bottom: 30px;
+            padding-bottom: 30px;
+            border-bottom: 1px solid var(--border-color);
+        }
+
+        .cart-item-img {
+            width: 90px;
+            height: 120px;
+            object-fit: cover;
+            background-color: #FAFAFA;
+        }
+
+        .cart-item-details {
+            flex: 1;
+            display: flex;
+            flex-direction: column;
+            justify-content: space-between;
+        }
+
+        .cart-item-title {
+            font-family: var(--font-serif);
+            font-size: 18px;
+            color: var(--dark-text);
+            margin-bottom: 5px;
+        }
+
+        .cart-item-price {
+            font-size: 12px;
+            color: var(--muted-gray);
+            font-weight: 500;
+        }
+
+        .cart-item-actions {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-top: 15px;
+        }
+
+        .remove-item-btn {
+            background: none;
+            border: none;
+            font-size: 10px;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            color: var(--muted-gray);
+            cursor: pointer;
+            text-decoration: underline;
+            text-underline-offset: 3px;
+        }
+
+        .remove-item-btn:hover {
+            color: #E24C4C;
+        }
+
+        .cart-footer {
+            padding: 30px 40px;
+            background-color: #FAFAFA;
+            border-top: 1px solid var(--border-color);
+        }
+
+        .cart-subtotal {
+            display: flex;
+            justify-content: space-between;
+            font-size: 14px;
+            font-weight: 500;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            color: var(--dark-text);
+            margin-bottom: 10px;
+        }
+
+        .subtotal-amount {
+            font-family: var(--font-serif);
+            font-size: 22px;
+            font-weight: 500;
+        }
+
+        .shipping-note {
+            font-size: 11px;
+            color: var(--muted-gray);
+            margin-bottom: 20px;
+        }
+
         /* 📱 TABLET VIEW */
         @media (max-width: 1024px) {
             .category-grid { grid-template-columns: repeat(3, 1fr); }
@@ -1385,15 +1495,7 @@
             .category-content { padding: 15px 5px 10px 5px; }
             .category-name { font-size: 14px; }
             
-            .header-container {
-                display: flex;
-                justify-content: space-between;
-                align-items: center;
-                max-width: 1440px;
-                margin: 0 auto;
-                padding: 18px 40px; 
-                transition: var(--transition-smooth);
-            }
+            .header-container { padding: 18px 40px; }
             .header-actions { gap: 15px; }
             .brand-identity { min-width: 120px; display: flex; align-items: center; justify-content: center; }
             .brand-logo-img { height: 120px; position: relative; top: auto; left: auto; transform: none; } 
@@ -1472,7 +1574,7 @@
                     </div>
                 </div>
 
-                <a href="#cart" class="cart-icon" aria-label="Open Luxury Shopping Bag Cart View">
+                <a href="#" class="cart-icon" id="cartIconBtn" aria-label="Open Luxury Shopping Bag Cart View">
                     <svg viewBox="0 0 24 24"><path d="M7 18c-1.1 0-1.99.9-1.99 2S5.9 22 7 22s2-.9 2-2-.9-2-2-2zm10 0c-1.1 0-1.99.9-1.99 2s.9 2 1.99 2 2-.9 2-2-.9-2-2-2zm-9.83-3.25l.03-.12M1 2h3.27l3.6 7.59-1.35 2.45c-.16.28-.25.61-.25.96 0 1.1.9 2 2 2h12v-2H7.42c-.14 0-.25-.11-.25-.25l.03-.12.9-1.63h7.45c.75 0 1.41-.41 1.75-1.03l3.58-6.49c.08-.14.12-.31.12-.48 0-.55-.45-1-1-1H5.21l-.94-2H1v2z"/></svg>
                 </a>
             </div>
@@ -1482,7 +1584,7 @@
 
     <section class="hero-section">
         <div class="carousel-track-wrapper" id="heroCarouselTrack">
-            <div class="carousel-slide active-slide" style="--desktop-img: url('images/hero-background.png'); --mobile-img: url('images/mobile-hero-1.png');"></div>
+            <div class="carousel-slide" style="--desktop-img: url('images/hero-background.png'); --mobile-img: url('images/mobile-hero-1.png');"></div>
             <div class="carousel-slide" style="--desktop-img: url('images/abaya.png'); --mobile-img: url('images/mobile-abaya.png');"></div>
             <div class="carousel-slide" style="--desktop-img: url('images/naqabs.png'); --mobile-img: url('images/mobile-naqabs.png');"></div>
             <div class="carousel-slide" style="--desktop-img: url('images/hijabs.png'); --mobile-img: url('images/mobile-hijabs.png');"></div>
@@ -1554,7 +1656,7 @@
     </section>
 
     <section class="vault-sale-section" id="shop-sale">
-        <div class="vault-sale-banner" onclick="location.href='#vault-offers'">
+        <div class="vault-sale-banner" onclick="addToCart('The Archive Collection Abaya', 145.00, 'sale-image.png');">
             <div class="vault-ambient-light"></div>
             <div class="vault-promo-content">
                 <span class="vault-subtitle">The Archive Event</span>
@@ -1563,7 +1665,7 @@
                     <div class="vault-value-text">OFF</div>
                 </div>
                 <p class="vault-desc">Unlock exceptional savings on our most sought-after silhouettes.</p>
-                <span class="vault-cta">Shop The Sale</span>
+                <span class="vault-cta">Add to Cart</span>
             </div>
         </div>
     </section>
@@ -1716,6 +1818,35 @@
         </div>
     </div>
 
+    <div class="cart-overlay" id="cartOverlay"></div>
+    <div class="cart-drawer" id="cartDrawer">
+        <div class="cart-header">
+            <h3>Your Vault</h3>
+            <button class="modal-close" id="closeCartBtn" aria-label="Close Cart">&times;</button>
+        </div>
+        
+        <div class="cart-body">
+            <div class="empty-cart-state" id="emptyCartState">
+                <p>Your vault is currently empty.</p>
+                <button class="submit-btn" onclick="document.getElementById('closeCartBtn').click(); document.getElementById('catalogs').scrollIntoView({behavior: 'smooth'});">
+                    Discover Collections
+                </button>
+            </div>
+
+            <div class="cart-items-wrapper" id="cartItemsWrapper" style="display: none;">
+                </div>
+        </div>
+
+        <div class="cart-footer" id="cartFooter" style="display: none;">
+            <div class="cart-subtotal">
+                <span>Subtotal</span>
+                <span class="subtotal-amount" id="cartSubtotalAmount">$0.00</span>
+            </div>
+            <p class="shipping-note">Taxes and shipping calculated at checkout.</p>
+            <button class="submit-btn">Proceed to Checkout</button>
+        </div>
+    </div>
+
     <div class="modal-overlay" id="loginModal">
         <div class="modal-content">
             <button class="modal-close" id="closeModalBtn" aria-label="Close Modal">&times;</button>
@@ -1805,14 +1936,12 @@
         const categoryCards = document.querySelectorAll('.category-card');
         const collectionsSection = document.getElementById('catalogs');
 
-        // Open Search
         searchTriggerBtn.addEventListener('click', (e) => {
             e.preventDefault();
             searchOverlay.classList.add('active');
             setTimeout(() => searchInput.focus(), 100); 
         });
 
-        // Close Search
         closeSearchBtn.addEventListener('click', closeSearch);
         searchOverlay.addEventListener('click', (e) => {
             if (e.target === searchOverlay) closeSearch();
@@ -1824,7 +1953,6 @@
             filterProducts(''); 
         }
 
-        // Live Typing Filter
         searchInput.addEventListener('input', (e) => filterProducts(e.target.value));
 
         function filterProducts(term) {
@@ -1880,30 +2008,23 @@
             });
         });
 
-        // --- Luxury Carousel System Core (Main Hero) ---
+        // --- Luxury Carousel System Core (Sliding Version) ---
         const slides = document.querySelectorAll('.carousel-slide');
         const dots = document.querySelectorAll('.indicator-dot');
         let currentSlideIndex = 0;
         let carouselIntervalId = null;
 
-       function showTargetSlide(index) {
-    if (!slides.length) return;
-    
-    // 1. Remove the highlight from the current dot
-    if (dots[currentSlideIndex]) dots[currentSlideIndex].classList.remove('active-dot');
-    
-    // 2. Figure out the next slide index (0 through 5)
-    currentSlideIndex = (index + slides.length) % slides.length;
-    
-    // 3. SLIDE THE ENTIRE ROW OF IMAGES
-    // If index is 1 (2nd image), it pushes the row left by -100%
-    // If index is 2 (3rd image), it pushes the row left by -200%, etc.
-    const track = document.getElementById('heroCarouselTrack');
-    track.style.transform = `translateX(-${currentSlideIndex * 100}%)`;
-    
-    // 4. Highlight the new active dot
-    if (dots[currentSlideIndex]) dots[currentSlideIndex].classList.add('active-dot');
-}
+        function showTargetSlide(index) {
+            if (!slides.length) return;
+            
+            if (dots[currentSlideIndex]) dots[currentSlideIndex].classList.remove('active-dot');
+            currentSlideIndex = (index + slides.length) % slides.length;
+            
+            const track = document.getElementById('heroCarouselTrack');
+            track.style.transform = `translateX(-${currentSlideIndex * 100}%)`;
+            
+            if (dots[currentSlideIndex]) dots[currentSlideIndex].classList.add('active-dot');
+        }
 
         function runAutoRotationPipeline() { showTargetSlide(currentSlideIndex + 1); }
         function startSliderInterval() { if(slides.length) carouselIntervalId = setInterval(runAutoRotationPipeline, 3000); }
@@ -1917,19 +2038,13 @@
         });
         startSliderInterval();
 
-        // --- NEW: Category Card Mini-Carousels ---
+        // --- Category Card Mini-Carousels ---
         const miniCarousels = document.querySelectorAll('.mini-carousel');
-        
         miniCarousels.forEach(carousel => {
             const miniSlides = carousel.querySelectorAll('.category-img');
-            
-            // Skip logic if there's only 1 image provided inside the category wrapper
             if(miniSlides.length <= 1) return;
-            
             let currentMiniIndex = 0;
-            // Add a slight randomization to interval time so they don't all cycle at the exact identical millisecond
             const intervalTime = 3000 + (Math.random() * 1500);
-            
             setInterval(() => {
                 miniSlides[currentMiniIndex].classList.remove('active-mini-slide');
                 currentMiniIndex = (currentMiniIndex + 1) % miniSlides.length;
@@ -1943,7 +2058,6 @@
             btn.addEventListener('click', function() {
                 const input = this.previousElementSibling;
                 const eyeSlash = this.querySelector('.eye-slash');
-                
                 if (input.getAttribute('type') === 'password') {
                     input.setAttribute('type', 'text');
                     eyeSlash.style.display = 'none'; 
@@ -1954,7 +2068,7 @@
             });
         });
 
-        // --- UI Modal Toggle Logic ---
+        // --- UI Modal & Dropdown Logic ---
         const accountIconBtn = document.getElementById('accountIconBtn');
         const profilePic = document.getElementById('profilePic');
         const profileDropdown = document.getElementById('profileDropdown');
@@ -1968,13 +2082,14 @@
         accountIconBtn.addEventListener('click', () => {
             if(!window.isAppLoggedIn) {
                 loginModal.classList.add('active');
+                document.getElementById('modalTitle').textContent = "Sign In";
+                document.getElementById('modalSubtitle').textContent = "Access your exclusive ABAYRAH profile vault";
             }
         });
 
         closeModalBtn.addEventListener('click', () => {
             loginModal.classList.remove('active');
             authErrorMsg.style.display = 'none'; 
-            
             const pwInputs = document.querySelectorAll('.password-wrapper input');
             const eyeSlashes = document.querySelectorAll('.eye-slash');
             pwInputs.forEach(input => input.setAttribute('type', 'password'));
@@ -2042,6 +2157,100 @@
                 document.getElementById('confirmPasswordInput').required = false;
             }
         });
+
+        // --- Premium Cart Logic ---
+        const cartIconBtn = document.getElementById('cartIconBtn');
+        const cartOverlay = document.getElementById('cartOverlay');
+        const cartDrawer = document.getElementById('cartDrawer');
+        const closeCartBtn = document.getElementById('closeCartBtn');
+        
+        const emptyCartState = document.getElementById('emptyCartState');
+        const cartItemsWrapper = document.getElementById('cartItemsWrapper');
+        const cartFooter = document.getElementById('cartFooter');
+        const cartSubtotalAmount = document.getElementById('cartSubtotalAmount');
+
+        let shoppingCart = [];
+
+        cartIconBtn.addEventListener('click', (e) => {
+            e.preventDefault();
+            if (!window.isAppLoggedIn) {
+                loginModal.classList.add('active');
+                document.getElementById('modalTitle').textContent = "Sign In Required";
+                document.getElementById('modalSubtitle').textContent = "Please sign in to view your secure vault.";
+            } else {
+                cartOverlay.classList.add('active');
+                cartDrawer.classList.add('active');
+                renderCart();
+            }
+        });
+
+        function closeCart() {
+            cartOverlay.classList.remove('active');
+            cartDrawer.classList.remove('active');
+        }
+        closeCartBtn.addEventListener('click', closeCart);
+        cartOverlay.addEventListener('click', closeCart);
+
+        function renderCart() {
+            cartItemsWrapper.innerHTML = ''; 
+            let subtotal = 0;
+
+            if (shoppingCart.length === 0) {
+                emptyCartState.style.display = 'block';
+                cartItemsWrapper.style.display = 'none';
+                cartFooter.style.display = 'none';
+            } else {
+                emptyCartState.style.display = 'none';
+                cartItemsWrapper.style.display = 'block';
+                cartFooter.style.display = 'block';
+
+                shoppingCart.forEach((item, index) => {
+                    subtotal += item.price;
+                    const itemHTML = `
+                        <div class="cart-item">
+                            <img src="${item.img}" alt="${item.name}" class="cart-item-img">
+                            <div class="cart-item-details">
+                                <div>
+                                    <h4 class="cart-item-title">${item.name}</h4>
+                                    <div class="cart-item-price">$${item.price.toFixed(2)}</div>
+                                </div>
+                                <div class="cart-item-actions">
+                                    <span style="font-size: 11px; color: var(--muted-gray);">Qty: 1</span>
+                                    <button class="remove-item-btn" onclick="removeFromCart(${index})">Remove</button>
+                                </div>
+                            </div>
+                        </div>
+                    `;
+                    cartItemsWrapper.innerHTML += itemHTML;
+                });
+
+                cartSubtotalAmount.textContent = `$${subtotal.toFixed(2)}`;
+            }
+        }
+
+        window.removeFromCart = function(index) {
+            shoppingCart.splice(index, 1);
+            renderCart();
+        };
+
+        window.addToCart = function(productName, productPrice, productImg) {
+            if (!window.isAppLoggedIn) {
+                loginModal.classList.add('active');
+                document.getElementById('modalTitle').textContent = "Sign In Required";
+                document.getElementById('modalSubtitle').textContent = "Please sign in to add items to your vault.";
+                return;
+            }
+
+            shoppingCart.push({
+                name: productName,
+                price: productPrice,
+                img: productImg
+            });
+            
+            cartOverlay.classList.add('active');
+            cartDrawer.classList.add('active');
+            renderCart();
+        };
     </script>
 
     <script type="module">
