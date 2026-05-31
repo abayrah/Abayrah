@@ -1038,42 +1038,28 @@
 
 
 
-            <div id="view-manage" style="display: none;">
-
-
-
+         <div id="view-manage" style="display: none;">
                 <div class="admin-form-section" style="width: 100%;">
-
-
-
                     <div class="admin-header">
-
-
-
                         <h2>Inventory Management</h2>
-
-
-
                     </div>
-
-
-
                     <p class="welcome-text">View all live products across all catalogs, toggle their availability, or permanently remove them.</p>
-
-
-
                     
-
-
+                    <!-- NEW CATEGORY FILTER DROPDOWN -->
+                    <div class="form-group" style="max-width: 300px; margin-bottom: 25px;">
+                        <label>Filter by Catalog</label>
+                        <select id="filter-category" onchange="loadInventory()">
+                            <option value="all" selected>All Products</option>
+                            <option value="abayas">Abayas</option>
+                            <option value="hampers">Hampers</option>
+                            <option value="Naqabs">Naqabs</option>
+                            <option value="Hijabs">Hijabs</option>
+                            <option value="accessories">Accessories</option>
+                        </select>
+                    </div> 
 
                     <div id="inventory-list" class="inventory-list"></div>
-
-
-
                 </div>
-
-
-
             </div>
 
 
@@ -1852,232 +1838,80 @@
 
         };
 
-
-
-
-
-
-
         // --- FETCH & RENDER INVENTORY ---
-
-
 
         window.allProductsData = {}; // Store data locally so the modal can access it
 
 
-
-
-
-
-
-        window.loadInventory = async function() {
-
-
-
+       window.loadInventory = async function() {
             const listContainer = document.getElementById('inventory-list');
-
-
-
-            listContainer.innerHTML = '<p style="color:var(--muted-gray); font-size: 12px; text-transform:uppercase;">Loading Database...</p>';
-
-
-
+            const filterDropdown = document.getElementById('filter-category');
+            const filterVal = filterDropdown ? filterDropdown.value : 'all'; // Gets the current dropdown selection
             
-
-
-
+            listContainer.innerHTML = '<p style="color:var(--muted-gray); font-size: 12px; text-transform:uppercase;">Loading Database...</p>';
+            
             try {
-
-
-
                 const querySnapshot = await getDocs(collection(db, "products"));
-
-
-
                 listContainer.innerHTML = ''; 
-
-
-
                 window.allProductsData = {}; // Clear previous data
 
-
-
-
-
-
-
                 if (querySnapshot.empty) {
-
-
-
                     listContainer.innerHTML = '<p style="color:var(--muted-gray); font-size: 12px;">No products found in the database.</p>';
-
-
-
                     return;
-
-
-
                 }
 
-
-
-
-
-
+                let itemsFound = 0;
 
                 querySnapshot.forEach((docSnap) => {
-
-
-
                     const data = docSnap.data();
-
-
-
                     const id = docSnap.id;
-
-
-
                     const inStock = data.inStock !== false; 
-
-
-
                     
-
-
-
-                    window.allProductsData[id] = data; // Save to our global object
-
-
-
+                    window.allProductsData[id] = data; 
                     const itemCategory = data.category ? data.category : "general"; 
-
-
-
                     
+                    // NEW FILTER LOGIC: Skip items that don't match the dropdown
+                    if (filterVal !== 'all' && itemCategory !== filterVal) {
+                        return; // Acts as a "continue" in a forEach loop
+                    }
 
-
+                    itemsFound++;
 
                     const itemHTML = `
-
-
-
                         <div class="inv-item ${!inStock ? 'out-of-stock' : ''}">
-
-
-
                             <div class="inv-info">
-
-
-
                                 <img src="${data.image}" alt="${data.title}" class="inv-img">
-
-
-
                                 <div class="inv-details">
-
-
-
                                     <h4 class="inv-title">${data.title}</h4>
-
-
-
                                     <span class="inv-price">₹${parseFloat(data.price).toFixed(2)}</span>
-
-
-
                                     <div class="badge-group">
-
-
-
                                         <span class="status-badge catalog-badge">${itemCategory}</span>
-
-
-
                                         <span class="status-badge">${inStock ? 'Live - In Stock' : 'Out of Stock'}</span>
-
-
-
                                     </div>
-
-
-
                                 </div>
-
-
-
                             </div>
-
-
-
                             <div class="inv-actions">
-
-
-
                                 <button class="action-btn" onclick="openEditModal('${id}')">Edit</button>
-
-
-
                                 <button class="action-btn" onclick="toggleStockStatus('${id}', ${inStock})">
-
-
-
                                     ${inStock ? 'Mark Out of Stock' : 'Mark In Stock'}
-
-
-
                                 </button>
-
-
-
                                 <button class="action-btn btn-delete" onclick="deleteProduct('${id}')">Remove</button>
-
-
-
                             </div>
-
-
-
                         </div>
-
-
-
                     `;
-
-
-
                     listContainer.insertAdjacentHTML('beforeend', itemHTML);
-
-
-
                 });
 
-
+                // Display a message if a specific category is empty
+                if (itemsFound === 0) {
+                    listContainer.innerHTML = '<p style="color:var(--muted-gray); font-size: 12px;">No products found in this category.</p>';
+                }
 
             } catch (error) {
-
-
-
                 console.error("Error fetching inventory:", error);
-
-
-
                 listContainer.innerHTML = '<p style="color:red; font-size:12px;">Error loading products.</p>';
-
-
-
             }
-
-
-
         };
-
-
-
-
-
-
-
         window.toggleStockStatus = async function(docId, currentStatus) {
 
 
@@ -2111,11 +1945,6 @@
 
 
         };
-
-
-
-
-
 
 
         window.deleteProduct = async function(docId) {
@@ -2156,15 +1985,7 @@
 
         };
 
-
-
-
-
-
-
         // --- EDIT PRODUCT LOGIC ---
-
-
 
         window.openEditModal = function(id) {
 
@@ -2175,12 +1996,6 @@
 
 
             if(!product) return;
-
-
-
-
-
-
 
             // Populate the modal fields
 
@@ -2208,12 +2023,6 @@
 
             document.getElementById('edit-desc').value = product.description || '';
 
-
-
-
-
-
-
             // Show modal
 
 
@@ -2223,12 +2032,6 @@
 
 
         };
-
-
-
-
-
-
 
         window.closeEditModal = function() {
 
@@ -2240,12 +2043,6 @@
 
         };
 
-
-
-
-
-
-
         window.saveEditedProduct = async function(event) {
 
 
@@ -2255,11 +2052,6 @@
 
 
             const btn = event.target;
-
-
-
-            
-
 
 
             const category = document.getElementById('edit-category').value;
@@ -2280,12 +2072,6 @@
 
             const desc = document.getElementById('edit-desc').value.trim();
 
-
-
-
-
-
-
             if(!title || isNaN(price) || !rawImageUrl || !desc) {
 
 
@@ -2299,22 +2085,11 @@
 
 
             }
-
-
-
-
-
-
-
-            btn.innerText = "Saving...";
+       btn.innerText = "Saving...";
 
 
 
             btn.disabled = true;
-
-
-
-
 
 
 
@@ -2335,12 +2110,6 @@
 
 
                     : convertDriveLink(rawImageUrl);
-
-
-
-
-
-
 
                 await updateDoc(doc(db, "products", id), {
 
@@ -2367,11 +2136,6 @@
 
 
                 });
-
-
-
-
-
 
 
                 closeEditModal();
@@ -2415,11 +2179,5 @@
 
 
     </script>
-
-
-
 </body>
-
-
-
 </html> 
