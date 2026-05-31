@@ -71,7 +71,7 @@
         .admin-header h2 { margin: 0 0 10px 0; font-family: var(--font-serif); text-transform: uppercase; letter-spacing: 2px; font-size: 24px; font-weight: 400; }
         .welcome-text { color: var(--muted-gray); font-size: 13px; margin-bottom: 30px; line-height: 1.6; }
         
-        /* Form Styles - ADDED SELECT HERE */
+        /* Form Styles */
         .form-group { margin-bottom: 20px; }
         label { display: block; font-weight: 500; margin-bottom: 8px; font-size: 11px; text-transform: uppercase; letter-spacing: 1.5px; }
         
@@ -138,6 +138,47 @@
             .inv-actions { width: 100%; justify-content: flex-start; }
             .site-header { display: flex; flex-direction: column; gap: 20px; padding: 20px; }
         }
+
+        /* --- EDIT MODAL STYLES --- */
+        .modal-overlay { 
+            display: none; 
+            position: fixed; 
+            top: 0; left: 0; 
+            width: 100%; height: 100%; 
+            background: rgba(0,0,0,0.5); 
+            z-index: 1000; 
+            align-items: center; 
+            justify-content: center; 
+            backdrop-filter: blur(3px);
+        }
+        .modal-content { 
+            background: #fff; 
+            padding: 40px; 
+            border-radius: 2px; 
+            width: 90%; 
+            max-width: 500px; 
+            max-height: 90vh; 
+            overflow-y: auto; 
+            box-shadow: 0 20px 40px rgba(0,0,0,0.1);
+        }
+        .modal-header { 
+            display: flex; 
+            justify-content: space-between; 
+            align-items: center; 
+            margin-bottom: 25px; 
+            border-bottom: 1px solid var(--border-color);
+            padding-bottom: 15px;
+        }
+        .modal-header h2 { margin: 0; }
+        .close-btn { 
+            background: none; 
+            border: none; 
+            font-size: 24px; 
+            cursor: pointer; 
+            color: var(--muted-gray); 
+            transition: 0.3s;
+        }
+        .close-btn:hover { color: var(--dark-text); }
     </style>
 </head>
 <body>
@@ -229,6 +270,46 @@
             </div>
 
         </div>
+
+        <div id="edit-modal" class="modal-overlay">
+            <div class="modal-content">
+                <div class="modal-header admin-header">
+                    <h2>Edit Product</h2>
+                    <button class="close-btn" onclick="closeEditModal()">&times;</button>
+                </div>
+                
+                <input type="hidden" id="edit-doc-id">
+                
+                <div class="form-group">
+                    <label>Catalog / Category</label>
+                    <select id="edit-category" required>
+                        <option value="abayas">Abayas</option>
+                        <option value="hampers">Hampers</option>
+                        <option value="Naqabs">Naqabs</option>
+                        <option value="Hijabs">Hijabs</option>
+                        <option value="accessories">Accessories</option>
+                    </select>
+                </div>
+                <div class="form-group">
+                    <label>Product Title</label>
+                    <input type="text" id="edit-title" required>
+                </div>
+                <div class="form-group">
+                    <label>Price</label>
+                    <input type="number" id="edit-price" step="0.01" required>
+                </div>
+                <div class="form-group">
+                    <label>Image Link</label>
+                    <input type="text" id="edit-image" required>
+                </div>
+                <div class="form-group">
+                    <label>Description</label>
+                    <textarea id="edit-desc" rows="4" required></textarea>
+                </div>
+                <button class="submit-btn" onclick="saveEditedProduct(event)">Save Changes</button>
+            </div>
+        </div>
+        
     </div>
 
     <script type="module">
@@ -292,20 +373,16 @@
             if(tabName === 'manage') loadInventory();
         };
 
-       function convertDriveLink(url) {
-    if (!url) return '';
-    
-    
-    const match = url.match(/\/d\/(.+?)\//) || url.match(/id=(.+?)(&|$)/);
-    
-    if (match && match[1]) {
-       
-        return `https://drive.google.com/thumbnail?id=${match[1]}&sz=w1000`;
-    }
-    return url; 
-}
+        function convertDriveLink(url) {
+            if (!url) return '';
+            const match = url.match(/\/d\/(.+?)\//) || url.match(/id=(.+?)(&|$)/);
+            if (match && match[1]) {
+                return `https://drive.google.com/thumbnail?id=${match[1]}&sz=w1000`;
+            }
+            return url; 
+        }
 
-        // --- LIVE PREVIEW (UPDATED WITH CATALOG) ---
+        // --- LIVE PREVIEW ---
         const categoryInput = document.getElementById('prod-category');
         const titleInput = document.getElementById('prod-title');
         const priceInput = document.getElementById('prod-price');
@@ -340,7 +417,7 @@
             }
         });
 
-        // --- UPLOAD PRODUCT (UPDATED WITH CATALOG) ---
+        // --- UPLOAD PRODUCT ---
         window.uploadProduct = async function() {
             const category = categoryInput.value;
             const title = titleInput.value.trim();
@@ -350,7 +427,6 @@
             const submitBtn = document.getElementById('submit-btn');
             const successMsg = document.getElementById('success-msg');
 
-            // NEW: Validation now checks for category selection
             if(!category || !title || isNaN(price) || !rawImageUrl || !desc) {
                 alert("Please select a catalog and fill in all fields before pushing to the store.");
                 return;
@@ -360,7 +436,6 @@
             submitBtn.innerText = "Pushing to Vault...";
 
             try {
-                // NEW: Passed `category` to Firestore
                 await addDoc(collection(db, "products"), {
                     category: category, 
                     title: title,
@@ -388,7 +463,9 @@
             }
         };
 
-        // --- FETCH & RENDER INVENTORY (UPDATED WITH BADGES) ---
+        // --- FETCH & RENDER INVENTORY ---
+        window.allProductsData = {}; // Store data locally so the modal can access it
+
         window.loadInventory = async function() {
             const listContainer = document.getElementById('inventory-list');
             listContainer.innerHTML = '<p style="color:var(--muted-gray); font-size: 12px; text-transform:uppercase;">Loading Database...</p>';
@@ -396,6 +473,7 @@
             try {
                 const querySnapshot = await getDocs(collection(db, "products"));
                 listContainer.innerHTML = ''; 
+                window.allProductsData = {}; // Clear previous data
 
                 if (querySnapshot.empty) {
                     listContainer.innerHTML = '<p style="color:var(--muted-gray); font-size: 12px;">No products found in the database.</p>';
@@ -407,7 +485,7 @@
                     const id = docSnap.id;
                     const inStock = data.inStock !== false; 
                     
-                    // Default to 'General' if you have old products without a category
+                    window.allProductsData[id] = data; // Save to our global object
                     const itemCategory = data.category ? data.category : "general"; 
                     
                     const itemHTML = `
@@ -424,6 +502,7 @@
                                 </div>
                             </div>
                             <div class="inv-actions">
+                                <button class="action-btn" onclick="openEditModal('${id}')">Edit</button>
                                 <button class="action-btn" onclick="toggleStockStatus('${id}', ${inStock})">
                                     ${inStock ? 'Mark Out of Stock' : 'Mark In Stock'}
                                 </button>
@@ -457,6 +536,70 @@
                 } catch (error) {
                     alert("Error deleting product.");
                 }
+            }
+        };
+
+        // --- EDIT PRODUCT LOGIC ---
+        window.openEditModal = function(id) {
+            const product = window.allProductsData[id];
+            if(!product) return;
+
+            // Populate the modal fields
+            document.getElementById('edit-doc-id').value = id;
+            document.getElementById('edit-category').value = product.category || 'abayas';
+            document.getElementById('edit-title').value = product.title;
+            document.getElementById('edit-price').value = product.price;
+            document.getElementById('edit-image').value = product.image; 
+            document.getElementById('edit-desc').value = product.description || '';
+
+            // Show modal
+            document.getElementById('edit-modal').style.display = 'flex';
+        };
+
+        window.closeEditModal = function() {
+            document.getElementById('edit-modal').style.display = 'none';
+        };
+
+        window.saveEditedProduct = async function(event) {
+            const id = document.getElementById('edit-doc-id').value;
+            const btn = event.target;
+            
+            const category = document.getElementById('edit-category').value;
+            const title = document.getElementById('edit-title').value.trim();
+            const price = parseFloat(document.getElementById('edit-price').value);
+            const rawImageUrl = document.getElementById('edit-image').value.trim();
+            const desc = document.getElementById('edit-desc').value.trim();
+
+            if(!title || isNaN(price) || !rawImageUrl || !desc) {
+                alert("Please fill in all fields.");
+                return;
+            }
+
+            btn.innerText = "Saving...";
+            btn.disabled = true;
+
+            try {
+                // If the user pastes a new raw drive link, convert it. If they left the old converted one, keep it.
+                const finalImage = rawImageUrl.includes('drive.google.com/thumbnail') 
+                    ? rawImageUrl 
+                    : convertDriveLink(rawImageUrl);
+
+                await updateDoc(doc(db, "products", id), {
+                    category: category,
+                    title: title,
+                    price: price,
+                    image: finalImage,
+                    description: desc
+                });
+
+                closeEditModal();
+                loadInventory(); // Refresh the UI to show changes
+            } catch (error) {
+                console.error("Error updating product:", error);
+                alert("Error updating product. Check console for details.");
+            } finally {
+                btn.innerText = "Save Changes";
+                btn.disabled = false;
             }
         };
     </script>
