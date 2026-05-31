@@ -24,10 +24,10 @@
 
         body { font-family: var(--font-sans); background-color: #f8f8f8; margin: 0; color: var(--dark-text); }
         
-/* --- HEADER & NAVIGATION --- */
+        /* --- HEADER & NAVIGATION --- */
         .site-header { 
             background: var(--primary-bg); 
-            padding: 10px 40px; /* Reduced vertical padding from 15px to 10px to keep it slim */
+            padding: 10px 40px;
             border-bottom: 1px solid var(--border-color); 
             display: grid; 
             grid-template-columns: 0.5fr auto 1.5fr; 
@@ -37,36 +37,20 @@
             z-index: 100;
         }
 
-        .header-left {
-        }
-
-        .brand-logo-wrapper {
-            display: flex;
-            justify-content: center;
-        }
+        .brand-logo-wrapper { display: flex; justify-content: center; }
 
         .brand-logo-img { 
-            height: 45px; /* Keep this small so the white header stays thin */
+            height: 45px;
             width: auto;
             object-fit: contain;
-            transform: scale(3.0); /* This is the magic! Increase or decrease 1.8 to zoom in/out */
-        }
-        /* Remove up/down arrows from number input */
-        input[type="number"]::-webkit-outer-spin-button,
-        input[type="number"]::-webkit-inner-spin-button {
-            -webkit-appearance: none;
-            margin: 0;
-        }
-        input[type="number"] {
-            -moz-appearance: textfield; /* Firefox */
+            transform: scale(3.0); 
         }
         
-        .admin-nav { 
-            display: flex; 
-            gap: 30px; 
-            align-items: center; 
-            justify-content: flex-end; /* Aligns the admin buttons to the right */
-        }
+        input[type="number"]::-webkit-outer-spin-button,
+        input[type="number"]::-webkit-inner-spin-button { -webkit-appearance: none; margin: 0; }
+        input[type="number"] { -moz-appearance: textfield; }
+        
+        .admin-nav { display: flex; gap: 30px; align-items: center; justify-content: flex-end; }
         
         .nav-btn { background: none; border: none; font-family: var(--font-sans); text-transform: uppercase; letter-spacing: 1.5px; font-size: 11px; cursor: pointer; padding-bottom: 5px; color: var(--muted-gray); transition: 0.3s; }
         .nav-btn:hover { color: var(--dark-text); }
@@ -87,11 +71,24 @@
         .admin-header h2 { margin: 0 0 10px 0; font-family: var(--font-serif); text-transform: uppercase; letter-spacing: 2px; font-size: 24px; font-weight: 400; }
         .welcome-text { color: var(--muted-gray); font-size: 13px; margin-bottom: 30px; line-height: 1.6; }
         
-        /* Form Styles */
+        /* Form Styles - ADDED SELECT HERE */
         .form-group { margin-bottom: 20px; }
         label { display: block; font-weight: 500; margin-bottom: 8px; font-size: 11px; text-transform: uppercase; letter-spacing: 1.5px; }
-        input[type="text"], input[type="number"], textarea { width: 100%; padding: 14px; border: 1px solid var(--border-color); border-radius: 2px; font-family: var(--font-sans); font-size: 13px; box-sizing: border-box; transition: border-color 0.3s; }
-        input:focus, textarea:focus { border-color: var(--accent-gold); outline: none; }
+        
+        input[type="text"], input[type="number"], textarea, select { 
+            width: 100%; 
+            padding: 14px; 
+            border: 1px solid var(--border-color); 
+            border-radius: 2px; 
+            font-family: var(--font-sans); 
+            font-size: 13px; 
+            box-sizing: border-box; 
+            transition: border-color 0.3s; 
+            background-color: #fff;
+            color: var(--dark-text);
+        }
+        
+        input:focus, textarea:focus, select:focus { border-color: var(--accent-gold); outline: none; }
         
         button.submit-btn { width: 100%; padding: 16px; background-color: var(--dark-text); color: #fff; border: none; font-size: 11px; font-family: var(--font-sans); font-weight: 500; cursor: pointer; text-transform: uppercase; letter-spacing: 2px; border-radius: 2px; transition: 0.3s; margin-top: 10px;}
         button.submit-btn:hover { background-color: var(--accent-gold); }
@@ -106,6 +103,7 @@
         .category-img { position: absolute; top: 0; left: 0; width: 100%; height: 100%; object-fit: contain; }
         .img-placeholder-text { font-size: 11px; color: var(--muted-gray); letter-spacing: 1px; text-transform: uppercase; }
         
+        .preview-catalog-tag { font-size: 9px; text-transform: uppercase; letter-spacing: 2px; color: var(--accent-gold); text-align: center; margin-bottom: 6px; font-weight: 500;}
         .category-name { font-family: var(--font-serif); font-size: 18px; font-weight: 400; margin-bottom: 5px; text-transform: uppercase; letter-spacing: 1.5px; color: var(--dark-text); text-align: center; }
         .category-price { font-size: 11px; color: var(--muted-gray); font-weight: 500; letter-spacing: 1px; text-align: center; }
 
@@ -121,7 +119,10 @@
         .inv-details { display: flex; flex-direction: column; gap: 5px; }
         .inv-title { font-family: var(--font-serif); font-size: 18px; text-transform: uppercase; letter-spacing: 1px; margin: 0; }
         .inv-price { font-size: 12px; color: var(--muted-gray); font-weight: 500; }
-        .status-badge { display: inline-block; padding: 4px 8px; font-size: 9px; text-transform: uppercase; letter-spacing: 1px; border-radius: 2px; margin-top: 5px; background: #e9f2ea; color: #4A5D4E; width: fit-content;}
+        
+        .badge-group { display: flex; gap: 8px; margin-top: 5px; }
+        .status-badge { display: inline-block; padding: 4px 8px; font-size: 9px; text-transform: uppercase; letter-spacing: 1px; border-radius: 2px; background: #e9f2ea; color: #4A5D4E; width: fit-content;}
+        .catalog-badge { background: #f0eee9; color: var(--accent-gold); font-weight: 500; }
         .out-of-stock .status-badge { background: #fce8e8; color: #c9302c; }
 
         .inv-actions { display: flex; gap: 10px; }
@@ -141,19 +142,15 @@
 </head>
 <body>
 
-    <div id="loading-screen">
-        Verifying Secure Vault Access...
-    </div>
+    <div id="loading-screen">Verifying Secure Vault Access...</div>
 
     <div id="admin-content" style="display: none;">
         
         <header class="site-header">
             <div class="header-left"></div>
-
             <div class="brand-logo-wrapper">
                 <img src="header.png" alt="ABAYRAH Logo" class="brand-logo-img">
             </div>
-
             <nav class="admin-nav">
                 <button class="nav-btn active" id="tab-add" onclick="switchTab('add')">Add New Product</button>
                 <button class="nav-btn" id="tab-manage" onclick="switchTab('manage')">Manage Inventory</button>
@@ -168,8 +165,20 @@
                     <div class="admin-header">
                         <h2>Vault Entry</h2>
                     </div>
-                    <p class="welcome-text">Welcome, <strong id="adminName">Admin</strong>. Add new products here. They will automatically be marked as "In Stock" and pushed to the live storefront.</p>
+                    <p class="welcome-text">Welcome, <strong id="adminName">Admin</strong>. Add new products here. They will automatically be pushed to their selected catalog collection.</p>
                     
+                    <div class="form-group">
+                        <label>Select Catalog / Category</label>
+                        <select id="prod-category" required>
+                            <option value="" disabled selected>Choose a collection...</option>
+                            <option value="abayas">Abayas</option>
+                            <option value="hampers">Hampers</option>
+                            <option value="Naqabs">Naqabs</option>
+                            <option value="Hijabs">Hijabs</option>
+                            <option value="accessories">Accessories</option>
+                        </select>
+                    </div>
+
                     <div class="form-group">
                         <label>Product Title</label>
                         <input type="text" id="prod-title" placeholder="e.g., Emerald Green Silk Abaya" required>
@@ -201,6 +210,7 @@
                             <span class="img-placeholder-text" id="preview-img-text">Image Preview</span>
                             <img id="preview-image" src="" alt="" class="category-img" style="display: none;">
                         </div>
+                        <div class="preview-catalog-tag" id="preview-category">Select Catalog</div>
                         <h3 class="category-name" id="preview-title">Product Title</h3>
                         <p class="category-price" id="preview-price">₹0.00</p>
                     </div>
@@ -212,10 +222,9 @@
                     <div class="admin-header">
                         <h2>Inventory Management</h2>
                     </div>
-                    <p class="welcome-text">View all live products, toggle their availability, or permanently remove them from the store.</p>
+                    <p class="welcome-text">View all live products across all catalogs, toggle their availability, or permanently remove them.</p>
                     
-                    <div id="inventory-list" class="inventory-list">
-                        </div>
+                    <div id="inventory-list" class="inventory-list"></div>
                 </div>
             </div>
 
@@ -225,7 +234,6 @@
     <script type="module">
         import { initializeApp } from "https://www.gstatic.com/firebasejs/10.8.1/firebase-app.js";
         import { getAuth, onAuthStateChanged, signOut } from "https://www.gstatic.com/firebasejs/10.8.1/firebase-auth.js";
-        // Added getDocs, updateDoc, and deleteDoc to handle inventory features
         import { getFirestore, doc, getDoc, collection, addDoc, getDocs, updateDoc, deleteDoc } from "https://www.gstatic.com/firebasejs/10.8.1/firebase-firestore.js";
 
         const firebaseConfig = {
@@ -248,7 +256,6 @@
         const logoutBtn = document.getElementById('logoutBtn');
         const adminNameLabel = document.getElementById('adminName');
 
-        // --- SECURITY GATEKEEPER ---
         onAuthStateChanged(auth, async (user) => {
             if (user) {
                 try {
@@ -271,12 +278,10 @@
             }
         });
 
-        // --- LOGOUT LOGIC ---
         logoutBtn.addEventListener('click', () => {
             signOut(auth).then(() => { window.location.href = 'index.html'; });
         });
 
-        // --- TAB NAVIGATION ---
         window.switchTab = function(tabName) {
             document.getElementById('view-add').style.display = tabName === 'add' ? 'flex' : 'none';
             document.getElementById('view-manage').style.display = tabName === 'manage' ? 'block' : 'none';
@@ -284,10 +289,7 @@
             document.getElementById('tab-add').classList.toggle('active', tabName === 'add');
             document.getElementById('tab-manage').classList.toggle('active', tabName === 'manage');
 
-            // If switching to manage tab, fetch fresh data
-            if(tabName === 'manage') {
-                loadInventory();
-            }
+            if(tabName === 'manage') loadInventory();
         };
 
         function convertDriveLink(url) {
@@ -299,20 +301,28 @@
             return url; 
         }
 
-        // --- LIVE PREVIEW ---
+        // --- LIVE PREVIEW (UPDATED WITH CATALOG) ---
+        const categoryInput = document.getElementById('prod-category');
         const titleInput = document.getElementById('prod-title');
         const priceInput = document.getElementById('prod-price');
         const imageInput = document.getElementById('prod-image-url');
+        
+        const previewCategory = document.getElementById('preview-category');
         const previewTitle = document.getElementById('preview-title');
         const previewPrice = document.getElementById('preview-price');
         const previewImage = document.getElementById('preview-image');
         const previewImgText = document.getElementById('preview-img-text');
 
+        categoryInput.addEventListener('change', (e) => {
+            previewCategory.textContent = e.target.options[e.target.selectedIndex].text;
+        });
+        
         titleInput.addEventListener('input', (e) => previewTitle.textContent = e.target.value || 'Product Title');
         priceInput.addEventListener('input', (e) => {
             const val = parseFloat(e.target.value);
             previewPrice.textContent = isNaN(val) ? '₹0.00' : `₹${val.toFixed(2)}`;
         });
+        
         imageInput.addEventListener('input', (e) => {
             const rawUrl = e.target.value.trim();
             if (rawUrl) {
@@ -326,8 +336,9 @@
             }
         });
 
-        // --- UPLOAD PRODUCT ---
+        // --- UPLOAD PRODUCT (UPDATED WITH CATALOG) ---
         window.uploadProduct = async function() {
+            const category = categoryInput.value;
             const title = titleInput.value.trim();
             const price = parseFloat(priceInput.value);
             const rawImageUrl = imageInput.value.trim();
@@ -335,8 +346,9 @@
             const submitBtn = document.getElementById('submit-btn');
             const successMsg = document.getElementById('success-msg');
 
-            if(!title || isNaN(price) || !rawImageUrl || !desc) {
-                alert("Please fill in all fields correctly before pushing to the store.");
+            // NEW: Validation now checks for category selection
+            if(!category || !title || isNaN(price) || !rawImageUrl || !desc) {
+                alert("Please select a catalog and fill in all fields before pushing to the store.");
                 return;
             }
 
@@ -344,8 +356,9 @@
             submitBtn.innerText = "Pushing to Vault...";
 
             try {
-                // Added "inStock: true" as default for new products
+                // NEW: Passed `category` to Firestore
                 await addDoc(collection(db, "products"), {
+                    category: category, 
                     title: title,
                     price: price,
                     image: convertDriveLink(rawImageUrl), 
@@ -358,8 +371,9 @@
                 submitBtn.disabled = false;
                 submitBtn.innerText = "Push to Live Store";
                 
-                titleInput.value = ''; priceInput.value = ''; imageInput.value = ''; document.getElementById('prod-desc').value = '';
-                previewTitle.textContent = 'Product Title'; previewPrice.textContent = '₹0.00';
+                // Reset form
+                categoryInput.value = ''; titleInput.value = ''; priceInput.value = ''; imageInput.value = ''; document.getElementById('prod-desc').value = '';
+                previewCategory.textContent = 'Select Catalog'; previewTitle.textContent = 'Product Title'; previewPrice.textContent = '₹0.00';
                 previewImage.src = ''; previewImage.style.display = 'none'; previewImgText.style.display = 'block';
 
                 setTimeout(() => { successMsg.style.display = 'none'; }, 4000);
@@ -370,14 +384,14 @@
             }
         };
 
-        // --- FETCH & RENDER INVENTORY ---
+        // --- FETCH & RENDER INVENTORY (UPDATED WITH BADGES) ---
         window.loadInventory = async function() {
             const listContainer = document.getElementById('inventory-list');
             listContainer.innerHTML = '<p style="color:var(--muted-gray); font-size: 12px; text-transform:uppercase;">Loading Database...</p>';
             
             try {
                 const querySnapshot = await getDocs(collection(db, "products"));
-                listContainer.innerHTML = ''; // clear
+                listContainer.innerHTML = ''; 
 
                 if (querySnapshot.empty) {
                     listContainer.innerHTML = '<p style="color:var(--muted-gray); font-size: 12px;">No products found in the database.</p>';
@@ -387,8 +401,10 @@
                 querySnapshot.forEach((docSnap) => {
                     const data = docSnap.data();
                     const id = docSnap.id;
-                    // Treat legacy products (without inStock field) as in-stock by default
                     const inStock = data.inStock !== false; 
+                    
+                    // Default to 'General' if you have old products without a category
+                    const itemCategory = data.category ? data.category : "general"; 
                     
                     const itemHTML = `
                         <div class="inv-item ${!inStock ? 'out-of-stock' : ''}">
@@ -397,7 +413,10 @@
                                 <div class="inv-details">
                                     <h4 class="inv-title">${data.title}</h4>
                                     <span class="inv-price">₹${parseFloat(data.price).toFixed(2)}</span>
-                                    <span class="status-badge">${inStock ? 'Live - In Stock' : 'Out of Stock'}</span>
+                                    <div class="badge-group">
+                                        <span class="status-badge catalog-badge">${itemCategory}</span>
+                                        <span class="status-badge">${inStock ? 'Live - In Stock' : 'Out of Stock'}</span>
+                                    </div>
                                 </div>
                             </div>
                             <div class="inv-actions">
@@ -416,31 +435,26 @@
             }
         };
 
-        // --- TOGGLE STOCK STATUS ---
         window.toggleStockStatus = async function(docId, currentStatus) {
             try {
                 const docRef = doc(db, "products", docId);
-                // Flip the boolean
                 await updateDoc(docRef, { inStock: !currentStatus });
-                // Reload the view to reflect changes
                 loadInventory();
             } catch (error) {
                 alert("Error updating product status.");
             }
         };
 
-        // --- DELETE PRODUCT ---
         window.deleteProduct = async function(docId) {
             if(confirm("WARNING: Are you sure you want to permanently remove this product from the storefront?")) {
                 try {
                     await deleteDoc(doc(db, "products", docId));
-                    loadInventory(); // Refresh view
+                    loadInventory(); 
                 } catch (error) {
                     alert("Error deleting product.");
                 }
             }
         };
-
     </script>
 </body>
 </html>
