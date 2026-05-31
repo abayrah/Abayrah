@@ -1413,19 +1413,40 @@
             const qty = parseInt(document.getElementById('product-quantity').value) || 1;
             addSecureProductToCart(currentProductView.id, qty);
         };
-        document.addEventListener("DOMContentLoaded", function() {
-        const images = document.querySelectorAll('img');
-        images.forEach(img => {
-            const src = img.getAttribute('src');
-            if (src && src.includes('drive.google.com/file/d/')) {
-                const match = src.match(/\/d\/([a-zA-Z0-9_-]+)/);
-                if (match && match[1]) {
-                    const fileId = match[1];
-                    img.setAttribute('src', 'https://drive.google.com/thumbnail?id=' + fileId + '&sz=w1000');
-                }
+        (function() {
+    // Function to convert a single image element's source
+    function fixGoogleDriveImage(img) {
+        const src = img.getAttribute('src');
+        if (src && src.includes('drive.google.com/file/d/')) {
+            const match = src.match(/\/d\/([a-zA-Z0-9_-]+)/);
+            if (match && match[1]) {
+                const fileId = match[1];
+                // Convert to the mobile-approved thumbnail link format
+                img.src = 'https://drive.google.com/thumbnail?id=' + fileId + '&sz=w1000';
             }
+        }
+    }
+
+    // 1. Run immediately on existing images
+    document.querySelectorAll('img').forEach(fixGoogleDriveImage);
+
+    // 2. Watch the page for any dynamically loaded images (MutationObserver)
+    const observer = new MutationObserver((mutations) => {
+        mutations.forEach((mutation) => {
+            mutation.addedNodes.forEach((node) => {
+                if (node.nodeType === 1) { // Check if it's an element
+                    if (node.tagName === 'IMG') {
+                        fixGoogleDriveImage(node);
+                    }
+                    node.querySelectorAll('img').forEach(fixGoogleDriveImage);
+                }
+            });
         });
     });
+
+    // Start watching the entire document for changes
+    observer.observe(document.body, { childList: true, subtree: true });
+})();
         
     </script>
 </body>
