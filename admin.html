@@ -51,6 +51,15 @@
             object-fit: contain;
             transform: scale(3.0); /* This is the magic! Increase or decrease 1.8 to zoom in/out */
         }
+        /* Remove up/down arrows from number input */
+        input[type="number"]::-webkit-outer-spin-button,
+        input[type="number"]::-webkit-inner-spin-button {
+            -webkit-appearance: none;
+            margin: 0;
+        }
+        input[type="number"] {
+            -moz-appearance: textfield; /* Firefox */
+        }
         
         .admin-nav { 
             display: flex; 
@@ -168,7 +177,7 @@
                     
                     <div class="form-group">
                         <label>Price (Numbers Only)</label>
-                        <input type="number" id="prod-price" placeholder="e.g., 150.00" step="0.01" required>
+                        <input type="number" id="prod-price" placeholder="e.g., 1500.00" step="0.01" onwheel="this.blur()" required>
                     </div>
 
                     <div class="form-group">
