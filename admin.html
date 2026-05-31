@@ -1,63 +1,18 @@
 <!DOCTYPE html>
-
-
-
 <html lang="en">
-
-
-
 <head>
-
-
-
     <meta charset="UTF-8">
-
-
-
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-
-
-
     <title>Store Admin Dashboard | ABAYRAH</title>
-
-
-
-    
-
-
-
     <link rel="preconnect" href="https://fonts.googleapis.com">
-
-
-
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-
-
-
     <link rel="icon" type="image/png" href="star-logo.png">
-
-
-
     <link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,300;0,400;0,500;1,300&family=Montserrat:wght@200;300;400;500&display=swap" rel="stylesheet">
-
-
-
-
-
-
-
+    
     <style>
-
-
-
         /* --- Core Admin Variables --- */
 
-
-
         :root {
-
-
-
             --primary-bg: #FFFFFF;       
 
 
@@ -88,19 +43,7 @@
 
         }
 
-
-
-
-
-
-
         body { font-family: var(--font-sans); background-color: #f8f8f8; margin: 0; color: var(--dark-text); }
-
-
-
-        
-
-
 
         /* --- HEADER & NAVIGATION --- */
 
@@ -148,19 +91,7 @@
 
         }
 
-
-
-
-
-
-
         .brand-logo-wrapper { display: flex; justify-content: center; }
-
-
-
-
-
-
 
         .brand-logo-img { 
 
@@ -184,12 +115,6 @@
 
         }
 
-
-
-        
-
-
-
         input[type="number"]::-webkit-outer-spin-button,
 
 
@@ -200,19 +125,7 @@
 
         input[type="number"] { -moz-appearance: textfield; }
 
-
-
-        
-
-
-
         .admin-nav { display: flex; gap: 30px; align-items: center; justify-content: flex-end; }
-
-
-
-        
-
-
 
         .nav-btn { background: none; border: none; font-family: var(--font-sans); text-transform: uppercase; letter-spacing: 1.5px; font-size: 11px; cursor: pointer; padding-bottom: 5px; color: var(--muted-gray); transition: 0.3s; }
 
@@ -224,88 +137,28 @@
 
         .nav-btn.active { color: var(--dark-text); border-bottom: 1px solid var(--dark-text); font-weight: 500; }
 
-
-
-        
-
-
-
         .logout-btn { background-color: transparent; color: #e24c4c; border: none; font-size: 11px; text-transform: uppercase; letter-spacing: 1px; cursor: pointer; text-decoration: underline; text-underline-offset: 3px; }
 
 
 
         .logout-btn:hover { color: var(--dark-text); }
 
-
-
-
-
-
-
         /* Loading Screen */
-
-
 
         #loading-screen { text-align: center; padding-top: 15vh; font-size: 16px; color: var(--muted-gray); letter-spacing: 2px; text-transform: uppercase; }
 
-
-
-        
-
-
-
         /* --- LAYOUT STRUCTURE --- */
 
-
-
         .admin-container { padding: 40px; max-width: 1200px; margin: 0 auto; }
-
-
-
         .admin-layout { display: flex; gap: 40px; align-items: flex-start; }
-
-
-
         .admin-form-section { flex: 1.2; background: #fff; padding: 40px; border-radius: 2px; box-shadow: 0 10px 30px rgba(0,0,0,0.02); border: 1px solid var(--border-color); }
-
-
-
         .admin-preview-section { flex: 0.8; position: sticky; top: 100px; }
-
-
-
-        
-
-
-
         .admin-header h2 { margin: 0 0 10px 0; font-family: var(--font-serif); text-transform: uppercase; letter-spacing: 2px; font-size: 24px; font-weight: 400; }
-
-
-
         .welcome-text { color: var(--muted-gray); font-size: 13px; margin-bottom: 30px; line-height: 1.6; }
 
-
-
-        
-
-
-
         /* Form Styles */
-
-
-
         .form-group { margin-bottom: 20px; }
-
-
-
         label { display: block; font-weight: 500; margin-bottom: 8px; font-size: 11px; text-transform: uppercase; letter-spacing: 1.5px; }
-
-
-
-        
-
-
-
         input[type="text"], input[type="number"], textarea, select { 
 
 
@@ -352,70 +205,31 @@
 
         }
 
-
-
-        
-
-
-
         input:focus, textarea:focus, select:focus { border-color: var(--accent-gold); outline: none; }
-
-
-
-        
-
-
 
         button.submit-btn { width: 100%; padding: 16px; background-color: var(--dark-text); color: #fff; border: none; font-size: 11px; font-family: var(--font-sans); font-weight: 500; cursor: pointer; text-transform: uppercase; letter-spacing: 2px; border-radius: 2px; transition: 0.3s; margin-top: 10px;}
 
-
-
         button.submit-btn:hover { background-color: var(--accent-gold); }
-
-
 
         button.submit-btn:disabled { background-color: var(--border-color); color: var(--muted-gray); cursor: not-allowed; }
 
-
-
-        
-
-
-
         .success-msg { color: #4A5D4E; text-align: center; font-size: 12px; font-weight: 500; margin-top: 20px; display: none; padding: 12px; background: #e9f2ea; border: 1px solid #c3d8c5; border-radius: 2px; letter-spacing: 1px; text-transform: uppercase; }
-
-
-
-
-
-
 
         /* --- PREVIEW CARD --- */
 
-
-
         .preview-header { font-size: 12px; font-weight: 500; text-transform: uppercase; letter-spacing: 2px; margin-bottom: 20px; color: var(--muted-gray); border-bottom: 1px solid var(--border-color); padding-bottom: 10px; }
-
 
 
         .category-card { position: relative; width: 100%; max-width: 320px; background-color: var(--primary-bg); border: 1px solid var(--border-color); padding: 12px; border-radius: 2px; display: flex; flex-direction: column; margin: 0 auto; box-shadow: 0 15px 35px rgba(0,0,0,0.05); }
 
 
-
         .img-wrapper { width: 100%; aspect-ratio: 3 / 4; background-color: #FAFAFA; position: relative; overflow: hidden; margin-bottom: 15px; display: flex; align-items: center; justify-content: center; }
-
 
 
         .category-img { position: absolute; top: 0; left: 0; width: 100%; height: 100%; object-fit: contain; }
 
 
-
         .img-placeholder-text { font-size: 11px; color: var(--muted-gray); letter-spacing: 1px; text-transform: uppercase; }
-
-
-
-        
-
 
 
         .preview-catalog-tag { font-size: 9px; text-transform: uppercase; letter-spacing: 2px; color: var(--accent-gold); text-align: center; margin-bottom: 6px; font-weight: 500;}
@@ -428,15 +242,7 @@
 
         .category-price { font-size: 11px; color: var(--muted-gray); font-weight: 500; letter-spacing: 1px; text-align: center; }
 
-
-
-
-
-
-
         /* --- INVENTORY MANAGEMENT STYLES --- */
-
-
 
         .inventory-list { display: flex; flex-direction: column; gap: 15px; margin-top: 20px;}
 
@@ -457,11 +263,6 @@
         .inv-item.out-of-stock .inv-title { color: var(--muted-gray); text-decoration: line-through; }
 
 
-
-        
-
-
-
         .inv-info { display: flex; align-items: center; gap: 20px; flex: 1; }
 
 
@@ -480,66 +281,34 @@
 
         .inv-price { font-size: 12px; color: var(--muted-gray); font-weight: 500; }
 
-
-
-        
-
-
-
         .badge-group { display: flex; gap: 8px; margin-top: 5px; }
-
 
 
         .status-badge { display: inline-block; padding: 4px 8px; font-size: 9px; text-transform: uppercase; letter-spacing: 1px; border-radius: 2px; background: #e9f2ea; color: #4A5D4E; width: fit-content;}
 
 
-
         .catalog-badge { background: #f0eee9; color: var(--accent-gold); font-weight: 500; }
-
 
 
         .out-of-stock .status-badge { background: #fce8e8; color: #c9302c; }
 
-
-
-
-
-
-
         .inv-actions { display: flex; gap: 10px; }
-
-
 
         .action-btn { background: #fff; border: 1px solid var(--border-color); padding: 10px 15px; font-family: var(--font-sans); font-size: 10px; text-transform: uppercase; letter-spacing: 1px; cursor: pointer; transition: 0.2s; border-radius: 2px; }
 
-
-
         .action-btn:hover { border-color: var(--dark-text); }
-
-
 
         .btn-delete { color: #c9302c; }
 
-
-
         .btn-delete:hover { background: #c9302c; color: #fff; border-color: #c9302c; }
 
-
-
-
-
-
-
         @media (max-width: 900px) {
-
 
 
             .admin-layout { flex-direction: column; }
 
 
-
             .admin-preview-section { width: 100%; position: static; }
-
 
 
             .inv-item { flex-direction: column; align-items: flex-start; gap: 15px; }
@@ -555,16 +324,7 @@
 
 
         }
-
-
-
-
-
-
-
         /* --- EDIT MODAL STYLES --- */
-
-
 
         .modal-overlay { 
 
@@ -732,26 +492,9 @@
 
 <body>
 
-
-
-
-
-
-
     <div id="loading-screen">Verifying Secure Vault Access...</div>
 
-
-
-
-
-
-
     <div id="admin-content" style="display: none;">
-
-
-
-        
-
 
 
         <header class="site-header">
@@ -796,18 +539,7 @@
 
         </header>
 
-
-
-
-
-
-
         <div class="admin-container">
-
-
-
-            
-
 
 
             <div id="view-add" class="admin-layout">
@@ -833,11 +565,6 @@
                     <p class="welcome-text">Welcome, <strong id="adminName">Admin</strong>. Add new products here. They will automatically be pushed to their selected catalog collection.</p>
 
 
-
-                    
-
-
-
                     <div class="form-group">
 
 
@@ -860,11 +587,6 @@
                     </div>
 
 
-
-
-
-
-
                     <div class="form-group">
 
 
@@ -880,24 +602,14 @@
                     </div>
 
 
-
-                    
-
-
-
                   <div class="form-group">
-                    <label>Original Price (₹)</label>
-                    <input type="number" id="edit-price" step="0.01" required>
-                </div>
-                <div class="form-group">
-                    <label>Discount Percentage (%)</label>
-                    <input type="number" id="edit-discount" placeholder="e.g. 20 (Leave 0 for no discount)" value="0" min="0" max="100">
-                </div>
-
-
-
-
-
+    <label>Original Price (₹)</label>
+    <input type="number" id="prod-price" step="0.01" required>
+</div>
+<div class="form-group">
+    <label>Discount Percentage (%)</label>
+    <input type="number" id="prod-discount" placeholder="e.g. 20 (Leave 0 for no discount)" value="0" min="0" max="100">
+</div>
 
 
                     <div class="form-group">
@@ -914,12 +626,6 @@
 
                     </div>
 
-
-
-
-
-
-
                     <div class="form-group">
 
 
@@ -935,11 +641,6 @@
                     </div>
 
 
-
-
-
-
-
                     <button id="submit-btn" class="submit-btn" onclick="uploadProduct()">Push to Live Store</button>
 
 
@@ -949,11 +650,6 @@
 
 
                 </div>
-
-
-
-
-
 
 
                 <div class="admin-preview-section">
@@ -1006,12 +702,6 @@
 
             </div>
 
-
-
-
-
-
-
          <div id="view-manage" style="display: none;">
                 <div class="admin-form-section" style="width: 100%;">
                     <div class="admin-header">
@@ -1037,18 +727,7 @@
             </div>
 
 
-
-
-
-
-
         </div>
-
-
-
-
-
-
 
         <div id="edit-modal" class="modal-overlay">
 
@@ -1072,19 +751,7 @@
 
                 </div>
 
-
-
-                
-
-
-
                 <input type="hidden" id="edit-doc-id">
-
-
-
-                
-
-
 
                 <div class="form-group">
 
@@ -1180,20 +847,7 @@
 
 
         </div>
-
-
-
-        
-
-
-
     </div>
-
-
-
-
-
-
 
     <script type="module">
 
@@ -1208,11 +862,6 @@
 
 
         import { getFirestore, doc, getDoc, collection, addDoc, getDocs, updateDoc, deleteDoc } from "https://www.gstatic.com/firebasejs/10.8.1/firebase-firestore.js";
-
-
-
-
-
 
 
         const firebaseConfig = {
@@ -1250,11 +899,6 @@
         };
 
 
-
-
-
-
-
         const app = initializeApp(firebaseConfig);
 
 
@@ -1264,12 +908,6 @@
 
 
         const db = getFirestore(app);
-
-
-
-
-
-
 
         // UI Elements
 
@@ -1289,12 +927,6 @@
 
         const adminNameLabel = document.getElementById('adminName');
 
-
-
-
-
-
-
         onAuthStateChanged(auth, async (user) => {
 
 
@@ -1312,12 +944,6 @@
 
 
                     const adminDocSnap = await getDoc(adminDocRef);
-
-
-
-
-
-
 
                     if (adminDocSnap.exists() && adminDocSnap.data().role === "superadmin") {
 
@@ -1378,11 +1004,6 @@
         });
 
 
-
-
-
-
-
         logoutBtn.addEventListener('click', () => {
 
 
@@ -1392,11 +1013,6 @@
 
 
         });
-
-
-
-
-
 
 
         window.switchTab = function(tabName) {
@@ -1410,11 +1026,6 @@
             document.getElementById('view-manage').style.display = tabName === 'manage' ? 'block' : 'none';
 
 
-
-            
-
-
-
             document.getElementById('tab-add').classList.toggle('active', tabName === 'add');
 
 
@@ -1422,21 +1033,11 @@
             document.getElementById('tab-manage').classList.toggle('active', tabName === 'manage');
 
 
-
-
-
-
-
             if(tabName === 'manage') loadInventory();
 
 
 
         };
-
-
-
-
-
 
 
         function convertDriveLink(url) {
@@ -1469,12 +1070,6 @@
 
         }
 
-
-
-
-
-
-
         // --- LIVE PREVIEW ---
 
 
@@ -1492,12 +1087,6 @@
 
 
         const imageInput = document.getElementById('prod-image-url');
-
-
-
-        
-
-
 
         const previewCategory = document.getElementById('preview-category');
 
@@ -1518,11 +1107,6 @@
         const previewImgText = document.getElementById('preview-img-text');
 
 
-
-
-
-
-
         categoryInput.addEventListener('change', (e) => {
 
 
@@ -1532,11 +1116,6 @@
 
 
         });
-
-
-
-        
-
 
 
         titleInput.addEventListener('input', (e) => previewTitle.textContent = e.target.value || 'Product Title');
@@ -1556,12 +1135,6 @@
 
 
         });
-
-
-
-        
-
-
 
         imageInput.addEventListener('input', (e) => {
 
@@ -1609,12 +1182,6 @@
 
         });
 
-
-
-
-
-
-
         // --- UPLOAD PRODUCT ---
 
 
@@ -1649,12 +1216,6 @@
 
             const successMsg = document.getElementById('success-msg');
 
-
-
-
-
-
-
             if(!category || !title || isNaN(price) || !rawImageUrl || !desc) {
 
 
@@ -1670,21 +1231,11 @@
             }
 
 
-
-
-
-
-
             submitBtn.disabled = true;
 
 
 
             submitBtn.innerText = "Pushing to Vault...";
-
-
-
-
-
 
 
             try {
@@ -1724,13 +1275,6 @@
 
 
                 });
-
-
-
-
-
-
-
                 successMsg.style.display = 'block';
 
 
@@ -1740,12 +1284,6 @@
 
 
                 submitBtn.innerText = "Push to Live Store";
-
-
-
-                
-
-
 
                 // Reset form
 
@@ -1760,12 +1298,6 @@
 
 
                 previewImage.src = ''; previewImage.style.display = 'none'; previewImgText.style.display = 'block';
-
-
-
-
-
-
 
                 setTimeout(() => { successMsg.style.display = 'none'; }, 4000);
 
