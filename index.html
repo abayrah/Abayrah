@@ -1414,40 +1414,40 @@
             addSecureProductToCart(currentProductView.id, qty);
         };
         (function() {
-    // Function to convert a single image element's source
-    function fixGoogleDriveImage(img) {
+    function proxyGoogleDriveImage(img) {
         const src = img.getAttribute('src');
+        // Check if the image source is a standard Google Drive link
         if (src && src.includes('drive.google.com/file/d/')) {
             const match = src.match(/\/d\/([a-zA-Z0-9_-]+)/);
             if (match && match[1]) {
                 const fileId = match[1];
-                // Convert to the mobile-approved thumbnail link format
-                img.src = 'https://drive.google.com/thumbnail?id=' + fileId + '&sz=w1000';
+                // Route through a free image caching proxy (wsrv.nl) to bypass mobile security blocks
+                const driveUrl = encodeURIComponent('drive.google.com/uc?id=' + fileId + '&export=download');
+                img.src = 'https://wsrv.nl/?url=' + driveUrl;
             }
         }
     }
 
     // 1. Run immediately on existing images
-    document.querySelectorAll('img').forEach(fixGoogleDriveImage);
+    document.querySelectorAll('img').forEach(proxyGoogleDriveImage);
 
-    // 2. Watch the page for any dynamically loaded images (MutationObserver)
+    // 2. Watch the page for any dynamically loaded images
     const observer = new MutationObserver((mutations) => {
         mutations.forEach((mutation) => {
             mutation.addedNodes.forEach((node) => {
-                if (node.nodeType === 1) { // Check if it's an element
+                if (node.nodeType === 1) { 
                     if (node.tagName === 'IMG') {
-                        fixGoogleDriveImage(node);
+                        proxyGoogleDriveImage(node);
                     }
-                    node.querySelectorAll('img').forEach(fixGoogleDriveImage);
+                    node.querySelectorAll('img').forEach(proxyGoogleDriveImage);
                 }
             });
         });
     });
 
-    // Start watching the entire document for changes
+    // Start watching the entire document
     observer.observe(document.body, { childList: true, subtree: true });
 })();
-        
     </script>
 </body>
 </html>
