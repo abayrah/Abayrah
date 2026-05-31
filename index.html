@@ -1214,12 +1214,11 @@
             loadProducts(title); // Pass title as an argument for potential future Firebase filtering
         };
 
-        window.backToCatalogs = function() {
-            document.getElementById('dynamic-shopping-section').style.display = 'none';
+         window.backToCatalogs = function() {
+             document.getElementById('dynamic-shopping-section').style.display = 'none';
             document.getElementById('main-storefront').style.display = 'block';
-            window.scrollTo({ top: 0, behavior: 'smooth' });
+            document.getElementById('catalogs').scrollIntoView({ behavior: 'smooth' });
         };
-
         // --- FIRESTORE PRODUCT LOADING ---
         async function loadProducts(categoryFilter) {
             const productsContainer = document.getElementById('collection-view');
