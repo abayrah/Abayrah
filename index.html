@@ -349,22 +349,21 @@
     width: 100%;
     height: 100%;
     z-index: 1;
-    /* ADD THESE 2 LINES: */
-    display: flex;
-    transition: transform 1.2s cubic-bezier(0.25, 1, 0.5, 1);
+    display: flex; /* This lines all 6 images up in a row */
+    transition: transform 1.2s cubic-bezier(0.25, 1, 0.5, 1); /* This creates the smooth sliding motion */
 }
 
-       .carousel-slide {
-
-    flex: 0 0 100%;
-    
+     .carousel-slide {
+    flex: 0 0 100%; /* Forces each image to take up exactly 1 screen width */
     width: 100%;
     height: 100%;
     background-position: center;
     background-size: cover; 
     background-repeat: no-repeat;
     background-image: var(--desktop-img);
+    /* Notice we removed position: absolute and opacity! */
 }
+
 
         .carousel-slide.active-slide {
             opacity: 1;
@@ -1887,20 +1886,22 @@
         let currentSlideIndex = 0;
         let carouselIntervalId = null;
 
-        function showTargetSlide(index) {
+       function showTargetSlide(index) {
     if (!slides.length) return;
     
-    // 1. Remove the active state from the current dot
+    // 1. Remove the highlight from the current dot
     if (dots[currentSlideIndex]) dots[currentSlideIndex].classList.remove('active-dot');
     
-    // 2. Update the index
+    // 2. Figure out the next slide index (0 through 5)
     currentSlideIndex = (index + slides.length) % slides.length;
     
-    // 3. SLIDE THE TRACK (This is the new sliding logic)
+    // 3. SLIDE THE ENTIRE ROW OF IMAGES
+    // If index is 1 (2nd image), it pushes the row left by -100%
+    // If index is 2 (3rd image), it pushes the row left by -200%, etc.
     const track = document.getElementById('heroCarouselTrack');
     track.style.transform = `translateX(-${currentSlideIndex * 100}%)`;
     
-    // 4. Add the active state to the new dot
+    // 4. Highlight the new active dot
     if (dots[currentSlideIndex]) dots[currentSlideIndex].classList.add('active-dot');
 }
 
