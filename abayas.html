@@ -47,6 +47,7 @@
             max-width: 1200px;
             margin: 40px auto;
             padding: 0 20px;
+            min-height: 60vh;
         }
 
         /* Section Titles */
@@ -259,37 +260,17 @@
     <!-- Header -->
     <header>
         <h1>Luxe Boutique</h1>
-        <div class="cart-icon">🛒 Cart (<span id="cart-count">0</span>)</div>
+        <div class="cart-icon" onclick="window.location.href='index.html'">🛒 Cart (<span id="cart-count">0</span>)</div>
     </header>
 
     <div class="container">
         
-        <!-- Collection View -->
-        <div id="collection-view">
-            <h2 class="section-title">The Abaya Collection</h2>
-            <div class="product-card" onclick="openProduct('Classic Black Silk Abaya', '$120.00', 'Elegant black silk abaya with subtle embroidery along the sleeves. Perfect for formal evenings and everyday luxury. Features a breathable fabric and a matching hijab.', 'https://images.unsplash.com/photo-1616421556942-0050d2bb69a8?auto=format&fit=crop&w=600&q=80')">
-                <img src="https://images.unsplash.com/photo-1616421556942-0050d2bb69a8?auto=format&fit=crop&w=600&q=80" alt="Abaya 1">
-                <h3>Classic Black Silk Abaya</h3>
-                <p>$120.00</p>
-            </div>
-            
-            <div class="product-card" onclick="openProduct('Desert Sand Chiffon Abaya', '$145.00', 'Lightweight chiffon abaya in a stunning desert sand hue. Designed with a flowing open front and cinched waist detailing. Ideal for warmer climates.', 'https://images.unsplash.com/photo-1589465885855-4421b8eb5f08?auto=format&fit=crop&w=600&q=80')">
-                <img src="https://images.unsplash.com/photo-1589465885855-4421b8eb5f08?auto=format&fit=crop&w=600&q=80" alt="Abaya 2">
-                <h3>Desert Sand Chiffon Abaya</h3>
-                <p>$145.00</p>
-            </div>
+        <!-- Notice the added ID 'main-title' so we can hide it dynamically -->
+        <h2 id="main-title" class="section-title">The Abaya Collection</h2>
 
-            <div class="product-card" onclick="openProduct('Midnight Blue Velvet Abaya', '$185.00', 'A luxurious midnight blue velvet abaya crafted for special occasions. Features hidden pockets, pearl button details, and a rich, draped silhouette.', 'https://images.unsplash.com/photo-1596452296155-27a3ba11d99d?auto=format&fit=crop&w=600&q=80')">
-                <img src="https://images.unsplash.com/photo-1596452296155-27a3ba11d99d?auto=format&fit=crop&w=600&q=80" alt="Abaya 3">
-                <h3>Midnight Blue Velvet Abaya</h3>
-                <p>$185.00</p>
-            </div>
-            
-            <div class="product-card" onclick="openProduct('Embroidered Rose Abaya', '$160.00', 'Soft crepe abaya featuring delicate, hand-stitched rose embroidery. This piece blends traditional modesty with contemporary floral aesthetics.', 'https://images.unsplash.com/photo-1612022839257-2c1f964dc08b?auto=format&fit=crop&w=600&q=80')">
-                <img src="https://images.unsplash.com/photo-1612022839257-2c1f964dc08b?auto=format&fit=crop&w=600&q=80" alt="Abaya 4">
-                <h3>Embroidered Rose Abaya</h3>
-                <p>$160.00</p>
-            </div>
+        <!-- The hardcoded HTML has been removed. Products will load here automatically. -->
+        <div id="collection-view">
+            <p style="text-align: center; width: 100%;">Loading latest collection...</p>
         </div>
 
         <!-- Product Detail View -->
@@ -358,48 +339,159 @@
         </div>
     </footer>
 
-    <!-- Interactive JavaScript -->
-    <script>
-        let cartTotal = 0;
+    <!-- SECURE FIREBASE JAVASCRIPT -->
+    <script type="module">
+        // 1. Import Firebase SDKs (Added getDocs for fetching)
+        import { initializeApp } from "https://www.gstatic.com/firebasejs/10.8.1/firebase-app.js";
+        import { getAuth, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/10.8.1/firebase-auth.js";
+        import { getFirestore, doc, setDoc, onSnapshot, collection, getDoc, getDocs } from "https://www.gstatic.com/firebasejs/10.8.1/firebase-firestore.js";
 
-        function openProduct(title, price, description, imageSrc) {
-            // Hide collection, show details
+        // 2. YOUR FIREBASE CONFIGURATION 
+        const firebaseConfig = {
+            apiKey: "AIzaSyDxe9DeHRsCzD4vlNsknlDHN0w7txd51ic",
+            authDomain: "abayrah-9df21.firebaseapp.com",
+            projectId: "abayrah-9df21",
+            storageBucket: "abayrah-9df21.firebasestorage.app",
+            messagingSenderId: "789725334313",
+            appId: "1:789725334313:web:b37408f42add9611730538",
+            measurementId: "G-NLJJVVE32M"
+        };
+
+        // Initialize Firebase
+        const app = initializeApp(firebaseConfig);
+        const auth = getAuth(app);
+        const db = getFirestore(app);
+
+        let currentUser = null;
+        let currentProductView = {};
+
+        // 3. FETCH PRODUCTS DYNAMICALLY FROM FIRESTORE
+        async function loadProducts() {
+            const productsContainer = document.getElementById('collection-view');
+            try {
+                const querySnapshot = await getDocs(collection(db, "products"));
+                productsContainer.innerHTML = ''; // Clear the "Loading..." text
+
+                if(querySnapshot.empty) {
+                    productsContainer.innerHTML = '<p style="text-align: center; width: 100%;">No products available right now.</p>';
+                    return;
+                }
+
+                // Loop through every product your staff added
+                querySnapshot.forEach((docSnap) => {
+                    const product = docSnap.data();
+                    const productId = docSnap.id; 
+                    
+                    // Safely escape quotes to prevent breaking the HTML
+                    const safeTitle = product.title ? product.title.replace(/'/g, "\\'") : '';
+                    const safeDesc = product.description ? product.description.replace(/'/g, "\\'") : '';
+                    const safeImage = product.image ? product.image.replace(/'/g, "\\'") : '';
+                    const price = product.price || 0;
+
+                    // Dynamically build the product card using the Google Drive Image link and Database Info
+                    const productCardHTML = `
+                        <div class="product-card" onclick="openProduct('${productId}', '${safeTitle}', ${price}, '${safeDesc}', '${safeImage}')">
+                            <img src="${safeImage}" alt="${safeTitle}">
+                            <h3>${safeTitle}</h3>
+                            <p>$${parseFloat(price).toFixed(2)}</p>
+                        </div>
+                    `;
+                    productsContainer.innerHTML += productCardHTML;
+                });
+            } catch (error) {
+                console.error("Error loading products: ", error);
+                productsContainer.innerHTML = '<p style="text-align: center; width: 100%;">Failed to load products. Please check your database connection.</p>';
+            }
+        }
+
+        // Run the fetch function as soon as the page loads
+        loadProducts();
+
+        // 4. Listen for User Login
+        onAuthStateChanged(auth, (user) => {
+            if (user) {
+                currentUser = user;
+                listenToCart(user.uid);
+            } else {
+                currentUser = null;
+                document.getElementById('cart-count').innerText = "0";
+            }
+        });
+
+        // 5. Real-time Cross-Device Cart Sync
+        function listenToCart(userId) {
+            const cartRef = collection(db, "users", userId, "cart");
+            onSnapshot(cartRef, (snapshot) => {
+                let totalItems = 0;
+                snapshot.forEach((doc) => {
+                    totalItems += doc.data().quantity || 1;
+                });
+                document.getElementById('cart-count').innerText = totalItems;
+            });
+        }
+
+        // 6. Open Product Detail View
+        window.openProduct = function(id, title, price, description, imageSrc) {
+            currentProductView = { id, title, price, imageSrc };
+
             document.getElementById('collection-view').style.display = 'none';
             document.getElementById('product-detail-view').style.display = 'block';
+            document.getElementById('main-title').style.display = 'none'; // Hide main title
 
-            // Populate the details dynamically
             document.getElementById('detail-title').innerText = title;
-            document.getElementById('detail-price').innerText = price;
+            document.getElementById('detail-price').innerText = "$" + parseFloat(price).toFixed(2);
             document.getElementById('detail-desc').innerText = description;
             document.getElementById('detail-image').src = imageSrc;
             
-            // Scroll to top of product seamlessly
             window.scrollTo({ top: 0, behavior: 'smooth' });
-        }
+        };
 
-        function closeProduct() {
-            // Hide details, show collection
+        // 7. Close Product Detail View
+        window.closeProduct = function() {
             document.getElementById('product-detail-view').style.display = 'none';
             document.getElementById('collection-view').style.display = 'grid';
-            
-            // Re-insert section title visually
-            const sectionTitle = document.querySelector('.section-title');
-            if(sectionTitle) sectionTitle.style.display = 'block';
-        }
+            document.getElementById('main-title').style.display = 'block'; // Show main title
+        };
 
-        function addToCart() {
-            cartTotal++;
-            document.getElementById('cart-count').innerText = cartTotal;
-            alert('Item added to your cart! You can continue shopping.');
-        }
+        // 8. Secure Add to Cart
+        window.addToCart = async function() {
+            if (!currentUser) {
+                alert("Please log in or create an account to start shopping.");
+                return;
+            }
 
-        function buyNow() {
-            cartTotal++;
-            document.getElementById('cart-count').innerText = cartTotal;
-            alert('Proceeding directly to secure checkout...');
-            // In a real site, this would redirect to the payment gateway:
-            // window.location.href = '/checkout';
-        }
+            try {
+                const cartItemRef = doc(db, "users", currentUser.uid, "cart", currentProductView.id);
+                const docSnap = await getDoc(cartItemRef);
+                let newQuantity = 1;
+
+                if (docSnap.exists()) {
+                    newQuantity = docSnap.data().quantity + 1; 
+                }
+
+                await setDoc(cartItemRef, {
+                    productId: currentProductView.id,
+                    quantity: newQuantity,
+                    title: currentProductView.title,
+                    image: currentProductView.imageSrc 
+                }, { merge: true });
+
+                alert(currentProductView.title + ' was added to your cart securely!');
+            } catch (error) {
+                console.error("Error adding to cart: ", error);
+                alert("There was an error adding to your cart.");
+            }
+        };
+
+        // 9. Buy Now Button
+        window.buyNow = async function() {
+            if (!currentUser) {
+                alert("Please log in to purchase.");
+                return;
+            }
+            await window.addToCart();
+            window.location.href = 'index.html'; 
+        };
     </script>
 </body>
 </html>
