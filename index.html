@@ -1413,6 +1413,20 @@
             const qty = parseInt(document.getElementById('product-quantity').value) || 1;
             addSecureProductToCart(currentProductView.id, qty);
         };
+        document.addEventListener("DOMContentLoaded", function() {
+        const images = document.querySelectorAll('img');
+        images.forEach(img => {
+            const src = img.getAttribute('src');
+            if (src && src.includes('drive.google.com/file/d/')) {
+                const match = src.match(/\/d\/([a-zA-Z0-9_-]+)/);
+                if (match && match[1]) {
+                    const fileId = match[1];
+                    img.setAttribute('src', 'https://drive.google.com/thumbnail?id=' + fileId + '&sz=w1000');
+                }
+            }
+        });
+    });
+        
     </script>
 </body>
 </html>
