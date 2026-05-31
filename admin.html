@@ -4,30 +4,66 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Store Admin Dashboard | ABAYRAH</title>
+    
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,300;0,400;0,500;1,300&family=Montserrat:wght@200;300;400;500&display=swap" rel="stylesheet">
+
     <style>
-        body { font-family: 'Helvetica Neue', Helvetica, Arial, sans-serif; background-color: #f4f4f4; padding: 40px; margin: 0; }
+        /* --- Core Admin Variables (Matching Storefront) --- */
+        :root {
+            --primary-bg: #FFFFFF;       
+            --dark-text: #1C1B1A;        
+            --muted-gray: #7A7571;       
+            --border-color: #ECEAE6;     
+            --accent-gold: #C5A880;      
+            --font-serif: 'Cormorant Garamond', serif;
+            --font-sans: 'Montserrat', sans-serif;
+        }
+
+        body { font-family: var(--font-sans); background-color: #f8f8f8; padding: 40px; margin: 0; color: var(--dark-text); }
         
-        /* Loading Screen Styles */
-        #loading-screen { text-align: center; padding-top: 100px; font-size: 18px; color: #666; letter-spacing: 1px; text-transform: uppercase; }
+        /* Loading Screen */
+        #loading-screen { text-align: center; padding-top: 15vh; font-size: 16px; color: var(--muted-gray); letter-spacing: 2px; text-transform: uppercase; }
         
-        /* Admin Dashboard Styles */
-        .admin-container { max-width: 600px; background: #fff; padding: 30px; border-radius: 8px; box-shadow: 0 4px 15px rgba(0,0,0,0.1); margin: 0 auto; }
-        .admin-header { display: flex; justify-content: space-between; align-items: center; border-bottom: 1px solid #eee; padding-bottom: 15px; margin-bottom: 25px; }
-        .admin-header h2 { margin: 0; color: #111; text-transform: uppercase; letter-spacing: 1px; font-size: 22px; }
-        .welcome-text { color: #666; font-size: 14px; margin-bottom: 20px; text-align: center; }
+        /* Layout Structure */
+        .admin-layout { display: flex; gap: 40px; max-width: 1100px; margin: 0 auto; align-items: flex-start; }
+        .admin-form-section { flex: 1.2; background: #fff; padding: 40px; border-radius: 4px; box-shadow: 0 10px 30px rgba(0,0,0,0.05); }
+        .admin-preview-section { flex: 0.8; position: sticky; top: 40px; }
         
-        .form-group { margin-bottom: 15px; }
-        label { display: block; font-weight: bold; margin-bottom: 5px; font-size: 12px; text-transform: uppercase; letter-spacing: 1px; color: #333; }
-        input[type="text"], input[type="number"], textarea { width: 100%; padding: 12px; border: 1px solid #ddd; border-radius: 4px; font-size: 14px; box-sizing: border-box; }
+        .admin-header { display: flex; justify-content: space-between; align-items: center; border-bottom: 1px solid var(--border-color); padding-bottom: 15px; margin-bottom: 25px; }
+        .admin-header h2 { margin: 0; font-family: var(--font-serif); text-transform: uppercase; letter-spacing: 2px; font-size: 28px; font-weight: 400; }
+        .welcome-text { color: var(--muted-gray); font-size: 13px; margin-bottom: 30px; line-height: 1.6; }
         
-        button { width: 100%; padding: 15px; background-color: #111; color: #fff; border: none; font-size: 14px; font-weight: bold; cursor: pointer; text-transform: uppercase; letter-spacing: 2px; border-radius: 4px; transition: 0.3s; margin-top: 10px;}
-        button:hover { background-color: #C5A880; }
-        button:disabled { background-color: #999; cursor: not-allowed; }
+        /* Form Styles */
+        .form-group { margin-bottom: 20px; }
+        label { display: block; font-weight: 500; margin-bottom: 8px; font-size: 11px; text-transform: uppercase; letter-spacing: 1.5px; }
+        input[type="text"], input[type="number"], textarea { width: 100%; padding: 14px; border: 1px solid var(--border-color); border-radius: 2px; font-family: var(--font-sans); font-size: 13px; box-sizing: border-box; transition: border-color 0.3s; }
+        input:focus, textarea:focus { border-color: var(--accent-gold); outline: none; }
         
-        .logout-btn { background-color: transparent; color: #e24c4c; border: 1px solid #e24c4c; padding: 8px 15px; width: auto; margin: 0; font-size: 11px; }
-        .logout-btn:hover { background-color: #e24c4c; color: #fff; }
+        button.submit-btn { width: 100%; padding: 16px; background-color: var(--dark-text); color: #fff; border: none; font-size: 11px; font-family: var(--font-sans); font-weight: 500; cursor: pointer; text-transform: uppercase; letter-spacing: 2px; border-radius: 2px; transition: 0.3s; margin-top: 10px;}
+        button.submit-btn:hover { background-color: var(--accent-gold); }
+        button.submit-btn:disabled { background-color: var(--border-color); color: var(--muted-gray); cursor: not-allowed; }
         
-        .success-msg { color: #4A5D4E; text-align: center; font-weight: bold; margin-top: 15px; display: none; padding: 10px; background: #e9f2ea; border-radius: 4px; }
+        .logout-btn { background-color: transparent; color: #e24c4c; border: none; padding: 8px 0; font-size: 11px; text-transform: uppercase; letter-spacing: 1px; cursor: pointer; text-decoration: underline; text-underline-offset: 3px; }
+        .logout-btn:hover { color: var(--dark-text); }
+        
+        .success-msg { color: #4A5D4E; text-align: center; font-size: 12px; font-weight: 500; margin-top: 20px; display: none; padding: 12px; background: #e9f2ea; border: 1px solid #c3d8c5; border-radius: 2px; letter-spacing: 1px; text-transform: uppercase; }
+
+        /* --- LIVE PREVIEW CARD STYLES (Mirrored from Storefront) --- */
+        .preview-header { font-size: 12px; font-weight: 500; text-transform: uppercase; letter-spacing: 2px; margin-bottom: 20px; color: var(--muted-gray); border-bottom: 1px solid var(--border-color); padding-bottom: 10px; }
+        .category-card { position: relative; width: 100%; max-width: 320px; background-color: var(--primary-bg); border: 1px solid var(--border-color); padding: 12px; border-radius: 2px; display: flex; flex-direction: column; margin: 0 auto; box-shadow: 0 15px 35px rgba(0,0,0,0.05); }
+        .img-wrapper { width: 100%; aspect-ratio: 3 / 4; background-color: #FAFAFA; position: relative; overflow: hidden; margin-bottom: 15px; display: flex; align-items: center; justify-content: center; }
+        .category-img { position: absolute; top: 0; left: 0; width: 100%; height: 100%; object-fit: contain; }
+        .img-placeholder-text { font-size: 11px; color: var(--muted-gray); letter-spacing: 1px; text-transform: uppercase; }
+        
+        .category-name { font-family: var(--font-serif); font-size: 18px; font-weight: 400; margin-bottom: 5px; text-transform: uppercase; letter-spacing: 1.5px; color: var(--dark-text); text-align: center; }
+        .category-price { font-size: 11px; color: var(--muted-gray); font-weight: 500; letter-spacing: 1px; text-align: center; }
+
+        @media (max-width: 900px) {
+            .admin-layout { flex-direction: column; }
+            .admin-preview-section { width: 100%; position: static; }
+        }
     </style>
 </head>
 <body>
@@ -37,36 +73,53 @@
     </div>
 
     <div id="admin-content" style="display: none;">
-        <div class="admin-container">
-            <div class="admin-header">
-                <h2>Admin Vault</h2>
-                <button id="logoutBtn" class="logout-btn">Log Out</button>
-            </div>
+        <div class="admin-layout">
             
-            <p class="welcome-text">Welcome, <strong id="adminName">Admin</strong>. Add a new product to the live store below.</p>
-            
-            <div class="form-group">
-                <label>Product Title</label>
-                <input type="text" id="prod-title" placeholder="e.g., Emerald Green Silk Abaya" required>
-            </div>
-            
-            <div class="form-group">
-                <label>Price (Numbers Only)</label>
-                <input type="number" id="prod-price" placeholder="e.g., 150" required>
+            <div class="admin-form-section">
+                <div class="admin-header">
+                    <h2>Admin Vault</h2>
+                    <button id="logoutBtn" class="logout-btn">Log Out</button>
+                </div>
+                
+                <p class="welcome-text">Welcome, <strong id="adminName">Admin</strong>.<br>Enter product details below. The preview card on the right will update in real-time. Once satisfied, push it to the live database.</p>
+                
+                <div class="form-group">
+                    <label>Product Title</label>
+                    <input type="text" id="prod-title" placeholder="e.g., Emerald Green Silk Abaya" required>
+                </div>
+                
+                <div class="form-group">
+                    <label>Price (Numbers Only)</label>
+                    <input type="number" id="prod-price" placeholder="e.g., 150.00" step="0.01" required>
+                </div>
+
+                <div class="form-group">
+                    <label>Google Drive Image Link</label>
+                    <input type="text" id="prod-image-url" placeholder="Paste the 'Anyone with the link can view' URL here" required>
+                </div>
+
+                <div class="form-group">
+                    <label>Product Description</label>
+                    <textarea id="prod-desc" rows="4" placeholder="Describe the fabric, style, and fit..." required></textarea>
+                </div>
+
+                <button id="submit-btn" class="submit-btn" onclick="uploadProduct()">Push to Live Store</button>
+                <p id="success-msg" class="success-msg">Product Successfully Added to Database!</p>
             </div>
 
-            <div class="form-group">
-                <label>Google Drive Image Link</label>
-                <input type="text" id="prod-image-url" placeholder="Paste the 'Anyone with the link can view' URL here" required>
+            <div class="admin-preview-section">
+                <div class="preview-header">Live Storefront Preview</div>
+                
+                <div class="category-card">
+                    <div class="img-wrapper">
+                        <span class="img-placeholder-text" id="preview-img-text">Image Preview</span>
+                        <img id="preview-image" src="" alt="" class="category-img" style="display: none;">
+                    </div>
+                    <h3 class="category-name" id="preview-title">Product Title</h3>
+                    <p class="category-price" id="preview-price">$0.00</p>
+                </div>
             </div>
 
-            <div class="form-group">
-                <label>Product Description</label>
-                <textarea id="prod-desc" rows="4" placeholder="Describe the fabric, style, and fit..." required></textarea>
-            </div>
-
-            <button id="submit-btn" onclick="uploadProduct()">Push to Live Store</button>
-            <p id="success-msg" class="success-msg">Product Successfully Added to Database!</p>
         </div>
     </div>
 
@@ -99,7 +152,6 @@
         onAuthStateChanged(auth, async (user) => {
             if (user) {
                 try {
-                    // Check if this specific user exists in the 'admins' collection
                     const adminDocRef = doc(db, "admins", user.uid);
                     const adminDocSnap = await getDoc(adminDocRef);
 
@@ -118,7 +170,6 @@
                     window.location.href = 'index.html';
                 }
             } else {
-                // Not logged in at all
                 window.location.href = 'index.html';
             }
         });
@@ -130,8 +181,9 @@
             });
         });
 
-        // --- PRODUCT UPLOAD LOGIC ---
+        // --- GOOGLE DRIVE LINK CONVERTER ---
         function convertDriveLink(url) {
+            if (!url) return '';
             const match = url.match(/\/d\/(.+?)\//);
             if (match && match[1]) {
                 return `https://drive.google.com/uc?export=view&id=${match[1]}`;
@@ -139,22 +191,61 @@
             return url; 
         }
 
+        // --- LIVE PREVIEW LOGIC ---
+        // Grab form inputs
+        const titleInput = document.getElementById('prod-title');
+        const priceInput = document.getElementById('prod-price');
+        const imageInput = document.getElementById('prod-image-url');
+        
+        // Grab preview elements
+        const previewTitle = document.getElementById('preview-title');
+        const previewPrice = document.getElementById('preview-price');
+        const previewImage = document.getElementById('preview-image');
+        const previewImgText = document.getElementById('preview-img-text');
+
+        // Update Title on type
+        titleInput.addEventListener('input', (e) => {
+            previewTitle.textContent = e.target.value || 'Product Title';
+        });
+
+        // Update Price on type (formatted with 2 decimal places)
+        priceInput.addEventListener('input', (e) => {
+            const val = parseFloat(e.target.value);
+            previewPrice.textContent = isNaN(val) ? '$0.00' : `$${val.toFixed(2)}`;
+        });
+
+        // Update Image immediately when URL is pasted
+        imageInput.addEventListener('input', (e) => {
+            const rawUrl = e.target.value.trim();
+            if (rawUrl) {
+                const directUrl = convertDriveLink(rawUrl);
+                previewImage.src = directUrl;
+                previewImage.style.display = 'block';
+                previewImgText.style.display = 'none';
+            } else {
+                previewImage.src = '';
+                previewImage.style.display = 'none';
+                previewImgText.style.display = 'block';
+            }
+        });
+
+        // --- PRODUCT UPLOAD LOGIC ---
         window.uploadProduct = async function() {
-            const title = document.getElementById('prod-title').value.trim();
-            const price = parseFloat(document.getElementById('prod-price').value);
-            const rawImageUrl = document.getElementById('prod-image-url').value.trim();
+            const title = titleInput.value.trim();
+            const price = parseFloat(priceInput.value);
+            const rawImageUrl = imageInput.value.trim();
             const desc = document.getElementById('prod-desc').value.trim();
             
             const submitBtn = document.getElementById('submit-btn');
             const successMsg = document.getElementById('success-msg');
 
-            if(!title || !price || !rawImageUrl || !desc) {
-                alert("Please fill in all fields before pushing to the store.");
+            if(!title || isNaN(price) || !rawImageUrl || !desc) {
+                alert("Please fill in all fields correctly before pushing to the store.");
                 return;
             }
 
             submitBtn.disabled = true;
-            submitBtn.innerText = "Uploading...";
+            submitBtn.innerText = "Pushing to Vault...";
 
             try {
                 const directImageUrl = convertDriveLink(rawImageUrl);
@@ -174,10 +265,17 @@
                 submitBtn.innerText = "Push to Live Store";
                 
                 // Clear the form
-                document.getElementById('prod-title').value = '';
-                document.getElementById('prod-price').value = '';
-                document.getElementById('prod-image-url').value = '';
+                titleInput.value = '';
+                priceInput.value = '';
+                imageInput.value = '';
                 document.getElementById('prod-desc').value = '';
+
+                // Reset Previews
+                previewTitle.textContent = 'Product Title';
+                previewPrice.textContent = '$0.00';
+                previewImage.src = '';
+                previewImage.style.display = 'none';
+                previewImgText.style.display = 'block';
 
                 setTimeout(() => { successMsg.style.display = 'none'; }, 4000);
 
