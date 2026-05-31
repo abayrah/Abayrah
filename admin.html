@@ -303,26 +303,35 @@
         .btn-delete:hover { background: #c9302c; color: #fff; border-color: #c9302c; }
 
         @media (max-width: 900px) {
-
-
             .admin-layout { flex-direction: column; }
-
-
             .admin-preview-section { width: 100%; position: static; }
-
-
             .inv-item { flex-direction: column; align-items: flex-start; gap: 15px; }
-
-
-
-            .inv-actions { width: 100%; justify-content: flex-start; }
-
-
-
-            .site-header { display: flex; flex-direction: column; gap: 20px; padding: 20px; }
-
-
-
+            .inv-actions { width: 100%; justify-content: flex-start; flex-wrap: wrap; }
+            .site-header { display: flex; flex-direction: column; gap: 15px; padding: 20px; }
+        }
+        @media (max-width: 600px) {
+            /* Reclaim screen real estate by reducing heavy padding */
+            .admin-container { padding: 20px 15px; }
+            .admin-form-section { padding: 25px 20px; }
+            
+            /* Prevent the logo from stretching out of bounds */
+            .brand-logo-img { transform: scale(2.0); margin: 10px 0; }
+            
+            /* Center and wrap navigation links nicely */
+            .admin-nav { flex-wrap: wrap; justify-content: center; gap: 15px; }
+            
+            /* Stack the inventory items and center them for a card-like feel */
+            .inv-info { flex-direction: column; align-items: center; text-align: center; width: 100%; gap: 10px; }
+            .inv-img { width: 100px; height: 130px; } /* Slightly larger image focus on mobile */
+            .badge-group { justify-content: center; flex-wrap: wrap; }
+            
+            /* Make action buttons full-width for easy thumb-tapping */
+            .inv-actions { flex-direction: column; width: 100%; gap: 8px; }
+            .action-btn { width: 100%; padding: 12px; font-size: 11px; text-align: center; }
+            
+            /* Make the Edit Modal fit perfectly on small screens */
+            .modal-content { padding: 25px 20px; width: 95%; max-height: 85vh;}
+            .admin-header h2 { font-size: 20px; }
         }
         /* --- EDIT MODAL STYLES --- */
 
