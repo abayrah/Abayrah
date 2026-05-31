@@ -467,7 +467,7 @@
             </div>
             <div class="category-grid">
                 
-                <div class="category-card" id="abayas" data-keywords="dress, gown, modest, maxi, burqa" onclick="openAbayasStore()">
+                <div class="category-card" id="abayas" data-keywords="dress, gown, modest, maxi, burqa" onclick="openCategoryStore('Luxury Abayas', 'The Complete Collection')">
                     <div class="img-wrapper mini-carousel">
                         <img src="abayas 2.png" alt="Premium Abayas Collection" class="category-img active-mini-slide" loading="eager">
                         <img src="abayas 3.png" alt="Premium Abayas Collection Alternative" class="category-img" loading="lazy">
@@ -481,7 +481,7 @@
                     </div>
                 </div>
 
-                <div class="category-card" id="niqabs" data-keywords="face cover, veil, headpiece" onclick="location.href='#shop-niqabs'">
+                <div class="category-card" id="niqabs" data-keywords="face cover, veil, headpiece" onclick="openCategoryStore('Premium Niqabs', 'The Complete Collection')">
                     <div class="img-wrapper mini-carousel">
                         <img src="naqabs 2.png" alt="Elegant Niqabs Collection" class="category-img active-mini-slide" loading="eager">
                         <img src="naqabs 3.png" alt="Elegant Niqabs Close-up" class="category-img" loading="lazy">
@@ -495,7 +495,7 @@
                     </div>
                 </div>
 
-                <div class="category-card" id="hijabs" data-keywords="scarf, scarves, wrap, head cover, pashmina" onclick="location.href='#shop-hijabs'">
+                <div class="category-card" id="hijabs" data-keywords="scarf, scarves, wrap, head cover, pashmina" onclick="openCategoryStore('Essential Hijabs', 'The Complete Collection')">
                     <div class="img-wrapper mini-carousel">
                         <img src="hijabs 2.png" alt="Essential Hijabs Collection" class="category-img active-mini-slide" loading="eager">
                         <img src="hijabs 3.png" alt="Essential Hijabs Detail" class="category-img" loading="lazy">
@@ -509,7 +509,7 @@
                     </div>
                 </div>
 
-                <div class="category-card" id="accessories" data-keywords="pins, brooches, jewelry, undercap" onclick="location.href='#shop-accessories'">
+                <div class="category-card" id="accessories" data-keywords="pins, brooches, jewelry, undercap" onclick="openCategoryStore('Signature Accessories', 'Explore Finery')">
                     <div class="img-wrapper mini-carousel">
                         <img src="accessiories 2.png" alt="Luxury Accessories Collection" class="category-img active-mini-slide" loading="lazy">
                         <img src="accessiories 3.png" alt="Accessories Highlight" class="category-img" loading="lazy">
@@ -523,7 +523,7 @@
                     </div>
                 </div>
 
-                <div class="category-card" id="hampers" data-keywords="gifts, bundles, sets, presents" onclick="location.href='#shop-hampers'">
+                <div class="category-card" id="hampers" data-keywords="gifts, bundles, sets, presents" onclick="openCategoryStore('Curated Hampers', 'Explore Gifting')">
                     <div class="img-wrapper mini-carousel">
                         <img src="hampers 2.png" alt="Curated Gift Hampers Collection" class="category-img active-mini-slide" loading="lazy">
                         <img src="hampers 3.png" alt="Gift Hampers Inside" class="category-img" loading="lazy">
@@ -538,15 +538,17 @@
                 </div>
             </div>
         </section>
-    </div> <div id="dynamic-shopping-section" style="display: none; padding: 100px 40px; min-height: 60vh; max-width: 1560px; margin: 0 auto; font-family: inherit;">
+    </div> 
+    
+    <div id="dynamic-shopping-section" style="display: none; padding: 100px 40px; min-height: 60vh; max-width: 1560px; margin: 0 auto; font-family: inherit;">
         
         <button onclick="backToCatalogs()" style="background: none; border: none; cursor: pointer; text-decoration: underline; margin-bottom: 20px; font-size: 16px; color: var(--muted-gray);">
             ← Back to Collections
         </button>
         
         <div class="section-header" id="dynamic-main-title">
-            <h2 style="font-family: var(--font-serif); font-size: 38px; font-weight: 300; letter-spacing: 6px; text-transform: uppercase;">Luxury Abayas</h2>
-            <p style="font-size: 12px; color: var(--muted-gray); margin-top: 16px; font-weight: 300; letter-spacing: 3px; text-transform: uppercase;">The Complete Collection</p>
+            <h2 id="store-category-title" style="font-family: var(--font-serif); font-size: 38px; font-weight: 300; letter-spacing: 6px; text-transform: uppercase;">Luxury Abayas</h2>
+            <p id="store-category-subtitle" style="font-size: 12px; color: var(--muted-gray); margin-top: 16px; font-weight: 300; letter-spacing: 3px; text-transform: uppercase;">The Complete Collection</p>
         </div>
 
         <div id="collection-view" style="display: grid; grid-template-columns: repeat(auto-fill, minmax(280px, 1fr)); gap: 24px;">
@@ -592,9 +594,12 @@
             <div class="footer-column">
                 <h4>Boutique</h4>
                 <ul class="footer-links">
-                    <li><a href="#" onclick="openAbayasStore(); window.scrollTo({top: 0, behavior: 'smooth'}); return false;">All Abayas</a></li>
-                    <li><a href="#niqabs">Signature Niqabs</a></li>
-                    <li><a href="#hijabs">Chiffon Essentials</a></li>
+                    <!-- Links updated to trigger the dynamic store view -->
+                    <li><a href="#" onclick="openCategoryStore('Luxury Abayas', 'The Complete Collection'); window.scrollTo({top: 0, behavior: 'smooth'}); return false;">All Abayas</a></li>
+                    <li><a href="#" onclick="openCategoryStore('Premium Niqabs', 'The Complete Collection'); window.scrollTo({top: 0, behavior: 'smooth'}); return false;">Signature Niqabs</a></li>
+                    <li><a href="#" onclick="openCategoryStore('Essential Hijabs', 'The Complete Collection'); window.scrollTo({top: 0, behavior: 'smooth'}); return false;">Chiffon Essentials</a></li>
+                    <li><a href="#" onclick="openCategoryStore('Signature Accessories', 'Explore Finery'); window.scrollTo({top: 0, behavior: 'smooth'}); return false;">Signature Accessories</a></li>
+                    <li><a href="#" onclick="openCategoryStore('Curated Hampers', 'Explore Gifting'); window.scrollTo({top: 0, behavior: 'smooth'}); return false;">Curated Hampers</a></li>
                 </ul>
             </div>
 
@@ -1083,7 +1088,8 @@
         };
 
         // --- SINGLE PAGE APPLICATION NAVIGATION LOGIC ---
-        window.openAbayasStore = function() {
+        // Dynamically Open ANY category instead of just Abayas
+        window.openCategoryStore = function(title, subtitle) {
             document.getElementById('main-storefront').style.display = 'none';
             document.getElementById('dynamic-shopping-section').style.display = 'block';
             
@@ -1091,8 +1097,12 @@
             document.getElementById('collection-view').style.display = 'grid';
             document.getElementById('dynamic-main-title').style.display = 'block';
             
+            // Set Dynamic Text Headers
+            document.getElementById('store-category-title').innerText = title;
+            document.getElementById('store-category-subtitle').innerText = subtitle;
+            
             window.scrollTo({ top: 0, behavior: 'smooth' });
-            loadProducts(); // Fetch latest from Firebase
+            loadProducts(title); // Pass title as an argument for potential future Firebase filtering
         };
 
         window.backToCatalogs = function() {
@@ -1102,9 +1112,11 @@
         };
 
         // --- FIRESTORE PRODUCT LOADING ---
-        async function loadProducts() {
+        async function loadProducts(categoryFilter) {
             const productsContainer = document.getElementById('collection-view');
             try {
+                // If you add categories to your Firebase in the future, you can filter here 
+                // e.g. query(collection(db, "products"), where("category", "==", categoryFilter));
                 const querySnapshot = await getDocs(collection(db, "products"));
                 productsContainer.innerHTML = ''; 
 
