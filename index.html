@@ -123,10 +123,35 @@
         .logout-btn { width: 100%; text-align: left; font-size: 11px; font-weight: 500; letter-spacing: 2px; text-transform: uppercase; color: var(--dark-text); background: none; border: none; cursor: pointer; transition: color 0.3s ease; }
         .logout-btn:hover { color: var(--accent-gold); }
 
-        /* --- Carousel Section View Frame --- */
+        /* --- UPDATED: Seamless Circular Hero Section --- */
         .hero-section { position: relative; width: 100%; max-width: 100%; aspect-ratio: 16 / 5; height: auto; overflow: hidden; background-color: #0D0C0B; contain: content; }
-        .carousel-track-wrapper { position: absolute; inset: 0; width: 100%; height: 100%; z-index: 1; display: flex; transition: transform 1.2s cubic-bezier(0.25, 1, 0.5, 1); }
-        .carousel-slide { flex: 0 0 100%; width: 100%; height: 100%; background-position: center; background-size: cover; background-repeat: no-repeat; background-image: var(--desktop-img); }
+        
+        .carousel-track-wrapper { position: absolute; inset: 0; width: 100%; height: 100%; z-index: 1; overflow: hidden; }
+        
+        .carousel-slide { 
+            position: absolute; 
+            top: 0; 
+            left: 100%; /* Start strictly off-screen to the right */
+            width: 100%; 
+            height: 100%; 
+            background-position: center; 
+            background-size: cover; 
+            background-repeat: no-repeat; 
+            background-image: var(--desktop-img); 
+            transition: left 1.2s cubic-bezier(0.25, 1, 0.5, 1);
+            z-index: 0;
+        }
+
+        .carousel-slide.active-hero-slide {
+            left: 0; /* Slide into view */
+            z-index: 1;
+        }
+
+        .carousel-slide.previous-hero-slide {
+            left: -100%; /* Slide out to the left */
+            z-index: 0;
+        }
+
         .carousel-overlay-shadow { position: absolute; inset: 0; background: linear-gradient(to bottom, rgba(13,12,11,0.1) 0%, rgba(13,12,11,0.42) 100%); z-index: 2; pointer-events: none; }
         .ambient-glow { position: absolute; inset: 0; background: linear-gradient(135deg, rgba(197, 168, 128, 0.1) 0%, transparent 50%, rgba(13,12,11,0) 100%); z-index: 2; pointer-events: none; mix-blend-mode: overlay; animation: lightShimmer 8s ease-in-out infinite alternate; }
         .hero-content-container { position: relative; z-index: 3; width: 100%; height: 100%; max-width: 1440px; margin: 0 auto; padding: 20px 40px; display: flex; flex-direction: column; justify-content: flex-end; align-items: center; }
@@ -410,7 +435,7 @@
     <div id="main-storefront">
         <section class="hero-section">
             <div class="carousel-track-wrapper" id="heroCarouselTrack">
-                <div class="carousel-slide" style="--desktop-img: url('images/hero-background.png'); --mobile-img: url('images/mobile-hero-1.png');"></div>
+                <div class="carousel-slide active-hero-slide" style="--desktop-img: url('images/hero-background.png'); --mobile-img: url('images/mobile-hero-1.png');"></div>
                 <div class="carousel-slide" style="--desktop-img: url('images/abaya.png'); --mobile-img: url('images/mobile-abaya.png');"></div>
                 <div class="carousel-slide" style="--desktop-img: url('images/naqabs.png'); --mobile-img: url('images/mobile-naqabs.png');"></div>
                 <div class="carousel-slide" style="--desktop-img: url('images/hijabs.png'); --mobile-img: url('images/mobile-hijabs.png');"></div>
@@ -818,23 +843,57 @@
             });
         });
 
+        // --- UPDATED: Seamless Circular Hero Carousel ---
         const slides = document.querySelectorAll('.carousel-slide');
         const dots = document.querySelectorAll('.indicator-dot');
         let currentSlideIndex = 0;
         let carouselIntervalId = null;
+        let isAnimating = false; // Prevents spam clicking the dots
 
         function showTargetSlide(index) {
-            if (!slides.length) return;
-            if (dots[currentSlideIndex]) dots[currentSlideIndex].classList.remove('active-dot');
+            if (!slides.length || isAnimating || index === currentSlideIndex) return;
+            isAnimating = true;
+
+            const prevIndex = currentSlideIndex;
+            // Ensure index loops properly
             currentSlideIndex = (index + slides.length) % slides.length;
-            document.getElementById('heroCarouselTrack').style.transform = `translateX(-${currentSlideIndex * 100}%)`;
+
+            // Update Indicator Dots
+            if (dots[prevIndex]) dots[prevIndex].classList.remove('active-dot');
             if (dots[currentSlideIndex]) dots[currentSlideIndex].classList.add('active-dot');
+
+            // Slide out the old image to the left
+            slides[prevIndex].classList.remove('active-hero-slide');
+            slides[prevIndex].classList.add('previous-hero-slide');
+            
+            // Slide in the new image from the right
+            slides[currentSlideIndex].classList.add('active-hero-slide');
+
+            // Clean up: Reset the old image back to the right side after it finishes sliding out
+            setTimeout(() => {
+                slides[prevIndex].classList.remove('previous-hero-slide');
+                isAnimating = false;
+            }, 1200); // This must match the 1.2s transition time in the CSS
         }
 
-        function runAutoRotationPipeline() { showTargetSlide(currentSlideIndex + 1); }
-        function startSliderInterval() { if(slides.length) carouselIntervalId = setInterval(runAutoRotationPipeline, 3000); }
+        function runAutoRotationPipeline() { 
+            showTargetSlide(currentSlideIndex + 1); 
+        }
+        
+        function startSliderInterval() { 
+            if(slides.length) {
+                carouselIntervalId = setInterval(runAutoRotationPipeline, 4500); // Slide changes every 4.5 seconds
+            } 
+        }
 
-        dots.forEach(dot => { dot.addEventListener('click', (e) => { clearInterval(carouselIntervalId); showTargetSlide(parseInt(e.target.getAttribute('data-slide-index'))); startSliderInterval(); }); });
+        dots.forEach(dot => { 
+            dot.addEventListener('click', (e) => { 
+                clearInterval(carouselIntervalId); 
+                showTargetSlide(parseInt(e.target.getAttribute('data-slide-index'))); 
+                startSliderInterval(); 
+            }); 
+        });
+        
         startSliderInterval();
 
         // --- Synchronized Sliding for Store Categories ---
@@ -844,29 +903,24 @@
         if (miniCarousels.length > 0) {
             // One master timer controls all cards at the exact same time
             setInterval(() => {
-                // Determine the next image index based on the first card
                 const numSlides = miniCarousels[0].querySelectorAll('.category-img').length;
                 const prevIndex = globalMiniIndex;
                 globalMiniIndex = (globalMiniIndex + 1) % numSlides;
 
                 miniCarousels.forEach(carousel => {
-                    const slides = carousel.querySelectorAll('.category-img');
-                    if (slides.length <= 1) return;
+                    const miniSlides = carousel.querySelectorAll('.category-img');
+                    if (miniSlides.length <= 1) return;
 
-                    // 1. Move current slide out to the left
-                    slides[prevIndex].classList.remove('active-mini-slide');
-                    slides[prevIndex].classList.add('previous-mini-slide');
+                    miniSlides[prevIndex].classList.remove('active-mini-slide');
+                    miniSlides[prevIndex].classList.add('previous-mini-slide');
 
-                    // 2. Bring new slide in from the right to the center
-                    slides[globalMiniIndex].classList.add('active-mini-slide');
+                    miniSlides[globalMiniIndex].classList.add('active-mini-slide');
 
-                    // 3. Clean up: After the animation finishes (800ms), remove the 'previous' 
-                    // class so the image quietly snaps back to the right side, waiting for its next turn.
                     setTimeout(() => {
-                        slides[prevIndex].classList.remove('previous-mini-slide');
+                        miniSlides[prevIndex].classList.remove('previous-mini-slide');
                     }, 800); 
                 });
-            }, 3500); // 3500ms = images change every 3.5 seconds. Adjust as needed.
+            }, 3500); 
         }
 
         const togglePasswordBtns = document.querySelectorAll('.toggle-password-btn');
