@@ -885,19 +885,14 @@
 
 
 
-                    <div class="form-group">
-
-
-
-                        <label>Price (Numbers Only)</label>
-
-
-
-                        <input type="number" id="prod-price" placeholder="e.g., 1500.00" step="0.01" onwheel="this.blur()" required>
-
-
-
-                    </div>
+                  <div class="form-group">
+                    <label>Original Price (₹)</label>
+                    <input type="number" id="edit-price" step="0.01" required>
+                </div>
+                <div class="form-group">
+                    <label>Discount Percentage (%)</label>
+                    <input type="number" id="edit-discount" placeholder="e.g. 20 (Leave 0 for no discount)" value="0" min="0" max="100">
+                </div>
 
 
 
@@ -1947,50 +1942,29 @@
 
         // --- EDIT PRODUCT LOGIC ---
 
-        window.openEditModal = function(id) {
-
-
-
+       window.openEditModal = function(id) {
             const product = window.allProductsData[id];
-
-
-
             if(!product) return;
 
-            // Populate the modal fields
-
-
-
             document.getElementById('edit-doc-id').value = id;
-
-
-
-            document.getElementById('edit-category').value = product.category || 'abayas';
-
-
-
+            document.getElementById('edit-category').value = product.category || 'Luxury Abayas';
             document.getElementById('edit-title').value = product.title;
-
-
-
-            document.getElementById('edit-price').value = product.price;
-
-
+            
+            // Set original price if it exists, otherwise use regular price
+            const basePrice = product.originalPrice ? product.originalPrice : product.price;
+            document.getElementById('edit-price').value = basePrice;
+            
+            // Calculate and show the existing discount percentage in the input box
+            let existingDiscount = 0;
+            if (product.originalPrice && product.originalPrice > product.price) {
+                existingDiscount = Math.round(((product.originalPrice - product.price) / product.originalPrice) * 100);
+            }
+            document.getElementById('edit-discount').value = existingDiscount;
 
             document.getElementById('edit-image').value = product.image; 
-
-
-
             document.getElementById('edit-desc').value = product.description || '';
 
-            // Show modal
-
-
-
             document.getElementById('edit-modal').style.display = 'flex';
-
-
-
         };
 
         window.closeEditModal = function() {
@@ -2003,139 +1977,59 @@
 
         };
 
-        window.saveEditedProduct = async function(event) {
-
-
-
+       window.saveEditedProduct = async function(event) {
             const id = document.getElementById('edit-doc-id').value;
-
-
-
             const btn = event.target;
 
-
             const category = document.getElementById('edit-category').value;
-
-
-
             const title = document.getElementById('edit-title').value.trim();
-
-
-
-            const price = parseFloat(document.getElementById('edit-price').value);
-
-
-
+            const basePrice = parseFloat(document.getElementById('edit-price').value);
+            const discountPercent = parseFloat(document.getElementById('edit-discount').value) || 0; // Gets the discount %
             const rawImageUrl = document.getElementById('edit-image').value.trim();
-
-
-
             const desc = document.getElementById('edit-desc').value.trim();
 
-            if(!title || isNaN(price) || !rawImageUrl || !desc) {
-
-
-
+            if(!title || isNaN(basePrice) || !rawImageUrl || !desc) {
                 alert("Please fill in all fields.");
-
-
-
                 return;
-
-
-
             }
-       btn.innerText = "Saving...";
 
-
-
+            btn.innerText = "Saving...";
             btn.disabled = true;
 
-
-
             try {
+                // Calculate final selling price based on discount
+                let finalPrice = basePrice;
+                let originalPriceToSave = null;
 
-
-
-                // If the user pastes a new raw drive link, convert it. If they left the old converted one, keep it.
-
-
+                if (discountPercent > 0) {
+                    finalPrice = basePrice - (basePrice * (discountPercent / 100)); // Math: 999 - 20% = 799.20
+                    originalPriceToSave = basePrice; // Save the high M.R.P to show strikethrough
+                }
 
                 const finalImage = rawImageUrl.includes('drive.google.com/thumbnail') 
-
-
-
                     ? rawImageUrl 
-
-
-
                     : convertDriveLink(rawImageUrl);
 
+                // Update the database with both the final price and original price
                 await updateDoc(doc(db, "products", id), {
-
-
-
                     category: category,
-
-
-
                     title: title,
-
-
-
-                    price: price,
-
-
-
+                    price: finalPrice, 
+                    originalPrice: originalPriceToSave, 
                     image: finalImage,
-
-
-
                     description: desc
-
-
-
                 });
 
-
                 closeEditModal();
-
-
-
                 loadInventory(); // Refresh the UI to show changes
-
-
-
             } catch (error) {
-
-
-
                 console.error("Error updating product:", error);
-
-
-
                 alert("Error updating product. Check console for details.");
-
-
-
             } finally {
-
-
-
                 btn.innerText = "Save Changes";
-
-
-
                 btn.disabled = false;
-
-
-
             }
-
-
-
         };
-
 
 
     </script>
