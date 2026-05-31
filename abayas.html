@@ -1,0 +1,405 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Premium Abayas Collection</title>
+    <style>
+        /* Global & Reset Styles */
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: 'Helvetica Neue', Helvetica, Arial, sans-serif;
+        }
+        body {
+            background-color: #fcfcfc;
+            color: #333;
+            line-height: 1.6;
+        }
+        a {
+            text-decoration: none;
+            color: inherit;
+        }
+
+        /* Header */
+        header {
+            background-color: #111;
+            color: #fff;
+            padding: 20px 50px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+        header h1 {
+            font-size: 24px;
+            font-weight: 300;
+            letter-spacing: 2px;
+            text-transform: uppercase;
+        }
+        .cart-icon {
+            cursor: pointer;
+            font-weight: bold;
+        }
+
+        /* Container */
+        .container {
+            max-width: 1200px;
+            margin: 40px auto;
+            padding: 0 20px;
+        }
+
+        /* Section Titles */
+        .section-title {
+            text-align: center;
+            font-size: 32px;
+            font-weight: 300;
+            margin-bottom: 40px;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+        }
+
+        /* --- Collection View --- */
+        #collection-view {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(250px, 1fr));
+            gap: 30px;
+        }
+        .product-card {
+            background: #fff;
+            padding: 15px;
+            border: 1px solid #eee;
+            border-radius: 8px;
+            text-align: center;
+            cursor: pointer;
+            transition: transform 0.3s ease, box-shadow 0.3s ease;
+        }
+        .product-card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 10px 20px rgba(0,0,0,0.05);
+        }
+        .product-card img {
+            width: 100%;
+            height: 350px;
+            object-fit: cover;
+            border-radius: 4px;
+            margin-bottom: 15px;
+        }
+        .product-card h3 {
+            font-size: 16px;
+            font-weight: 500;
+            margin-bottom: 5px;
+        }
+        .product-card p {
+            color: #666;
+            font-weight: bold;
+        }
+
+        /* --- Product Detail View (Amazon Style) --- */
+        #product-detail-view {
+            display: none; /* Hidden by default */
+        }
+        .back-btn {
+            display: inline-block;
+            margin-bottom: 20px;
+            cursor: pointer;
+            color: #555;
+            text-decoration: underline;
+        }
+        .product-layout {
+            display: flex;
+            gap: 50px;
+            background: #fff;
+            padding: 40px;
+            border: 1px solid #eee;
+            border-radius: 8px;
+        }
+        .product-image-container {
+            flex: 1;
+        }
+        .product-image-container img {
+            width: 100%;
+            border-radius: 4px;
+            object-fit: cover;
+        }
+        .product-info-container {
+            flex: 1;
+            display: flex;
+            flex-direction: column;
+        }
+        .product-title {
+            font-size: 28px;
+            font-weight: 400;
+            margin-bottom: 10px;
+        }
+        .product-price {
+            font-size: 24px;
+            font-weight: bold;
+            color: #b18846; /* Premium gold accent */
+            margin-bottom: 20px;
+        }
+        .product-description {
+            font-size: 15px;
+            color: #555;
+            margin-bottom: 30px;
+            border-top: 1px solid #eee;
+            padding-top: 20px;
+        }
+        
+        /* Action Buttons */
+        .btn-group {
+            display: flex;
+            gap: 15px;
+            margin-bottom: 20px;
+        }
+        .btn {
+            flex: 1;
+            padding: 15px;
+            font-size: 16px;
+            font-weight: bold;
+            text-align: center;
+            text-transform: uppercase;
+            cursor: pointer;
+            border: none;
+            border-radius: 4px;
+            transition: background 0.3s ease;
+        }
+        .btn-cart {
+            background-color: #f0f0f0;
+            color: #111;
+            border: 1px solid #ddd;
+        }
+        .btn-cart:hover {
+            background-color: #e2e2e2;
+        }
+        .btn-buy {
+            background-color: #111;
+            color: #fff;
+        }
+        .btn-buy:hover {
+            background-color: #333;
+        }
+
+        /* --- Premium Footer --- */
+        footer {
+            background-color: #111;
+            color: #fff;
+            padding: 60px 50px 20px;
+            margin-top: 60px;
+        }
+        .footer-content {
+            display: flex;
+            flex-wrap: wrap;
+            justify-content: space-between;
+            max-width: 1200px;
+            margin: 0 auto;
+            border-bottom: 1px solid #333;
+            padding-bottom: 40px;
+        }
+        .footer-col {
+            flex: 1;
+            min-width: 200px;
+            margin-bottom: 20px;
+        }
+        .footer-col h4 {
+            font-size: 16px;
+            margin-bottom: 20px;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+        }
+        .footer-col ul {
+            list-style: none;
+        }
+        .footer-col ul li {
+            margin-bottom: 10px;
+        }
+        .footer-col ul li a {
+            color: #999;
+            transition: color 0.3s ease;
+        }
+        .footer-col ul li a:hover {
+            color: #fff;
+        }
+        .newsletter input {
+            padding: 10px;
+            width: 70%;
+            border: none;
+            border-radius: 2px;
+            margin-bottom: 10px;
+        }
+        .newsletter button {
+            padding: 10px 20px;
+            background-color: #b18846;
+            color: #fff;
+            border: none;
+            cursor: pointer;
+            text-transform: uppercase;
+            font-weight: bold;
+        }
+        .footer-bottom {
+            text-align: center;
+            padding-top: 20px;
+            color: #666;
+            font-size: 14px;
+        }
+
+        /* Responsive Design */
+        @media (max-width: 768px) {
+            .product-layout {
+                flex-direction: column;
+            }
+            .footer-content {
+                flex-direction: column;
+            }
+        }
+    </style>
+</head>
+<body>
+
+    <!-- Header -->
+    <header>
+        <h1>Luxe Boutique</h1>
+        <div class="cart-icon">🛒 Cart (<span id="cart-count">0</span>)</div>
+    </header>
+
+    <div class="container">
+        
+        <!-- Collection View -->
+        <div id="collection-view">
+            <h2 class="section-title">The Abaya Collection</h2>
+            <div class="product-card" onclick="openProduct('Classic Black Silk Abaya', '$120.00', 'Elegant black silk abaya with subtle embroidery along the sleeves. Perfect for formal evenings and everyday luxury. Features a breathable fabric and a matching hijab.', 'https://images.unsplash.com/photo-1616421556942-0050d2bb69a8?auto=format&fit=crop&w=600&q=80')">
+                <img src="https://images.unsplash.com/photo-1616421556942-0050d2bb69a8?auto=format&fit=crop&w=600&q=80" alt="Abaya 1">
+                <h3>Classic Black Silk Abaya</h3>
+                <p>$120.00</p>
+            </div>
+            
+            <div class="product-card" onclick="openProduct('Desert Sand Chiffon Abaya', '$145.00', 'Lightweight chiffon abaya in a stunning desert sand hue. Designed with a flowing open front and cinched waist detailing. Ideal for warmer climates.', 'https://images.unsplash.com/photo-1589465885855-4421b8eb5f08?auto=format&fit=crop&w=600&q=80')">
+                <img src="https://images.unsplash.com/photo-1589465885855-4421b8eb5f08?auto=format&fit=crop&w=600&q=80" alt="Abaya 2">
+                <h3>Desert Sand Chiffon Abaya</h3>
+                <p>$145.00</p>
+            </div>
+
+            <div class="product-card" onclick="openProduct('Midnight Blue Velvet Abaya', '$185.00', 'A luxurious midnight blue velvet abaya crafted for special occasions. Features hidden pockets, pearl button details, and a rich, draped silhouette.', 'https://images.unsplash.com/photo-1596452296155-27a3ba11d99d?auto=format&fit=crop&w=600&q=80')">
+                <img src="https://images.unsplash.com/photo-1596452296155-27a3ba11d99d?auto=format&fit=crop&w=600&q=80" alt="Abaya 3">
+                <h3>Midnight Blue Velvet Abaya</h3>
+                <p>$185.00</p>
+            </div>
+            
+            <div class="product-card" onclick="openProduct('Embroidered Rose Abaya', '$160.00', 'Soft crepe abaya featuring delicate, hand-stitched rose embroidery. This piece blends traditional modesty with contemporary floral aesthetics.', 'https://images.unsplash.com/photo-1612022839257-2c1f964dc08b?auto=format&fit=crop&w=600&q=80')">
+                <img src="https://images.unsplash.com/photo-1612022839257-2c1f964dc08b?auto=format&fit=crop&w=600&q=80" alt="Abaya 4">
+                <h3>Embroidered Rose Abaya</h3>
+                <p>$160.00</p>
+            </div>
+        </div>
+
+        <!-- Product Detail View -->
+        <div id="product-detail-view">
+            <span class="back-btn" onclick="closeProduct()">← Back to Collection</span>
+            
+            <div class="product-layout">
+                <div class="product-image-container">
+                    <img id="detail-image" src="" alt="Product Image">
+                </div>
+                
+                <div class="product-info-container">
+                    <h2 id="detail-title" class="product-title">Product Title</h2>
+                    <div id="detail-price" class="product-price">$0.00</div>
+                    
+                    <div class="btn-group">
+                        <button class="btn btn-cart" onclick="addToCart()">Add to Cart</button>
+                        <button class="btn btn-buy" onclick="buyNow()">Buy Now</button>
+                    </div>
+
+                    <div class="product-description">
+                        <strong>Product Details:</strong><br><br>
+                        <span id="detail-desc">Description goes here.</span>
+                        <br><br>
+                        <ul>
+                            <li>Premium stitching and finishing</li>
+                            <li>Dry clean recommended</li>
+                            <li>Includes matching shayla</li>
+                        </ul>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+    </div>
+
+    <!-- Premium Footer -->
+    <footer>
+        <div class="footer-content">
+            <div class="footer-col">
+                <h4>Customer Care</h4>
+                <ul>
+                    <li><a href="#">Contact Us</a></li>
+                    <li><a href="#">Shipping & Returns</a></li>
+                    <li><a href="#">Size Guide</a></li>
+                    <li><a href="#">FAQ</a></li>
+                </ul>
+            </div>
+            <div class="footer-col">
+                <h4>About Us</h4>
+                <ul>
+                    <li><a href="#">Our Story</a></li>
+                    <li><a href="#">Sustainability</a></li>
+                    <li><a href="#">Boutiques</a></li>
+                </ul>
+            </div>
+            <div class="footer-col newsletter">
+                <h4>Join Our List</h4>
+                <p style="color: #999; margin-bottom: 10px; font-size: 14px;">Sign up for updates, new arrivals, and exclusive offers.</p>
+                <input type="email" placeholder="Enter your email">
+                <button>Subscribe</button>
+            </div>
+        </div>
+        <div class="footer-bottom">
+            &copy; 2026 Luxe Boutique. All Rights Reserved.
+        </div>
+    </footer>
+
+    <!-- Interactive JavaScript -->
+    <script>
+        let cartTotal = 0;
+
+        function openProduct(title, price, description, imageSrc) {
+            // Hide collection, show details
+            document.getElementById('collection-view').style.display = 'none';
+            document.getElementById('product-detail-view').style.display = 'block';
+
+            // Populate the details dynamically
+            document.getElementById('detail-title').innerText = title;
+            document.getElementById('detail-price').innerText = price;
+            document.getElementById('detail-desc').innerText = description;
+            document.getElementById('detail-image').src = imageSrc;
+            
+            // Scroll to top of product seamlessly
+            window.scrollTo({ top: 0, behavior: 'smooth' });
+        }
+
+        function closeProduct() {
+            // Hide details, show collection
+            document.getElementById('product-detail-view').style.display = 'none';
+            document.getElementById('collection-view').style.display = 'grid';
+            
+            // Re-insert section title visually
+            const sectionTitle = document.querySelector('.section-title');
+            if(sectionTitle) sectionTitle.style.display = 'block';
+        }
+
+        function addToCart() {
+            cartTotal++;
+            document.getElementById('cart-count').innerText = cartTotal;
+            alert('Item added to your cart! You can continue shopping.');
+        }
+
+        function buyNow() {
+            cartTotal++;
+            document.getElementById('cart-count').innerText = cartTotal;
+            alert('Proceeding directly to secure checkout...');
+            // In a real site, this would redirect to the payment gateway:
+            // window.location.href = '/checkout';
+        }
+    </script>
+</body>
+</html>
