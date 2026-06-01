@@ -251,6 +251,22 @@
             transition: transform 0.1s ease-out; /* Smooth follow */
         }
 
+        /* --- Size Selector Styling --- */
+        .size-selector-container { margin-bottom: 25px; }
+        .size-header { display: flex; justify-content: space-between; align-items: baseline; margin-bottom: 10px; }
+        .size-label { font-size: 11px; font-weight: 500; text-transform: uppercase; letter-spacing: 1px; color: var(--dark-text); }
+        .size-label span { font-weight: normal; color: var(--muted-gray); text-transform: none; letter-spacing: normal; font-size: 13px; margin-left: 5px; }
+        .size-chart-link { font-size: 10px; color: var(--muted-gray); text-decoration: underline; text-underline-offset: 3px; letter-spacing: 1px; text-transform: uppercase; }
+        .size-chart-link:hover { color: var(--dark-text); }
+        .size-options { display: flex; flex-wrap: wrap; gap: 8px; }
+        .size-btn { background-color: var(--primary-bg); border: 1px solid var(--border-color); border-radius: 2px; padding: 10px 16px; cursor: pointer; font-size: 13px; font-family: var(--font-sans); color: var(--dark-text); transition: all 0.2s ease; min-width: 45px; text-align: center; }
+        .size-btn:hover { border-color: var(--muted-gray); }
+        .size-btn.selected { border-color: var(--dark-text); background-color: var(--dark-text); color: #fff; font-weight: 500; }
+        #custom-size-container { margin-top: 15px; padding: 15px; background-color: #FAFAFA; border: 1px solid var(--border-color); border-radius: 2px; }
+        .custom-size-label { display: block; font-size: 11px; color: var(--dark-text); margin-bottom: 8px; letter-spacing: 1px; text-transform: uppercase; }
+        #custom-measurements { width: 100%; padding: 10px; border: 1px solid var(--border-color); border-radius: 2px; font-family: var(--font-sans); font-size: 12px; resize: vertical; outline: none; }
+        #custom-measurements:focus { border-color: var(--accent-gold); }
+
         /* --- Editorial Footer --- */
         .premium-footer { background-color: #1C1B1A; color: #ECEAE6; padding: 80px 40px 30px 40px; margin-top: 120px; border-top: 1px solid var(--border-color); contain: layout style; }
         .footer-grid { max-width: 1440px; margin: 0 auto; display: grid; grid-template-columns: 2fr repeat(3, 1fr); gap: 60px; border-bottom: 1px solid #33312F; padding-bottom: 60px; }
@@ -629,9 +645,28 @@
                 <div style="flex: 1; display: flex; flex-direction: column; min-width: 300px; justify-content: center;">
                     <h2 id="detail-title" style="font-family: var(--font-serif); font-size: 34px; font-weight: 400; margin-bottom: 15px; color: var(--dark-text); text-transform: uppercase; letter-spacing: 2px;">Product Title</h2>
                     
-                    <div id="price-container" style="margin-bottom: 25px;">
+                    <div id="price-container" style="margin-bottom: 25px;"></div>
+
+                    <div class="size-selector-container">
+                        <div class="size-header">
+                            <span class="size-label">Size: <span id="selected-size-text">Select a size</span></span>
+                            <a href="#" class="size-chart-link">Size Chart</a>
                         </div>
-                    
+            
+                        <div class="size-options" id="size-options">
+                            <button class="size-btn" data-size="52">52</button>
+                            <button class="size-btn" data-size="54">54</button>
+                            <button class="size-btn" data-size="56">56</button>
+                            <button class="size-btn" data-size="58">58</button>
+                            <button class="size-btn" data-size="60">60</button>
+                            <button class="size-btn" data-size="Custom">Custom</button>
+                        </div>
+            
+                        <div id="custom-size-container" style="display: none;">
+                            <label for="custom-measurements" class="custom-size-label">Enter Measurements (Length, Chest, Sleeves):</label>
+                            <textarea id="custom-measurements" placeholder="Specify your exact measurements..." rows="2"></textarea>
+                        </div>
+                    </div>
                     <div style="display: flex; align-items: center; gap: 15px; margin-bottom: 25px;">
                         <span style="font-size: 11px; font-weight: 500; text-transform: uppercase; letter-spacing: 1px;">Quantity</span>
                         <div style="display: flex; align-items: center; border: 1px solid var(--border-color); border-radius: 2px;">
@@ -1061,6 +1096,28 @@
                 zoomImg.style.transform = 'scale(1)';
             });
         }
+
+        // --- NEW: Size Selector Logic ---
+        const sizeButtons = document.querySelectorAll('.size-btn');
+        const selectedSizeText = document.getElementById('selected-size-text');
+        const customSizeContainer = document.getElementById('custom-size-container');
+
+        sizeButtons.forEach(button => {
+            button.addEventListener('click', function(e) {
+                e.preventDefault();
+                sizeButtons.forEach(btn => btn.classList.remove('selected'));
+                this.classList.add('selected');
+                
+                const selectedSize = this.getAttribute('data-size');
+                selectedSizeText.textContent = selectedSize;
+
+                if (selectedSize === 'Custom') {
+                    customSizeContainer.style.display = 'block';
+                } else {
+                    customSizeContainer.style.display = 'none';
+                }
+            });
+        });
     </script>
 
     <script type="module">
@@ -1270,6 +1327,9 @@
                 return;
             }
             try {
+                // Here you would also grab the size selection to send to Firebase
+                // e.g. const selectedSize = document.getElementById('selected-size-text').textContent;
+                
                 const safeProductId = escapeHTML(productId);
                 const cartItemRef = doc(db, "users", currentUser.uid, "cart", safeProductId);
                 const docSnap = await getDoc(cartItemRef);
@@ -1373,6 +1433,15 @@
             // Reset quantity to 1 when opening a new product
             document.getElementById('product-quantity').value = 1;
 
+            // Reset size selection when opening a new product
+            document.querySelectorAll('.size-btn').forEach(btn => btn.classList.remove('selected'));
+            const sizeText = document.getElementById('selected-size-text');
+            if(sizeText) sizeText.textContent = 'Select a size';
+            const customContainer = document.getElementById('custom-size-container');
+            if(customContainer) customContainer.style.display = 'none';
+            const customInput = document.getElementById('custom-measurements');
+            if(customInput) customInput.value = '';
+
             document.getElementById('detail-title').textContent = title;
             document.getElementById('detail-desc').textContent = description;
             document.getElementById('detail-image').src = imageSrc;
@@ -1410,6 +1479,10 @@
         };
 
         window.addCurrentProductToCart = function() {
+            // Future Update: Check if size is selected before adding to cart
+            // const sizeText = document.getElementById('selected-size-text').textContent;
+            // if(sizeText === 'Select a size') { alert('Please select a size'); return; }
+
             const qty = parseInt(document.getElementById('product-quantity').value) || 1;
             addSecureProductToCart(currentProductView.id, qty);
         };
