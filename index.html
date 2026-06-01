@@ -1872,11 +1872,9 @@ window.closeCheckoutModal = function() {
 
                                 <!-- Right Column: Amazon-Style Action Buttons -->
                                 <div style="flex: 1; min-width: 220px; display: flex; flex-direction: column;">
-                                    <button class="order-action-btn primary-action-btn" onclick="alert('Tracking ID: RZP-${order.paymentId.substring(4, 12).toUpperCase()}\\n\\nLive tracking pipeline will be integrated here.')">Track Package</button>
-                                    <button class="order-action-btn" onclick="alert('Return window is active. Redirecting to concierge support...')">Return or Replace Items</button>
-                                    <button class="order-action-btn" onclick="alert('Gift receipt link copied to your clipboard.')">Share Gift Receipt</button>
-                                    <button class="order-action-btn" onclick="alert('Opening feedback form...')">Leave Seller Feedback</button>
-                                    <button class="order-action-btn" onclick="alert('Opening review module...')">Write a Product Review</button>
+                                    <button class="order-action-btn primary-action-btn" onclick="contactConcierge('${order.id}', 'track')">Track Package</button>
+                                    <button class="order-action-btn" onclick="contactConcierge('${order.id}', 'return')">Return or Replace Items</button>
+                                    <button class="order-action-btn" onclick="contactConcierge('${order.id}', 'general')">Contact Concierge Support</button>
                                 </div>
                             </div>
                         </div>
@@ -1891,7 +1889,25 @@ window.closeCheckoutModal = function() {
     }
        // --- OPEN FULL ORDER DETAILS PAGE ---
     window.userOrderHistory = []; // We will save the fetched orders here
+// --- WHATSAPP CONCIERGE INTEGRATION ---
+    window.contactConcierge = function(orderId, actionType) {
+        const myPhoneNumber = "917842358753"; // <-- REPLACE WITH YOUR REAL NUMBER (e.g. 919550791538)
+        let customMessage = "";
 
+        if (actionType === 'track') {
+            customMessage = `Hi ABAYRAH Concierge! I would like to track the shipping status of my order: #${orderId.substring(0,10).toUpperCase()}`;
+        } else if (actionType === 'return') {
+            customMessage = `Hi ABAYRAH Concierge! I need assistance with returning or exchanging an item from my order: #${orderId.substring(0,10).toUpperCase()}`;
+        } else {
+            customMessage = `Hi ABAYRAH Concierge! I need some help regarding my order: #${orderId.substring(0,10).toUpperCase()}`;
+        }
+
+        // Encode the message so it formats correctly in a web link
+        const whatsappUrl = `https://wa.me/${myPhoneNumber}?text=${encodeURIComponent(customMessage)}`;
+        
+        // Open WhatsApp in a new tab
+        window.open(whatsappUrl, '_blank');
+    };
     window.openOrderDetails = function(orderId) {
         // 1. Find the specific order from our saved list
         const order = window.userOrderHistory.find(o => o.id === orderId);
