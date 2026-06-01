@@ -256,7 +256,7 @@
         .size-header { display: flex; justify-content: space-between; align-items: baseline; margin-bottom: 10px; }
         .size-label { font-size: 11px; font-weight: 500; text-transform: uppercase; letter-spacing: 1px; color: var(--dark-text); }
         .size-label span { font-weight: normal; color: var(--muted-gray); text-transform: none; letter-spacing: normal; font-size: 13px; margin-left: 5px; }
-        .size-chart-link { font-size: 10px; color: var(--muted-gray); text-decoration: underline; text-underline-offset: 3px; letter-spacing: 1px; text-transform: uppercase; }
+        .size-chart-link { font-size: 10px; color: var(--muted-gray); text-decoration: underline; text-underline-offset: 3px; letter-spacing: 1px; text-transform: uppercase; cursor: pointer;}
         .size-chart-link:hover { color: var(--dark-text); }
         .size-options { display: flex; flex-wrap: wrap; gap: 8px; }
         .size-btn { background-color: var(--primary-bg); border: 1px solid var(--border-color); border-radius: 2px; padding: 10px 16px; cursor: pointer; font-size: 13px; font-family: var(--font-sans); color: var(--dark-text); transition: all 0.2s ease; min-width: 45px; text-align: center; }
@@ -348,6 +348,14 @@
         .cart-subtotal { display: flex; justify-content: space-between; font-size: 14px; font-weight: 500; text-transform: uppercase; letter-spacing: 1px; color: var(--dark-text); margin-bottom: 10px; }
         .subtotal-amount { font-family: var(--font-serif); font-size: 22px; font-weight: 500; }
         .shipping-note { font-size: 11px; color: var(--muted-gray); margin-bottom: 20px; }
+        
+        /* --- Size Chart Modal CSS --- */
+        .size-chart-content { max-width: 600px; padding: 40px; }
+        .table-responsive { width: 100%; overflow-x: auto; margin-top: 20px; }
+        .size-chart-table { width: 100%; border-collapse: collapse; text-align: center; font-family: var(--font-sans); font-size: 13px; }
+        .size-chart-table th, .size-chart-table td { padding: 15px; border-bottom: 1px solid var(--border-color); }
+        .size-chart-table th { font-weight: 500; color: var(--dark-text); text-transform: uppercase; letter-spacing: 1px; background-color: #FAFAFA; }
+        .size-chart-table td { color: var(--muted-gray); font-weight: 400; }
 
         @media (max-width: 1024px) {
             .category-grid { grid-template-columns: repeat(3, 1fr); }
@@ -650,7 +658,7 @@
                     <div class="size-selector-container">
                         <div class="size-header">
                             <span class="size-label">Size: <span id="selected-size-text">Select a size</span></span>
-                            <a href="#" class="size-chart-link">Size Chart</a>
+                            <a class="size-chart-link">Size Chart</a>
                         </div>
             
                         <div class="size-options" id="size-options">
@@ -743,41 +751,6 @@
         </div>
     </footer>
 
-    <div class="search-overlay" id="searchOverlay">
-        <div class="search-container">
-            <button class="modal-close" id="closeSearchBtn" aria-label="Close Search">&times;</button>
-            <input type="text" id="searchInput" placeholder="Search for Abayas, Niqabs, or accessories..." autocomplete="off">
-            <div id="noResultsMsg" class="no-results-msg" style="display:none;"></div>
-        </div>
-    </div>
-
-    <div class="cart-overlay" id="cartOverlay"></div>
-    <div class="cart-drawer" id="cartDrawer">
-        <div class="cart-header">
-            <h3>Your Vault</h3>
-            <button class="modal-close" id="closeCartBtn" aria-label="Close Cart">&times;</button>
-        </div>
-        
-        <div class="cart-body">
-            <div class="empty-cart-state" id="emptyCartState">
-                <p>Your vault is currently empty.</p>
-                <button class="submit-btn" onclick="document.getElementById('closeCartBtn').click(); backToCatalogs(); document.getElementById('catalogs').scrollIntoView({behavior: 'smooth'});">
-                    Discover Collections
-                </button>
-            </div>
-            <div class="cart-items-wrapper" id="cartItemsWrapper" style="display: none;"></div>
-        </div>
-
-        <div class="cart-footer" id="cartFooter" style="display: none;">
-            <div class="cart-subtotal">
-                <span>Subtotal</span>
-                <span class="subtotal-amount" id="cartSubtotalAmount">₹0.00</span>
-            </div>
-            <p class="shipping-note">Taxes and shipping calculated at checkout.</p>
-            <button class="submit-btn">Proceed to Checkout</button>
-        </div>
-    </div>
-
     <div class="modal-overlay" id="loginModal">
         <div class="modal-content">
             <button class="modal-close" id="closeModalBtn" aria-label="Close Modal">&times;</button>
@@ -844,6 +817,33 @@
             <div class="modal-links">
                 <a href="#" id="forgotPasswordLink">Forgot Password?</a>
                 <p><span id="toggleAuthText">New Guest?</span> <a id="toggleAuthBtn">Create Account</a></p>
+            </div>
+        </div>
+    </div>
+    
+    <div class="modal-overlay" id="sizeChartModal">
+        <div class="modal-content size-chart-content">
+            <button class="modal-close" id="closeSizeChartBtn" aria-label="Close Modal">&times;</button>
+            <h2 class="modal-title">Size Guide</h2>
+            <p class="modal-subtitle" style="margin-bottom: 10px;">All measurements are in inches.</p>
+            <div class="table-responsive">
+                <table class="size-chart-table">
+                    <thead>
+                        <tr>
+                            <th>Size</th>
+                            <th>Length</th>
+                            <th>Chest</th>
+                            <th>Sleeve</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr><td>52</td><td>52</td><td>20</td><td>26</td></tr>
+                        <tr><td>54</td><td>54</td><td>21</td><td>27</td></tr>
+                        <tr><td>56</td><td>56</td><td>22</td><td>28</td></tr>
+                        <tr><td>58</td><td>58</td><td>23</td><td>29</td></tr>
+                        <tr><td>60</td><td>60</td><td>24</td><td>30</td></tr>
+                    </tbody>
+                </table>
             </div>
         </div>
     </div>
@@ -1117,6 +1117,26 @@
                     customSizeContainer.style.display = 'none';
                 }
             });
+        });
+
+        // --- SIZE CHART MODAL LOGIC ---
+        const sizeChartLink = document.querySelector('.size-chart-link');
+        const sizeChartModal = document.getElementById('sizeChartModal');
+        const closeSizeChartBtn = document.getElementById('closeSizeChartBtn');
+
+        sizeChartLink.addEventListener('click', (e) => {
+            e.preventDefault();
+            sizeChartModal.classList.add('active');
+        });
+
+        closeSizeChartBtn.addEventListener('click', () => {
+            sizeChartModal.classList.remove('active');
+        });
+
+        sizeChartModal.addEventListener('click', (e) => {
+            if (e.target === sizeChartModal) {
+                sizeChartModal.classList.remove('active');
+            }
         });
     </script>
 
