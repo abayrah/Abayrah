@@ -362,6 +362,16 @@
 .custom-measurements-grid input[type="number"]:focus { border-color: var(--accent-gold); }
 #custom-notes { width: 100%; padding: 12px; border: 1px solid var(--border-color); border-radius: 2px; font-family: var(--font-sans); font-size: 13px; color: var(--dark-text); outline: none; resize: vertical; box-sizing: border-box; background: transparent; }
 #custom-notes:focus { border-color: var(--accent-gold); }
+        /* --- Payment Modal Styles --- */
+.payment-methods-container { display: flex; flex-direction: column; gap: 10px; }
+.payment-method-card { display: block; border: 1px solid var(--border-color); border-radius: 2px; cursor: pointer; transition: all 0.3s ease; background: #fff; position: relative; }
+.payment-method-card:hover { border-color: var(--muted-gray); }
+.payment-method-card input[type="radio"] { position: absolute; opacity: 0; cursor: pointer; height: 0; width: 0; }
+.payment-method-content { display: flex; justify-content: space-between; align-items: center; padding: 18px 20px; font-size: 13px; font-weight: 500; color: var(--dark-text); text-transform: uppercase; letter-spacing: 1px; }
+.payment-method-card input[type="radio"]:checked + .payment-method-content { background-color: #FAFAFA; border-left: 3px solid var(--accent-gold); color: var(--accent-gold); }
+.payment-details-view { display: none; padding: 20px; border: 1px solid var(--border-color); border-top: none; background: #fff; margin-bottom: 10px; }
+.payment-details-view.active-payment-view { display: block; animation: fadeIn 0.4s ease; }
+@keyframes fadeIn { from { opacity: 0; transform: translateY(-5px); } to { opacity: 1; transform: translateY(0); } }
 
         @media (max-width: 1024px) {
             .category-grid { grid-template-columns: repeat(3, 1fr); }
@@ -1467,50 +1477,116 @@ window.closeCheckoutModal = function() {
     document.getElementById('checkoutModal').classList.remove('active');
 };
 
-// 3. Logic to process the shipping data
+// --- 1. Transition from Shipping to Payment ---
+let savedShippingData = {};
+
 const checkoutForm = document.getElementById('checkoutForm');
 if (checkoutForm) {
     checkoutForm.addEventListener('submit', async (e) => {
         e.preventDefault();
         if (!currentUser) return;
         
-        const proceedToPaymentBtn = document.getElementById('proceedToPaymentBtn');
-        proceedToPaymentBtn.textContent = "Processing...";
-        proceedToPaymentBtn.disabled = true;
+        // Save shipping data temporarily
+        savedShippingData = {
+            firstName: document.getElementById('shipFirstName').value,
+            lastName: document.getElementById('shipLastName').value,
+            email: document.getElementById('shipEmail').value,
+            phone: document.getElementById('shipPhone').value,
+            houseNo: document.getElementById('shipHouseNo').value,
+            street: document.getElementById('shipStreet').value,
+            city: document.getElementById('shipCity').value,
+            state: document.getElementById('shipState').value,
+            zip: document.getElementById('shipZip').value,
+            landmark: document.getElementById('shipLandmark').value
+        };
 
-        try {
-            // Gather all the new shipping details
-            const shippingData = {
-                firstName: document.getElementById('shipFirstName').value,
-                lastName: document.getElementById('shipLastName').value,
-                email: document.getElementById('shipEmail').value,
-                phone: document.getElementById('shipPhone').value,
-                houseNo: document.getElementById('shipHouseNo').value,
-                street: document.getElementById('shipStreet').value,
-                city: document.getElementById('shipCity').value,
-                state: document.getElementById('shipState').value,
-                zip: document.getElementById('shipZip').value,
-                landmark: document.getElementById('shipLandmark').value // Optional
-            };
-
-            // NOTE: Since you are splitting the flow, this is where you would 
-            // normally save the shippingData to a temporary state and then 
-            // OPEN YOUR PAYMENT MODAL or redirect to a payment gateway (like Razorpay).
-            
-            console.log("Shipping Data Saved:", shippingData);
-            alert("Shipping Details saved! You will now be redirected to the payment gateway.");
-            
-            // closeCheckoutModal(); // Un-comment this when your payment flow is ready
-            
-        } catch (error) {
-            console.error("Error: ", error);
-        } finally {
-            proceedToPaymentBtn.textContent = "Proceed to Payment";
-            proceedToPaymentBtn.disabled = false;
-        }
+        // Close Shipping Modal & Open Payment Modal
+        document.getElementById('checkoutModal').classList.remove('active');
+        
+        // Sync the total amount
+        document.getElementById('finalPaymentAmount').textContent = document.getElementById('checkoutTotalDisplay').textContent;
+        
+        document.getElementById('paymentModal').classList.add('active');
     });
 }
 
+// --- 2. Toggle Payment Views (UPI vs Card) ---
+window.togglePaymentViews = function() {
+    const selectedMethod = document.querySelector('input[name="payment_method"]:checked').value;
+    const upiView = document.getElementById('upi-details');
+    const cardView = document.getElementById('card-details');
+    
+    if (selectedMethod === 'upi') {
+        upiView.classList.add('active-payment-view');
+        cardView.classList.remove('active-payment-view');
+    } else {
+        cardView.classList.add('active-payment-view');
+        upiView.classList.remove('active-payment-view');
+    }
+};
+
+window.closePaymentModal = function() {
+    document.getElementById('paymentModal').classList.remove('active');
+};
+
+// --- 3. Process the Final Order ---
+window.processFinalOrder = async function() {
+    const confirmBtn = document.getElementById('confirmOrderBtn');
+    const selectedMethod = document.querySelector('input[name="payment_method"]:checked').value;
+    
+    // Basic validation
+    if (selectedMethod === 'upi' && !document.getElementById('upiIdInput').value) {
+        alert("Please enter a valid UPI ID.");
+        return;
+    } else if (selectedMethod === 'card' && (!document.getElementById('cardNumberInput').value || !document.getElementById('cardExpiryInput').value || !document.getElementById('cardCvvInput').value)) {
+        alert("Please fill in all card details.");
+        return;
+    }
+
+    confirmBtn.textContent = "Processing Payment...";
+    confirmBtn.disabled = true;
+
+    try {
+        // --- REALITY CHECK ---
+        // In a real app, this is where you call Razorpay or Stripe to process the actual money.
+        // For now, we simulate a successful payment delay.
+        await new Promise(resolve => setTimeout(resolve, 2000)); 
+        
+        // 1. Create the Order object
+        const orderData = {
+            userId: currentUser.uid,
+            shippingDetails: savedShippingData,
+            paymentMethod: selectedMethod,
+            totalAmount: document.getElementById('finalPaymentAmount').textContent,
+            status: "Processing",
+            createdAt: new Date().toISOString()
+        };
+
+        // 2. Save order to Firebase (Optional, if you have an 'orders' collection)
+        // await setDoc(doc(collection(db, "orders")), orderData);
+
+        // 3. Clear the user's cart in Firebase
+        const cartRef = collection(db, "users", currentUser.uid, "cart");
+        const cartSnapshot = await getDocs(cartRef);
+        cartSnapshot.forEach(async (cartDoc) => {
+            await deleteDoc(doc(db, "users", currentUser.uid, "cart", cartDoc.id));
+        });
+
+        // 4. Success UI
+        alert("Payment Successful! Your order has been placed.");
+        closePaymentModal();
+        
+        // Redirect home or show a beautiful success page
+        document.getElementById('catalogs').scrollIntoView({behavior: 'smooth'});
+
+    } catch (error) {
+        console.error("Payment failed: ", error);
+        alert("Payment failed. Please try again.");
+    } finally {
+        confirmBtn.textContent = "Pay Securely";
+        confirmBtn.disabled = false;
+    }
+};
    window.addCurrentProductToCart = function() {
         const qty = parseInt(document.getElementById('product-quantity').value) || 1;
         let sizeText = document.getElementById('selected-size-text').textContent;
@@ -1668,6 +1744,65 @@ if (checkoutForm) {
 
             <button type="submit" class="submit-btn" id="proceedToPaymentBtn" style="margin-top: 30px; padding: 20px; font-size: 13px;">Proceed to Payment</button>
         </form>
+    </div>
+</div>
+    <div class="modal-overlay" id="paymentModal">
+    <div class="modal-content" style="max-width: 500px; text-align: left;">
+        <button class="modal-close" onclick="closePaymentModal()" aria-label="Close Payment">&times;</button>
+        
+        <h2 class="modal-title" style="text-align: center;">Payment</h2>
+        <p class="modal-subtitle" style="text-align: center; margin-bottom: 25px;">Select your preferred payment method</p>
+
+        <div class="payment-methods-container">
+            <label class="payment-method-card">
+                <input type="radio" name="payment_method" value="upi" checked onchange="togglePaymentViews()">
+                <div class="payment-method-content">
+                    <span class="payment-method-title">UPI (GPay, PhonePe, Paytm)</span>
+                    <svg viewBox="0 0 24 24" width="24" height="24" fill="currentColor"><path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm-1 14H9v-2h2v2zm0-4H9V7h2v5zm4 4h-2V7h2v9z"/></svg>
+                </div>
+            </label>
+            
+            <div id="upi-details" class="payment-details-view active-payment-view">
+                <div class="input-group">
+                    <label>Enter UPI ID</label>
+                    <input type="text" id="upiIdInput" placeholder="username@upi">
+                </div>
+            </div>
+
+            <label class="payment-method-card">
+                <input type="radio" name="payment_method" value="card" onchange="togglePaymentViews()">
+                <div class="payment-method-content">
+                    <span class="payment-method-title">Credit / Debit Card</span>
+                    <svg viewBox="0 0 24 24" width="24" height="24" fill="currentColor"><path d="M20 4H4c-1.11 0-1.99.89-1.99 2L2 18c0 1.11.89 2 2 2h16c1.11 0 2-.89 2-2V6c0-1.11-.89-2-2-2zm0 14H4v-6h16v6zm0-10H4V6h16v2z"/></svg>
+                </div>
+            </label>
+
+            <div id="card-details" class="payment-details-view">
+                <div class="input-group" style="margin-bottom: 15px;">
+                    <label>Card Number</label>
+                    <input type="text" id="cardNumberInput" placeholder="XXXX XXXX XXXX XXXX" maxlength="19">
+                </div>
+                <div class="form-row" style="display: flex; gap: 15px;">
+                    <div class="input-group" style="flex: 1;">
+                        <label>Expiry Date</label>
+                        <input type="text" id="cardExpiryInput" placeholder="MM/YY" maxlength="5">
+                    </div>
+                    <div class="input-group" style="flex: 1;">
+                        <label>CVV</label>
+                        <input type="password" id="cardCvvInput" placeholder="123" maxlength="3">
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div style="background: #FAFAFA; padding: 15px; margin-top: 25px; border: 1px solid var(--border-color); border-radius: 2px;">
+            <div style="display: flex; justify-content: space-between; font-family: var(--font-sans); font-weight: 500; font-size: 16px; color: var(--dark-text);">
+                <span>Amount to Pay:</span>
+                <span id="finalPaymentAmount">₹0.00</span>
+            </div>
+        </div>
+
+        <button type="button" class="submit-btn" id="confirmOrderBtn" onclick="processFinalOrder()" style="margin-top: 20px;">Pay Securely</button>
     </div>
 </div>
 </body>
