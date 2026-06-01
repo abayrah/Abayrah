@@ -857,11 +857,7 @@
         const noResultsMsg = document.getElementById('noResultsMsg');
         const categoryCards = document.querySelectorAll('.category-card');
         const collectionsSection = document.getElementById('catalogs');
-
-        // Security Utility for mitigating XSS
-       <script>
-    // --- UI Interactions Script (CRASH-PROOFED) ---
-    // Security Utility for mitigating XSS
+        
     function escapeHTML(str) {
         return String(str).replace(/[&<>'"]/g, 
             tag => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', "'": '&#39;', '"': '&quot;' }[tag] || tag)
