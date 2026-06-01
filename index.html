@@ -1683,6 +1683,34 @@ window.closeCheckoutModal = function() {
             popup.style.display = 'block';
         }
     };
+       // --- VIEW ITEM FROM ORDER HISTORY LOGIC ---
+    window.viewItemFromOrder = async function(productId) {
+        // 1. Close the Orders Vault modal
+        document.getElementById('ordersModal').classList.remove('active');
+        
+        try {
+            // 2. Fetch the freshest product data from your database
+            const productRef = doc(db, "products", productId);
+            const productSnap = await getDoc(productRef);
+            
+            if (productSnap.exists()) {
+                const product = productSnap.data();
+                const price = parseFloat(product.price) || 0;
+                const originalPrice = parseFloat(product.originalPrice) || null;
+                
+                // 3. Hide the main storefront and ensure the dynamic shopping section is visible
+                document.getElementById('main-storefront').style.display = 'none';
+                document.getElementById('dynamic-shopping-section').style.display = 'block';
+                
+                // 4. Open the product detail view using your existing function
+                openProduct(productId, product.title, price, product.description || '', product.image || '', originalPrice);
+            } else {
+                alert("This product is from an older collection and is no longer available in the store.");
+            }
+        } catch (error) {
+            console.error("Error loading product:", error);
+        }
+    };
 
     async function loadOrderHistory() {
         if (!currentUser) return;
@@ -1716,17 +1744,25 @@ window.closeCheckoutModal = function() {
                 if (order.status === "Cancelled" || order.status === "Failed") { statusColor = "#CC0C39"; statusIcon = "⚠️"; }
                 if (order.status === "Delivered") { statusColor = "var(--success-green)"; statusIcon = "✓"; }
 
-                // Build the HTML for the specific items inside this order
+               // Build the HTML for the specific items inside this order
                 let itemsHtml = '';
                 if (order.items && order.items.length > 0) {
                     order.items.forEach(item => {
                         itemsHtml += `
                             <div class="order-item-row">
-                                <img src="${item.image}" alt="${item.title}" style="width: 70px; height: 90px; object-fit: cover; background: #FAFAFA; border: 1px solid var(--border-color);" decoding="async">
+                                <!-- Clickable Image -->
+                                <img src="${item.image}" alt="${item.title}" onclick="viewItemFromOrder('${item.productId}')" style="width: 70px; height: 90px; object-fit: cover; background: #FAFAFA; border: 1px solid var(--border-color); cursor: pointer;" decoding="async">
+                                
                                 <div style="flex: 1;">
-                                    <h4 style="font-family: var(--font-serif); font-size: 16px; color: var(--dark-text); margin-bottom: 4px;"><a href="#" style="text-decoration: underline; text-underline-offset: 2px;">${item.title}</a></h4>
+                                    <!-- Clickable Title -->
+                                    <h4 style="font-family: var(--font-serif); font-size: 16px; color: var(--dark-text); margin-bottom: 4px;">
+                                        <a href="javascript:void(0)" onclick="viewItemFromOrder('${item.productId}')" style="text-decoration: underline; text-underline-offset: 2px;">${item.title}</a>
+                                    </h4>
+                                    
                                     <p style="font-size: 11px; color: var(--muted-gray); margin-bottom: 8px;">Size: ${item.size} | Qty: ${item.quantity}</p>
-                                    <button style="background: none; border: 1px solid var(--border-color); padding: 6px 12px; font-size: 10px; text-transform: uppercase; letter-spacing: 1px; color: var(--dark-text); border-radius: 12px; cursor: pointer;">View your item</button>
+                                    
+                                    <!-- View Item Button -->
+                                    <button onclick="viewItemFromOrder('${item.productId}')" style="background: none; border: 1px solid var(--border-color); padding: 6px 12px; font-size: 10px; text-transform: uppercase; letter-spacing: 1px; color: var(--dark-text); border-radius: 12px; cursor: pointer; transition: all 0.3s ease;" onmouseover="this.style.borderColor='var(--dark-text)'" onmouseout="this.style.borderColor='var(--border-color)'">View your item</button>
                                 </div>
                             </div>
                         `;
