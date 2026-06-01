@@ -11,7 +11,7 @@
     <link rel="preload" as="image" href="header.png">
     <link rel="preload" as="image" href="images/hero-background.png" media="(min-width: 769px)">
     <link rel="preload" as="image" href="images/mobile-hero-1.png" media="(max-width: 768px)">
-    
+    <script src="https://checkout.razorpay.com/v1/checkout.js"></script>
     <link rel="modulepreload" href="https://www.gstatic.com/firebasejs/10.8.0/firebase-app.js">
     <link rel="modulepreload" href="https://www.gstatic.com/firebasejs/10.8.0/firebase-auth.js">
     <link rel="modulepreload" href="https://www.gstatic.com/firebasejs/10.8.0/firebase-firestore.js">
@@ -1478,115 +1478,92 @@ window.closeCheckoutModal = function() {
 };
 
 // --- 1. Transition from Shipping to Payment ---
-let savedShippingData = {};
+// --- CONNECT FRONTEND CODE TO YOUR LIVE RENDER SERVER ---
+    const backendUrl = "https://abayrah-backend.onrender.com/create-order";
+    let savedShippingData = {};
 
-const checkoutForm = document.getElementById('checkoutForm');
-if (checkoutForm) {
-    checkoutForm.addEventListener('submit', async (e) => {
-        e.preventDefault();
-        if (!currentUser) return;
-        
-        // Save shipping data temporarily
-        savedShippingData = {
-            firstName: document.getElementById('shipFirstName').value,
-            lastName: document.getElementById('shipLastName').value,
-            email: document.getElementById('shipEmail').value,
-            phone: document.getElementById('shipPhone').value,
-            houseNo: document.getElementById('shipHouseNo').value,
-            street: document.getElementById('shipStreet').value,
-            city: document.getElementById('shipCity').value,
-            state: document.getElementById('shipState').value,
-            zip: document.getElementById('shipZip').value,
-            landmark: document.getElementById('shipLandmark').value
-        };
+    const checkoutForm = document.getElementById('checkoutForm');
+    if (checkoutForm) {
+        checkoutForm.addEventListener('submit', async (e) => {
+            e.preventDefault();
+            if (!currentUser) return;
+            
+            const proceedBtn = document.getElementById('proceedToPaymentBtn');
+            proceedBtn.textContent = "Opening Secure Gateway...";
+            proceedBtn.disabled = true;
 
-        // Close Shipping Modal & Open Payment Modal
-        document.getElementById('checkoutModal').classList.remove('active');
-        
-        // Sync the total amount
-        document.getElementById('finalPaymentAmount').textContent = document.getElementById('checkoutTotalDisplay').textContent;
-        
-        document.getElementById('paymentModal').classList.add('active');
-    });
-}
+            // Save user shipping choices securely
+            savedShippingData = {
+                firstName: document.getElementById('shipFirstName').value,
+                lastName: document.getElementById('shipLastName').value,
+                email: document.getElementById('shipEmail').value,
+                phone: document.getElementById('shipPhone').value,
+                houseNo: document.getElementById('shipHouseNo').value,
+                street: document.getElementById('shipStreet').value,
+                city: document.getElementById('shipCity').value,
+                state: document.getElementById('shipState').value,
+                zip: document.getElementById('shipZip').value,
+                landmark: document.getElementById('shipLandmark').value
+            };
 
-// --- 2. Toggle Payment Views (UPI vs Card) ---
-window.togglePaymentViews = function() {
-    const selectedMethod = document.querySelector('input[name="payment_method"]:checked').value;
-    const upiView = document.getElementById('upi-details');
-    const cardView = document.getElementById('card-details');
-    
-    if (selectedMethod === 'upi') {
-        upiView.classList.add('active-payment-view');
-        cardView.classList.remove('active-payment-view');
-    } else {
-        cardView.classList.add('active-payment-view');
-        upiView.classList.remove('active-payment-view');
-    }
-};
+            // Grab total basket text from display string (e.g. "₹1,250.00" -> 1250.00)
+            const totalText = document.getElementById('checkoutTotalDisplay').textContent;
+            const orderAmount = parseFloat(totalText.replace(/[^0-9.]/g, ''));
 
-window.closePaymentModal = function() {
-    document.getElementById('paymentModal').classList.remove('active');
-};
+            try {
+                // 1. Tell your Render backend app to make a secure Razorpay order ID
+                const response = await fetch(backendUrl, {
+                    method: "POST",
+                    headers: { "Content-Type": "application/json" },
+                    body: JSON.stringify({ amount: orderAmount })
+                });
 
-// --- 3. Process the Final Order ---
-window.processFinalOrder = async function() {
-    const confirmBtn = document.getElementById('confirmOrderBtn');
-    const selectedMethod = document.querySelector('input[name="payment_method"]:checked').value;
-    
-    // Basic validation
-    if (selectedMethod === 'upi' && !document.getElementById('upiIdInput').value) {
-        alert("Please enter a valid UPI ID.");
-        return;
-    } else if (selectedMethod === 'card' && (!document.getElementById('cardNumberInput').value || !document.getElementById('cardExpiryInput').value || !document.getElementById('cardCvvInput').value)) {
-        alert("Please fill in all card details.");
-        return;
-    }
+                if (!response.ok) throw new Error("Backend payment order creation failed");
+                const orderData = await response.json();
 
-    confirmBtn.textContent = "Processing Payment...";
-    confirmBtn.disabled = true;
+                // 2. Open the official native luxury overlay drawer window interface
+                const options = {
+                    "key": "rzp_test_SwIjUbUrgElI7a", // Public Key ID
+                    "amount": orderData.amount,
+                    "currency": "INR",
+                    "name": "ABAYRAH",
+                    "description": "Crafted for Modesty",
+                    "order_id": orderData.id, // Links directly to cloud transaction
+                    "handler": async function (paymentResponse) {
+                        // This runs automatically the millisecond their card is approved!
+                        
+                        // Clear out the checkout cart nodes inside your database
+                        const cartRef = collection(db, "users", currentUser.uid, "cart");
+                        const cartSnapshot = await getDocs(cartRef);
+                        const deletePromises = cartSnapshot.docs.map(cartDoc => deleteDoc(doc(db, "users", currentUser.uid, "cart", cartDoc.id)));
+                        await Promise.all(deletePromises);
 
-    try {
-        // --- REALITY CHECK ---
-        // In a real app, this is where you call Razorpay or Stripe to process the actual money.
-        // For now, we simulate a successful payment delay.
-        await new Promise(resolve => setTimeout(resolve, 2000)); 
-        
-        // 1. Create the Order object
-        const orderData = {
-            userId: currentUser.uid,
-            shippingDetails: savedShippingData,
-            paymentMethod: selectedMethod,
-            totalAmount: document.getElementById('finalPaymentAmount').textContent,
-            status: "Processing",
-            createdAt: new Date().toISOString()
-        };
+                        alert("Payment Successful! Your modest wardrobe statement order has been placed.");
+                        document.getElementById('checkoutModal').classList.remove('active');
+                        document.getElementById('catalogs').scrollIntoView({behavior: 'smooth'});
+                    },
+                    "prefill": {
+                        "name": `${savedShippingData.firstName} ${savedShippingData.lastName}`,
+                        "email": savedShippingData.email,
+                        "contact": savedShippingData.phone
+                    },
+                    "theme": {
+                        "color": "#1C1B1A" // Dark luxury brand accent color matching theme styling tokens
+                    }
+                };
 
-        // 2. Save order to Firebase (Optional, if you have an 'orders' collection)
-        // await setDoc(doc(collection(db, "orders")), orderData);
+                const rzp = new window.Razorpay(options);
+                rzp.open();
 
-        // 3. Clear the user's cart in Firebase
-        const cartRef = collection(db, "users", currentUser.uid, "cart");
-        const cartSnapshot = await getDocs(cartRef);
-        cartSnapshot.forEach(async (cartDoc) => {
-            await deleteDoc(doc(db, "users", currentUser.uid, "cart", cartDoc.id));
+            } catch (error) {
+                console.error("Order setup path failed:", error);
+                alert("Something went wrong initializing the checkout gateway. Please try again.");
+            } finally {
+                proceedBtn.textContent = "Proceed to Payment";
+                proceedBtn.disabled = false;
+            }
         });
-
-        // 4. Success UI
-        alert("Payment Successful! Your order has been placed.");
-        closePaymentModal();
-        
-        // Redirect home or show a beautiful success page
-        document.getElementById('catalogs').scrollIntoView({behavior: 'smooth'});
-
-    } catch (error) {
-        console.error("Payment failed: ", error);
-        alert("Payment failed. Please try again.");
-    } finally {
-        confirmBtn.textContent = "Pay Securely";
-        confirmBtn.disabled = false;
     }
-};
    window.addCurrentProductToCart = function() {
         const qty = parseInt(document.getElementById('product-quantity').value) || 1;
         let sizeText = document.getElementById('selected-size-text').textContent;
