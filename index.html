@@ -280,6 +280,13 @@
         .custom-size-label { display: block; font-size: 11px; color: var(--dark-text); margin-bottom: 8px; letter-spacing: 1px; text-transform: uppercase; }
         #custom-measurements { width: 100%; padding: 10px; border: 1px solid var(--border-color); border-radius: 2px; font-family: var(--font-sans); font-size: 12px; resize: vertical; outline: none; }
         #custom-measurements:focus { border-color: var(--accent-gold); }
+        /* --- Order History Amazon-Style Layout --- */
+        .order-action-btn { width: 100%; padding: 12px 15px; font-size: 10px; font-family: var(--font-sans); text-transform: uppercase; letter-spacing: 1px; color: var(--dark-text); background: var(--primary-bg); border: 1px solid var(--border-color); border-radius: 2px; cursor: pointer; transition: all 0.3s ease; text-align: center; margin-bottom: 8px; font-weight: 500; }
+        .order-action-btn:hover { border-color: var(--dark-text); }
+        .order-action-btn.primary-action-btn { background: var(--dark-text); color: #fff; border-color: var(--dark-text); }
+        .order-action-btn.primary-action-btn:hover { background: var(--accent-gold); border-color: var(--accent-gold); }
+        .order-item-row { display: flex; gap: 15px; margin-bottom: 15px; padding-bottom: 15px; border-bottom: 1px solid rgba(28, 27, 26, 0.05); }
+        .order-item-row:last-child { border-bottom: none; margin-bottom: 0; padding-bottom: 0; }
 
         /* --- Editorial Footer --- */
         .premium-footer { background-color: #1C1B1A; color: #ECEAE6; padding: 80px 40px 30px 40px; margin-top: 120px; border-top: 1px solid var(--border-color); contain: layout style; }
@@ -1547,22 +1554,47 @@ window.closeCheckoutModal = function() {
                     "name": "ABAYRAH",
                     "description": "Crafted for Modesty",
                     "order_id": orderData.id, // Links directly to cloud transaction
-                     "handler": async function (paymentResponse) {
-                        // 1. Count items in the cart before deleting them
+                    "handler": async function (paymentResponse) {
+                        // 1. Fetch full item details from the cart before deleting it
                         const cartRef = collection(db, "users", currentUser.uid, "cart");
                         const cartSnapshot = await getDocs(cartRef);
+                        
+                        const orderItems = [];
                         let totalItemsCount = 0;
-                        cartSnapshot.forEach(doc => { totalItemsCount += doc.data().quantity; });
 
-                        // 2. Save the permanent Order Receipt to Firebase
+                        // Loop through cart to grab images and titles for the receipt
+                        for (const cartDoc of cartSnapshot.docs) {
+                            const itemData = cartDoc.data();
+                            totalItemsCount += itemData.quantity;
+
+                            // Grab the actual product data to save permanently
+                            const productSnap = await getDoc(doc(db, "products", itemData.productId));
+                            let productTitle = "ABAYRAH Premium Item";
+                            let productImage = "star-logo.png"; // Fallback image
+                            if (productSnap.exists()) {
+                                productTitle = productSnap.data().title;
+                                productImage = productSnap.data().image;
+                            }
+
+                            orderItems.push({
+                                productId: itemData.productId,
+                                title: productTitle,
+                                image: productImage,
+                                size: itemData.size,
+                                quantity: itemData.quantity
+                            });
+                        }
+
+                        // 2. Save the detailed permanent Order Receipt to Firebase
                         const orderRef = doc(collection(db, "users", currentUser.uid, "orders"));
                         await setDoc(orderRef, {
                             paymentId: paymentResponse.razorpay_payment_id || "TEST_PAYMENT",
                             amount: orderAmount,
                             date: new Date().toISOString(),
-                            status: "Processing", // Can be updated to Shipped/Delivered later
+                            status: "Processing", 
                             itemsCount: totalItemsCount,
-                            shippingCity: savedShippingData.city
+                            shippingInfo: savedShippingData, // Saves full address
+                            items: orderItems // Saves the images and titles!
                         });
                         
                         // 3. Clear out the checkout cart nodes
@@ -1635,9 +1667,12 @@ window.closeCheckoutModal = function() {
         closeOrdersBtn.addEventListener('click', () => ordersModal.classList.remove('active'));
     }
 
-    async function loadOrderHistory() {
+   async function loadOrderHistory() {
         if (!currentUser) return;
-        orderHistoryContainer.innerHTML = '<p style="text-align: center; color: var(--muted-gray); font-size: 13px;">Unlocking your vault...</p>';
+        
+        // Expand the modal width to fit the detailed Amazon-style layout
+        document.querySelector('#ordersModal .modal-content').style.maxWidth = "850px";
+        orderHistoryContainer.innerHTML = '<p style="text-align: center; color: var(--muted-gray); font-size: 13px;"><img src="star-logo.png" class="loading-star-icon" style="filter: invert(0); opacity: 0.5;"> Unlocking your vault...</p>';
         
         try {
             const ordersRef = collection(db, "users", currentUser.uid, "orders");
@@ -1655,25 +1690,69 @@ window.closeCheckoutModal = function() {
 
             let html = '';
             ordersList.forEach(order => {
-                const orderDate = new Date(order.date).toLocaleDateString('en-IN', { year: 'numeric', month: 'short', day: 'numeric' });
+                const orderDateObj = new Date(order.date);
+                const formattedDate = orderDateObj.toLocaleDateString('en-IN', { year: 'numeric', month: 'long', day: 'numeric' });
                 
                 // Color code the status
                 let statusColor = "var(--dark-text)";
-                if (order.status === "Cancelled" || order.status === "Failed") statusColor = "#CC0C39";
-                if (order.status === "Delivered") statusColor = "var(--success-green)";
+                let statusIcon = "📦";
+                if (order.status === "Cancelled" || order.status === "Failed") { statusColor = "#CC0C39"; statusIcon = "⚠️"; }
+                if (order.status === "Delivered") { statusColor = "var(--success-green)"; statusIcon = "✓"; }
+
+                // Build the HTML for the specific items inside this order
+                let itemsHtml = '';
+                if (order.items && order.items.length > 0) {
+                    order.items.forEach(item => {
+                        itemsHtml += `
+                            <div class="order-item-row">
+                                <img src="${item.image}" alt="${item.title}" style="width: 70px; height: 90px; object-fit: cover; background: #FAFAFA; border: 1px solid var(--border-color);">
+                                <div style="flex: 1;">
+                                    <h4 style="font-family: var(--font-serif); font-size: 16px; color: var(--dark-text); margin-bottom: 4px;"><a href="#" style="text-decoration: underline; text-underline-offset: 2px;">${item.title}</a></h4>
+                                    <p style="font-size: 11px; color: var(--muted-gray); margin-bottom: 8px;">Size: ${item.size} | Qty: ${item.quantity}</p>
+                                    <button style="background: none; border: 1px solid var(--border-color); padding: 6px 12px; font-size: 10px; text-transform: uppercase; letter-spacing: 1px; color: var(--dark-text); border-radius: 12px; cursor: pointer;">View your item</button>
+                                </div>
+                            </div>
+                        `;
+                    });
+                } else {
+                    itemsHtml = '<p style="font-size: 12px; color: var(--muted-gray);">Item details unavailable for older legacy orders.</p>';
+                }
+
+                // Grab the customer's first name from shipping info
+                const shipName = order.shippingInfo ? escapeHTML(order.shippingInfo.firstName) : "Guest";
 
                 html += `
-                    <div style="border: 1px solid var(--border-color); padding: 20px; border-radius: 2px; background: #FAFAFA;">
-                        <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 12px;">
-                            <strong style="font-family: var(--font-serif); font-size: 18px; color: var(--dark-text); letter-spacing: 1px;">Order #${order.id.substring(0,8).toUpperCase()}</strong>
-                            <span style="background: ${statusColor}; color: #fff; padding: 4px 10px; font-size: 9px; text-transform: uppercase; letter-spacing: 1px; border-radius: 12px;">${escapeHTML(order.status)}</span>
+                    <div style="border: 1px solid var(--border-color); border-radius: 4px; overflow: hidden; background: #FFFFFF; margin-bottom: 25px; box-shadow: 0 4px 15px rgba(0,0,0,0.02);">
+                        
+                        <div style="background-color: #F8F8F8; padding: 14px 20px; border-bottom: 1px solid var(--border-color); display: flex; justify-content: space-between; align-items: flex-start; flex-wrap: wrap; gap: 15px; font-size: 10px; text-transform: uppercase; letter-spacing: 1px; color: var(--muted-gray);">
+                            <div style="display: flex; gap: 40px;">
+                                <div><div style="margin-bottom: 4px;">Order Placed</div><strong style="color: var(--dark-text); font-size: 12px;">${formattedDate}</strong></div>
+                                <div><div style="margin-bottom: 4px;">Total</div><strong style="color: var(--dark-text); font-size: 12px;">₹${parseFloat(order.amount).toFixed(2)}</strong></div>
+                                <div><div style="margin-bottom: 4px;">Ship To</div><strong style="color: var(--dark-text); font-size: 12px; cursor: pointer; text-decoration: underline; text-underline-offset: 3px;">${shipName} ▾</strong></div>
+                            </div>
+                            <div style="text-align: right;">
+                                <div style="margin-bottom: 4px;">Order # ${order.id.substring(0,10).toUpperCase()}</div>
+                                <a href="#" style="color: var(--dark-text); font-weight: 500; text-decoration: underline; text-underline-offset: 3px; font-size: 11px;">View order details</a> <span style="margin: 0 8px;">|</span> <a href="#" style="color: var(--dark-text); font-weight: 500; text-decoration: underline; text-underline-offset: 3px; font-size: 11px;">Invoice ▾</a>
+                            </div>
                         </div>
-                        <div style="display: flex; justify-content: space-between; font-size: 12px; color: var(--muted-gray); margin-bottom: 6px;">
-                            <span>Date: <strong style="color: var(--dark-text); font-weight: 500;">${orderDate}</strong></span>
-                            <span>Items: <strong style="color: var(--dark-text); font-weight: 500;">${order.itemsCount || 1}</strong></span>
-                        </div>
-                        <div style="font-size: 12px; color: var(--muted-gray);">
-                            Amount: <strong style="color: var(--dark-text); font-weight: 500;">₹${parseFloat(order.amount).toFixed(2)}</strong>
+
+                        <div style="padding: 20px;">
+                            <h3 style="font-family: var(--font-serif); font-size: 22px; color: ${statusColor}; margin-bottom: 5px;">${statusIcon} ${escapeHTML(order.status)}</h3>
+                            <p style="font-size: 12px; color: var(--dark-text); margin-bottom: 25px;">Estimated delivery in 4-6 business days. Package processing via concierge.</p>
+
+                            <div style="display: flex; gap: 30px; flex-wrap: wrap;">
+                                <div style="flex: 2; min-width: 250px;">
+                                    ${itemsHtml}
+                                </div>
+
+                                <div style="flex: 1; min-width: 220px; display: flex; flex-direction: column;">
+                                    <button class="order-action-btn primary-action-btn" onclick="alert('Tracking ID: RZP-${order.paymentId.substring(4, 12).toUpperCase()}\\n\\nLive tracking pipeline will be integrated here.')">Track Package</button>
+                                    <button class="order-action-btn" onclick="alert('Return window is active. Redirecting to concierge support...')">Return or Replace Items</button>
+                                    <button class="order-action-btn" onclick="alert('Gift receipt link copied to your clipboard.')">Share Gift Receipt</button>
+                                    <button class="order-action-btn" onclick="alert('Opening feedback form...')">Leave Seller Feedback</button>
+                                    <button class="order-action-btn" onclick="alert('Opening review module...')">Write a Product Review</button>
+                                </div>
+                            </div>
                         </div>
                     </div>
                 `;
