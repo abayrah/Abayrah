@@ -799,7 +799,7 @@
 
         <div style="border: 1px solid var(--border-color); border-radius: 2px; padding: 30px; background: #FFFFFF;">
             <h3 id="detail-status" style="font-family: var(--font-serif); font-size: 24px; color: var(--dark-text); margin-bottom: 5px;">Processing</h3>
-            <p style="font-size: 12px; color: var(--dark-text); margin-bottom: 30px;">Estimated delivery in 4-6 business days via Concierge.</p>
+            <p id="detail-delivery-text" style="font-size: 12px; color: var(--muted-gray); margin-bottom: 30px;">Estimated delivery in 4-6 business days via Concierge.</p>
             
             <div id="detail-items-container" style="display: flex; flex-direction: column; gap: 30px;">
                 </div>
@@ -1861,9 +1861,12 @@ window.closeCheckoutModal = function() {
                             </div>
                         </div>
 
+                       <!-- Order Body & Action Buttons -->
                         <div style="padding: 20px;">
                             <h3 style="font-family: var(--font-serif); font-size: 22px; color: ${statusColor}; margin-bottom: 5px;">${statusIcon} ${escapeHTML(order.status)}</h3>
-                            <p style="font-size: 12px; color: var(--dark-text); margin-bottom: 25px;">Estimated delivery in 4-6 business days. Package processing via concierge.</p>
+                            <p style="font-size: 12px; color: var(--muted-gray); margin-bottom: 25px;">
+                                ${order.status === 'Cancelled' ? 'This order has been cancelled.' : 'Estimated delivery in 4-6 business days. Package processing via concierge.'}
+                            </p>
 
                             <div style="display: flex; gap: 30px; flex-wrap: wrap;">
                                 <div style="flex: 2; min-width: 250px;">
@@ -1985,6 +1988,12 @@ window.closeCheckoutModal = function() {
         }
         
         document.getElementById('detail-status').innerHTML = `${statusIcon} ${escapeHTML(order.status)} ${cancelBtnHtml}`;
+        // Update the delivery text based on cancellation
+        if (order.status === 'Cancelled') {
+            document.getElementById('detail-delivery-text').textContent = "This order has been cancelled. Refunds will be processed shortly.";
+        } else {
+            document.getElementById('detail-delivery-text').textContent = "Estimated delivery in 4-6 business days via Concierge.";
+        }
 
         // 6. Build Detailed Item Rows
         let itemsHtml = '';
