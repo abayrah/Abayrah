@@ -474,6 +474,9 @@
                             <h4 id="profileName">Guest</h4>
                             <p id="profileEmail">guest@abayrah.com</p>
                         </div>
+                        
+                        <button class="logout-btn" id="myOrdersBtn" style="margin-bottom: 15px; color: var(--muted-gray);">My Orders</button>
+                        
                         <button class="logout-btn" id="logoutBtn">Log Out</button>
                     </div>
                 </div>
@@ -1544,12 +1547,25 @@ window.closeCheckoutModal = function() {
                     "name": "ABAYRAH",
                     "description": "Crafted for Modesty",
                     "order_id": orderData.id, // Links directly to cloud transaction
-                    "handler": async function (paymentResponse) {
-                        // This runs automatically the millisecond their card is approved!
-                        
-                        // Clear out the checkout cart nodes inside your database
+                     "handler": async function (paymentResponse) {
+                        // 1. Count items in the cart before deleting them
                         const cartRef = collection(db, "users", currentUser.uid, "cart");
                         const cartSnapshot = await getDocs(cartRef);
+                        let totalItemsCount = 0;
+                        cartSnapshot.forEach(doc => { totalItemsCount += doc.data().quantity; });
+
+                        // 2. Save the permanent Order Receipt to Firebase
+                        const orderRef = doc(collection(db, "users", currentUser.uid, "orders"));
+                        await setDoc(orderRef, {
+                            paymentId: paymentResponse.razorpay_payment_id || "TEST_PAYMENT",
+                            amount: orderAmount,
+                            date: new Date().toISOString(),
+                            status: "Processing", // Can be updated to Shipped/Delivered later
+                            itemsCount: totalItemsCount,
+                            shippingCity: savedShippingData.city
+                        });
+                        
+                        // 3. Clear out the checkout cart nodes
                         const deletePromises = cartSnapshot.docs.map(cartDoc => deleteDoc(doc(db, "users", currentUser.uid, "cart", cartDoc.id)));
                         await Promise.all(deletePromises);
 
@@ -1601,6 +1617,73 @@ window.closeCheckoutModal = function() {
         
         addSecureProductToCart(currentProductView.id, qty, finalSize);
     };
+       // --- ORDER HISTORY LOGIC ---
+    const myOrdersBtn = document.getElementById('myOrdersBtn');
+    const ordersModal = document.getElementById('ordersModal');
+    const closeOrdersBtn = document.getElementById('closeOrdersBtn');
+    const orderHistoryContainer = document.getElementById('orderHistoryContainer');
+
+    if (myOrdersBtn) {
+        myOrdersBtn.addEventListener('click', () => {
+            document.getElementById('profileDropdown').classList.remove('active');
+            ordersModal.classList.add('active');
+            loadOrderHistory();
+        });
+    }
+
+    if (closeOrdersBtn) {
+        closeOrdersBtn.addEventListener('click', () => ordersModal.classList.remove('active'));
+    }
+
+    async function loadOrderHistory() {
+        if (!currentUser) return;
+        orderHistoryContainer.innerHTML = '<p style="text-align: center; color: var(--muted-gray); font-size: 13px;">Unlocking your vault...</p>';
+        
+        try {
+            const ordersRef = collection(db, "users", currentUser.uid, "orders");
+            const snapshot = await getDocs(ordersRef);
+            
+            if (snapshot.empty) {
+                orderHistoryContainer.innerHTML = '<p style="text-align: center; color: var(--muted-gray); font-size: 13px;">No past orders found in your vault.</p>';
+                return;
+            }
+
+            // Sort orders from newest to oldest
+            const ordersList = [];
+            snapshot.forEach(docSnap => ordersList.push({ id: docSnap.id, ...docSnap.data() }));
+            ordersList.sort((a, b) => new Date(b.date) - new Date(a.date));
+
+            let html = '';
+            ordersList.forEach(order => {
+                const orderDate = new Date(order.date).toLocaleDateString('en-IN', { year: 'numeric', month: 'short', day: 'numeric' });
+                
+                // Color code the status
+                let statusColor = "var(--dark-text)";
+                if (order.status === "Cancelled" || order.status === "Failed") statusColor = "#CC0C39";
+                if (order.status === "Delivered") statusColor = "var(--success-green)";
+
+                html += `
+                    <div style="border: 1px solid var(--border-color); padding: 20px; border-radius: 2px; background: #FAFAFA;">
+                        <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 12px;">
+                            <strong style="font-family: var(--font-serif); font-size: 18px; color: var(--dark-text); letter-spacing: 1px;">Order #${order.id.substring(0,8).toUpperCase()}</strong>
+                            <span style="background: ${statusColor}; color: #fff; padding: 4px 10px; font-size: 9px; text-transform: uppercase; letter-spacing: 1px; border-radius: 12px;">${escapeHTML(order.status)}</span>
+                        </div>
+                        <div style="display: flex; justify-content: space-between; font-size: 12px; color: var(--muted-gray); margin-bottom: 6px;">
+                            <span>Date: <strong style="color: var(--dark-text); font-weight: 500;">${orderDate}</strong></span>
+                            <span>Items: <strong style="color: var(--dark-text); font-weight: 500;">${order.itemsCount || 1}</strong></span>
+                        </div>
+                        <div style="font-size: 12px; color: var(--muted-gray);">
+                            Amount: <strong style="color: var(--dark-text); font-weight: 500;">₹${parseFloat(order.amount).toFixed(2)}</strong>
+                        </div>
+                    </div>
+                `;
+            });
+            orderHistoryContainer.innerHTML = html;
+        } catch (error) {
+            console.error("Error fetching orders:", error);
+            orderHistoryContainer.innerHTML = '<p style="text-align: center; color: #CC0C39; font-size: 13px;">Could not retrieve orders at this time.</p>';
+        }
+    }
     
     (function() {
         function proxyGoogleDriveImage(img) {
@@ -1797,5 +1880,15 @@ window.closeCheckoutModal = function() {
         <button type="button" class="submit-btn" id="confirmOrderBtn" onclick="processFinalOrder()" style="margin-top: 20px;">Pay Securely</button>
     </div>
 </div>
+    <div class="modal-overlay" id="ordersModal">
+        <div class="modal-content" style="max-width: 600px; max-height: 85vh; overflow-y: auto; text-align: left;">
+            <button class="modal-close" id="closeOrdersBtn" aria-label="Close Orders">&times;</button>
+            <h2 class="modal-title" style="text-align: center;">Your Vault</h2>
+            <p class="modal-subtitle" style="text-align: center;">Past orders and tracking status</p>
+            
+            <div id="orderHistoryContainer" style="margin-top: 30px; display: flex; flex-direction: column; gap: 15px;">
+                </div>
+        </div>
+    </div>
 </body>
 </html>
