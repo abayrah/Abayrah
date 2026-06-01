@@ -1870,9 +1870,15 @@ window.closeCheckoutModal = function() {
                                     ${itemsHtml}
                                 </div>
 
-                                <div style="flex: 1; min-width: 220px; display: flex; flex-direction: column;">
+                                 <div style="flex: 1; min-width: 220px; display: flex; flex-direction: column;">
                                     <button class="order-action-btn primary-action-btn" onclick="contactConcierge('${displayOrderId}', 'track')">Track Package</button>
                                     <button class="order-action-btn" onclick="contactConcierge('${displayOrderId}', 'return')">Return or Replace Items</button>
+                                    
+                                    <!-- Smart Cancellation Button (Only shows during 'Processing') -->
+                                    ${order.status === 'Processing' ? 
+                                        `<button class="order-action-btn" style="color: #CC0C39; border-color: #ECEAE6;" onmouseover="this.style.borderColor='#CC0C39'" onmouseout="this.style.borderColor='#ECEAE6'" onclick="cancelOrder('${order.id}')">Cancel Order</button>` 
+                                    : ''}
+                                    
                                     <button class="order-action-btn" onclick="contactConcierge('${displayOrderId}', 'general')">Contact Concierge Support</button>
                                 </div>
                             </div>
@@ -1906,6 +1912,34 @@ window.closeCheckoutModal = function() {
         
         // Open WhatsApp in a new tab
         window.open(whatsappUrl, '_blank');
+    };
+       // --- ORDER CANCELLATION LOGIC ---
+    window.cancelOrder = async function(orderId) {
+        if (!currentUser) return;
+        
+        // 1. Ask for confirmation so they don't click it by accident
+        const confirmCancel = confirm("Are you sure you want to cancel this order? This action cannot be undone.");
+        if (!confirmCancel) return;
+        
+        try {
+            // 2. Update the order status directly in your Firebase Database
+            const orderRef = doc(db, "users", currentUser.uid, "orders", orderId);
+            await setDoc(orderRef, { status: "Cancelled" }, { merge: true });
+            
+            alert("Your order has been successfully cancelled. Any charged amounts will be refunded within 5-7 business days.");
+            
+            // 3. Refresh the screens immediately so the customer sees the "Cancelled" status
+            if (document.getElementById('order-details-section').style.display === 'block') {
+                const orderToUpdate = window.userOrderHistory.find(o => o.id === orderId);
+                if(orderToUpdate) orderToUpdate.status = "Cancelled";
+                window.openOrderDetails(orderId);
+            } else {
+                loadOrderHistory();
+            }
+        } catch (error) {
+            console.error("Failed to cancel order:", error);
+            alert("Failed to cancel the order. Please contact Concierge Support.");
+        }
     };
     window.openOrderDetails = function(orderId) {
         // 1. Find the specific order from our saved list
@@ -1943,7 +1977,14 @@ window.closeCheckoutModal = function() {
         let statusIcon = "📦";
         if (order.status === "Cancelled" || order.status === "Failed") statusIcon = "⚠️";
         if (order.status === "Delivered") statusIcon = "✓";
-        document.getElementById('detail-status').innerHTML = `${statusIcon} ${escapeHTML(order.status)}`;
+        
+        // Add the cancel button underneath the status if it's processing
+        let cancelBtnHtml = '';
+        if (order.status === 'Processing') {
+            cancelBtnHtml = `<br><button onclick="cancelOrder('${order.id}')" style="margin-top: 15px; padding: 10px 20px; background: none; border: 1px solid #CC0C39; color: #CC0C39; font-size: 10px; font-family: var(--font-sans); text-transform: uppercase; letter-spacing: 1px; cursor: pointer; border-radius: 2px; transition: all 0.3s ease;" onmouseover="this.style.background='#CC0C39'; this.style.color='#FFF';" onmouseout="this.style.background='none'; this.style.color='#CC0C39';">Cancel Order</button>`;
+        }
+        
+        document.getElementById('detail-status').innerHTML = `${statusIcon} ${escapeHTML(order.status)} ${cancelBtnHtml}`;
 
         // 6. Build Detailed Item Rows
         let itemsHtml = '';
