@@ -1502,8 +1502,9 @@ window.closeCheckoutModal = function() {
             e.preventDefault();
             if (!currentUser) return;
             
-           const proceedBtn = document.getElementById('proceedToPaymentBtn');
-            proceedBtn.textContent = "Opening up secure gateway (30s)..."; 
+          const proceedBtn = document.getElementById('proceedToPaymentBtn');
+            // Inject the spinning star logo into the button HTML
+            proceedBtn.innerHTML = '<img src="star-logo.png" class="loading-star-icon" alt="Loading"> SECURING GATEWAY...'; 
             proceedBtn.disabled = true;
 
             // Save user shipping choices securely
