@@ -751,6 +751,38 @@
         </div>
     </footer>
 
+    <div class="search-overlay" id="searchOverlay">
+        <button class="modal-close" id="closeSearchBtn" aria-label="Close Search" style="top: 30px; right: 40px;">&times;</button>
+        <div class="search-container">
+            <input type="text" id="searchInput" placeholder="Search collections, fabrics...">
+            <div id="noResultsMsg" class="no-results-msg" style="display: none;"></div>
+        </div>
+    </div>
+
+    <div class="cart-overlay" id="cartOverlay"></div>
+    <div class="cart-drawer" id="cartDrawer">
+        <div class="cart-header">
+            <h3>Shopping Bag</h3>
+            <button class="modal-close" id="closeCartBtn" aria-label="Close Cart">&times;</button>
+        </div>
+        <div class="cart-body">
+            <div class="empty-cart-state" id="emptyCartState">
+                <p>Your shopping bag is currently empty.</p>
+                <button class="submit-btn" onclick="document.getElementById('closeCartBtn').click(); document.getElementById('catalogs').scrollIntoView({behavior: 'smooth'});">Continue Shopping</button>
+            </div>
+            <div id="cartItemsWrapper" style="display: none;">
+                </div>
+        </div>
+        <div class="cart-footer" id="cartFooter" style="display: none;">
+            <div class="cart-subtotal">
+                <span>Subtotal</span>
+                <span class="subtotal-amount" id="cartSubtotalAmount">₹0.00</span>
+            </div>
+            <p class="shipping-note">Taxes and shipping calculated at checkout.</p>
+            <button class="submit-btn" style="margin-bottom: 0;">Proceed to Checkout</button>
+        </div>
+    </div>
+
     <div class="modal-overlay" id="loginModal">
         <div class="modal-content">
             <button class="modal-close" id="closeModalBtn" aria-label="Close Modal">&times;</button>
@@ -1151,7 +1183,6 @@
             let subtotal = 0; let totalItems = 0; let htmlBuffer = '';
 
             if (snapshot.empty) {
-                // Safely update styles to avoid 'style is null' error
                 if(emptyCartState) emptyCartState.style.display = 'block';
                 if(cartItemsWrapper) { cartItemsWrapper.style.display = 'none'; cartItemsWrapper.innerHTML = ''; }
                 if(cartFooter) cartFooter.style.display = 'none';
