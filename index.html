@@ -1630,16 +1630,18 @@ window.closeCheckoutModal = function() {
 
                         // 2. Save the detailed permanent Order Receipt to Firebase
                         const orderRef = doc(collection(db, "users", currentUser.uid, "orders"));
+                        const numericOrderId = Math.floor(100000000 + Math.random() * 900000000).toString(); // Generates a random 9-digit number
+                        
                         await setDoc(orderRef, {
+                            orderNumber: numericOrderId, // Saves our new clean number
                             paymentId: paymentResponse.razorpay_payment_id || "TEST_PAYMENT",
                             amount: orderAmount,
                             date: new Date().toISOString(),
                             status: "Processing", 
                             itemsCount: totalItemsCount,
-                            shippingInfo: savedShippingData, // Saves full address
-                            items: orderItems // Saves the images and titles!
+                            shippingInfo: savedShippingData,
+                            items: orderItems 
                         });
-                        
                         // 3. Clear out the checkout cart nodes
                         const deletePromises = cartSnapshot.docs.map(cartDoc => deleteDoc(doc(db, "users", currentUser.uid, "cart", cartDoc.id)));
                         await Promise.all(deletePromises);
@@ -1821,23 +1823,23 @@ window.closeCheckoutModal = function() {
                 const shipFullName = escapeHTML((s.firstName || "Guest") + " " + (s.lastName || ""));
                 const addressLine1 = escapeHTML((s.houseNo || "") + ", " + (s.street || ""));
                 const addressLine2 = escapeHTML((s.city || "") + ", " + (s.state || ""));
-                const zipCode = escapeHTML(s.zip || "");
+              const zipCode = escapeHTML(s.zip || "");
+                
+                // Grab the new numeric ID (or fallback to the old letter ID for older test orders)
+                const displayOrderId = order.orderNumber ? order.orderNumber : order.id.substring(0,10).toUpperCase();
 
                 html += `
                     <div style="border: 1px solid var(--border-color); border-radius: 4px; overflow: hidden; background: #FFFFFF; margin-bottom: 25px; box-shadow: 0 4px 15px rgba(0,0,0,0.02);">
                         
-                        <!-- Amazon-Style Grey Header Bar -->
                         <div style="background-color: #F8F8F8; padding: 14px 20px; border-bottom: 1px solid var(--border-color); display: flex; justify-content: space-between; align-items: flex-start; flex-wrap: wrap; gap: 15px; font-size: 10px; text-transform: uppercase; letter-spacing: 1px; color: var(--muted-gray);">
                             <div style="display: flex; gap: 40px;">
                                 <div><div style="margin-bottom: 4px;">Order Placed</div><strong style="color: var(--dark-text); font-size: 12px;">${formattedDate}</strong></div>
                                 <div><div style="margin-bottom: 4px;">Total</div><strong style="color: var(--dark-text); font-size: 12px;">₹${parseFloat(order.amount).toFixed(2)}</strong></div>
                                 
-                                <!-- Clickable Ship To Module -->
                                 <div style="position: relative;">
                                     <div style="margin-bottom: 4px;">Ship To</div>
                                     <strong onclick="toggleAddressPopup('${order.id}')" style="color: var(--dark-text); font-size: 12px; cursor: pointer; text-decoration: underline; text-underline-offset: 3px;">${shipFirstName} ▾</strong>
                                     
-                                    <!-- Hidden Address Box -->
                                     <div id="address-popup-${order.id}" class="address-popup" style="display: none; position: absolute; top: 100%; left: 0; background: #fff; border: 1px solid var(--border-color); padding: 15px; border-radius: 4px; box-shadow: 0 5px 25px rgba(0,0,0,0.15); z-index: 100; width: 220px; margin-top: 8px; text-transform: none; font-size: 11px; line-height: 1.6; color: var(--dark-text);">
                                         <div style="display: flex; justify-content: space-between; margin-bottom: 8px; border-bottom: 1px solid var(--border-color); padding-bottom: 6px;">
                                             <strong style="font-size: 12px; font-family: var(--font-sans);">${shipFullName}</strong>
@@ -1854,27 +1856,24 @@ window.closeCheckoutModal = function() {
 
                             </div>
                             <div style="text-align: right;">
-                                <div style="margin-bottom: 4px;">Order # ${order.id.substring(0,10).toUpperCase()}</div>
-                                <a href="javascript:void(0)" onclick="openOrderDetails('${order.id}')" style="color: var(--dark-text); font-weight: 500; text-decoration: underline; text-underline-offset: 3px; font-size: 11px;">View order details</a>
+                                <div style="margin-bottom: 4px;">Order # ${displayOrderId}</div>
+                                <a href="javascript:void(0)" onclick="openOrderDetails('${order.id}')" style="color: var(--dark-text); font-weight: 500; text-decoration: underline; text-underline-offset: 3px; font-size: 11px;">View order details</a> <span style="margin: 0 8px;">|</span> <a href="#" style="color: var(--dark-text); font-weight: 500; text-decoration: underline; text-underline-offset: 3px; font-size: 11px;">Invoice ▾</a>
                             </div>
                         </div>
 
-                        <!-- Order Body & Action Buttons -->
                         <div style="padding: 20px;">
                             <h3 style="font-family: var(--font-serif); font-size: 22px; color: ${statusColor}; margin-bottom: 5px;">${statusIcon} ${escapeHTML(order.status)}</h3>
                             <p style="font-size: 12px; color: var(--dark-text); margin-bottom: 25px;">Estimated delivery in 4-6 business days. Package processing via concierge.</p>
 
                             <div style="display: flex; gap: 30px; flex-wrap: wrap;">
-                                <!-- Left Column: Item List -->
                                 <div style="flex: 2; min-width: 250px;">
                                     ${itemsHtml}
                                 </div>
 
-                                <!-- Right Column: Amazon-Style Action Buttons -->
                                 <div style="flex: 1; min-width: 220px; display: flex; flex-direction: column;">
-                                    <button class="order-action-btn primary-action-btn" onclick="contactConcierge('${order.id}', 'track')">Track Package</button>
-                                    <button class="order-action-btn" onclick="contactConcierge('${order.id}', 'return')">Return or Replace Items</button>
-                                    <button class="order-action-btn" onclick="contactConcierge('${order.id}', 'general')">Contact Concierge Support</button>
+                                    <button class="order-action-btn primary-action-btn" onclick="contactConcierge('${displayOrderId}', 'track')">Track Package</button>
+                                    <button class="order-action-btn" onclick="contactConcierge('${displayOrderId}', 'return')">Return or Replace Items</button>
+                                    <button class="order-action-btn" onclick="contactConcierge('${displayOrderId}', 'general')">Contact Concierge Support</button>
                                 </div>
                             </div>
                         </div>
@@ -1922,7 +1921,8 @@ window.closeCheckoutModal = function() {
         // 3. Populate Top Headers
         const orderDateObj = new Date(order.date);
         document.getElementById('detail-order-date').textContent = "Ordered on " + orderDateObj.toLocaleDateString('en-IN', { year: 'numeric', month: 'long', day: 'numeric' });
-        document.getElementById('detail-order-id').textContent = "Order # " + order.id.toUpperCase();
+       const displayOrderId = order.orderNumber ? order.orderNumber : order.id.toUpperCase();
+        document.getElementById('detail-order-id').textContent = "Order # " + displayOrderId;
         
         // 4. Populate 3-Column Boxes
         const s = order.shippingInfo || {};
