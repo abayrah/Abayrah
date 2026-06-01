@@ -795,14 +795,15 @@
             <div id="cartItemsWrapper" style="display: none;">
                 </div>
         </div>
-        <div class="cart-footer" id="cartFooter" style="display: none;">
-            <div class="cart-subtotal">
-                <span>Subtotal</span>
-                <span class="subtotal-amount" id="cartSubtotalAmount">₹0.00</span>
-            </div>
-            <p class="shipping-note">Taxes and shipping calculated at checkout.</p>
-            <button class="submit-btn" style="margin-bottom: 0;">Proceed to Checkout</button>
-        </div>
+       <div class="cart-footer" id="cartFooter" style="display: none;">
+    <div class="cart-subtotal">
+        <span>Subtotal</span>
+        <span class="subtotal-amount" id="cartSubtotalAmount">₹0.00</span>
+    </div>
+    <p class="shipping-note">Taxes and shipping calculated at checkout.</p>
+    
+    <button class="submit-btn" style="margin-bottom: 0;" onclick="openCheckoutModal()">Proceed to Checkout</button>
+</div>
     </div>
 
     <div class="modal-overlay" id="loginModal">
@@ -1438,6 +1439,77 @@
         document.getElementById('dynamic-main-title').style.display = 'block'; 
         window.scrollTo({ top: 0, behavior: 'smooth' });
     };
+       // --- ADD THIS TO YOUR JAVASCRIPT ---
+
+// 1. Function to open the checkout modal
+window.openCheckoutModal = function() {
+    // Require user to be logged in
+    if (!currentUser) {
+        document.getElementById('loginModal').classList.add('active');
+        document.getElementById('modalTitle').textContent = "Sign In to Checkout";
+        return;
+    }
+    
+    // Close the cart drawer
+    document.getElementById('cartDrawer').classList.remove('active');
+    document.getElementById('cartOverlay').classList.remove('active');
+    
+    // Copy the subtotal amount to the checkout screen
+    const currentTotal = document.getElementById('cartSubtotalAmount').textContent;
+    document.getElementById('checkoutTotalDisplay').textContent = currentTotal;
+    
+    // Show the checkout modal
+    document.getElementById('checkoutModal').classList.add('active');
+};
+
+// 2. Function to close the checkout modal
+window.closeCheckoutModal = function() {
+    document.getElementById('checkoutModal').classList.remove('active');
+};
+
+// 3. Logic to process the shipping data
+const checkoutForm = document.getElementById('checkoutForm');
+if (checkoutForm) {
+    checkoutForm.addEventListener('submit', async (e) => {
+        e.preventDefault();
+        if (!currentUser) return;
+        
+        const proceedToPaymentBtn = document.getElementById('proceedToPaymentBtn');
+        proceedToPaymentBtn.textContent = "Processing...";
+        proceedToPaymentBtn.disabled = true;
+
+        try {
+            // Gather all the new shipping details
+            const shippingData = {
+                firstName: document.getElementById('shipFirstName').value,
+                lastName: document.getElementById('shipLastName').value,
+                email: document.getElementById('shipEmail').value,
+                phone: document.getElementById('shipPhone').value,
+                houseNo: document.getElementById('shipHouseNo').value,
+                street: document.getElementById('shipStreet').value,
+                city: document.getElementById('shipCity').value,
+                state: document.getElementById('shipState').value,
+                zip: document.getElementById('shipZip').value,
+                landmark: document.getElementById('shipLandmark').value // Optional
+            };
+
+            // NOTE: Since you are splitting the flow, this is where you would 
+            // normally save the shippingData to a temporary state and then 
+            // OPEN YOUR PAYMENT MODAL or redirect to a payment gateway (like Razorpay).
+            
+            console.log("Shipping Data Saved:", shippingData);
+            alert("Shipping Details saved! You will now be redirected to the payment gateway.");
+            
+            // closeCheckoutModal(); // Un-comment this when your payment flow is ready
+            
+        } catch (error) {
+            console.error("Error: ", error);
+        } finally {
+            proceedToPaymentBtn.textContent = "Proceed to Payment";
+            proceedToPaymentBtn.disabled = false;
+        }
+    });
+}
 
    window.addCurrentProductToCart = function() {
         const qty = parseInt(document.getElementById('product-quantity').value) || 1;
@@ -1484,5 +1556,81 @@
         observer.observe(document.body, { childList: true, subtree: true });
     })();
 </script>
+    <div class="modal-overlay" id="checkoutModal">
+    <div class="modal-content" style="max-width: 600px; text-align: left;">
+        <button class="modal-close" onclick="closeCheckoutModal()" aria-label="Close Checkout">&times;</button>
+        
+        <h2 class="modal-title" style="text-align: center;">Secure Checkout</h2>
+        <p class="modal-subtitle" style="text-align: center; margin-bottom: 30px;">Enter your shipping details</p>
+
+        <form id="checkoutForm">
+            <h3 style="font-size: 14px; text-transform: uppercase; letter-spacing: 2px; margin-bottom: 20px; border-bottom: 1px solid var(--border-color); padding-bottom: 10px;">1. Shipping Address</h3>
+            
+            <div class="form-row" style="display: flex; gap: 15px; margin-bottom: 15px;">
+                <div class="input-group" style="flex: 1;">
+                    <label>First Name</label>
+                    <input type="text" id="shipFirstName" placeholder="Jane" required>
+                </div>
+                <div class="input-group" style="flex: 1;">
+                    <label>Last Name</label>
+                    <input type="text" id="shipLastName" placeholder="Doe" required>
+                </div>
+            </div>
+
+            <div class="form-row" style="display: flex; gap: 15px; margin-bottom: 15px;">
+                <div class="input-group" style="flex: 1;">
+                    <label>Email Address</label>
+                    <input type="email" id="shipEmail" placeholder="jane@example.com" required>
+                </div>
+                <div class="input-group" style="flex: 1;">
+                    <label>Phone Number</label>
+                    <input type="tel" id="shipPhone" placeholder="+91 98765 43210" required>
+                </div>
+            </div>
+
+            <div class="form-row" style="display: flex; gap: 15px; margin-bottom: 15px;">
+                <div class="input-group" style="flex: 1;">
+                    <label>House / Flat No.</label>
+                    <input type="text" id="shipHouseNo" placeholder="Apt 4B" required>
+                </div>
+                <div class="input-group" style="flex: 2;">
+                    <label>Street Name</label>
+                    <input type="text" id="shipStreet" placeholder="Luxury Lane" required>
+                </div>
+            </div>
+
+            <div class="form-row" style="display: flex; gap: 15px; margin-bottom: 15px;">
+                <div class="input-group" style="flex: 1;">
+                    <label>City</label>
+                    <input type="text" id="shipCity" placeholder="Mumbai" required>
+                </div>
+                <div class="input-group" style="flex: 1;">
+                    <label>State</label>
+                    <input type="text" id="shipState" placeholder="Maharashtra" required>
+                </div>
+            </div>
+
+            <div class="form-row" style="display: flex; gap: 15px; margin-bottom: 15px;">
+                <div class="input-group" style="flex: 1;">
+                    <label>Postal Code</label>
+                    <input type="text" id="shipZip" placeholder="400001" required>
+                </div>
+                <div class="input-group" style="flex: 1;">
+                    <label>Landmark (Optional)</label>
+                    <input type="text" id="shipLandmark" placeholder="Near City Mall">
+                </div>
+            </div>
+
+            <div style="background: #FAFAFA; padding: 20px; margin-top: 20px; border: 1px solid var(--border-color); border-radius: 2px;">
+                <div style="display: flex; justify-content: space-between; font-family: var(--font-sans); font-weight: 500; font-size: 16px; color: var(--dark-text);">
+                    <span>Total to Pay:</span>
+                    <span id="checkoutTotalDisplay">₹0.00</span>
+                </div>
+            </div>
+
+            <button type="submit" class="submit-btn" id="proceedToPaymentBtn" style="margin-top: 30px; padding: 20px; font-size: 13px;">Proceed to Payment</button>
+        </form>
+    </div>
+</div>
 </body>
 </html>
