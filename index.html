@@ -1498,6 +1498,58 @@ document.addEventListener('DOMContentLoaded', function() {
         document.getElementById('price-container').innerHTML = priceHTML;
         window.scrollTo({ top: 0, behavior: 'smooth' });
     };
+       // --- FOOLPROOF POSTAL CODE AUTO-FILL CORE ---
+window.handlePincodeAutoFill = async function(pincode) {
+    const cleanPincode = pincode.trim();
+    const cityInput = document.getElementById('shipCity');
+    const stateSelect = document.getElementById('shipState');
+
+    // Only look up if the user has entered exactly 6 digits
+    if (cleanPincode.length === 6 && /^\d+$/.test(cleanPincode)) {
+        if (cityInput) {
+            cityInput.value = "Fetching...";
+            cityInput.style.color = "var(--accent-gold)";
+        }
+
+        try {
+            const response = await fetch(`https://api.postalpincode.in/pincode/${cleanPincode}`);
+            const data = await response.json();
+
+            if (data && data[0].Status === "Success" && data[0].PostOffice) {
+                const postOffice = data[0].PostOffice[0];
+                
+                // 1. Automatically update City field to the matching post office location (e.g., "Manikonda")
+                if (cityInput) {
+                    cityInput.style.color = "var(--dark-text)";
+                    cityInput.value = postOffice.Name; 
+                }
+                
+                // 2. Automatically sync and update the State dropdown menu
+                if (stateSelect) {
+                    const apiState = postOffice.State;
+                    for (let i = 0; i < stateSelect.options.length; i++) {
+                        if (stateSelect.options[i].value.toLowerCase() === apiState.toLowerCase()) {
+                            stateSelect.selectedIndex = i;
+                            break;
+                        }
+                    }
+                }
+            } else {
+                if (cityInput) {
+                    cityInput.value = "";
+                    cityInput.placeholder = "Invalid Pincode";
+                    cityInput.style.color = "#E24C4C";
+                }
+            }
+        } catch (error) {
+            console.error("Postal API Fetch Error:", error);
+            if (cityInput) {
+                cityInput.value = "";
+                cityInput.style.color = "var(--dark-text)";
+            }
+        }
+    }
+};
 
     window.closeProduct = function() {
         document.getElementById('product-detail-view').style.display = 'none';
@@ -1756,10 +1808,10 @@ if (checkoutForm) {
             </div>
 
             <div class="form-row" style="display: flex; gap: 15px; margin-bottom: 15px;">
-                <div class="input-group" style="flex: 1;">
-                    <label>Postal Code</label>
-                    <input type="text" id="shipZip" placeholder="400001" required>
-                </div>
+               <div class="input-group" style="flex: 1;">
+    <label>Postal Code</label>
+    <input type="text" id="shipZip" placeholder="400001" required oninput="handlePincodeAutoFill(this.value)">
+</div>
                 <div class="input-group" style="flex: 1;">
                     <label>Landmark (Optional)</label>
                     <input type="text" id="shipLandmark" placeholder="Near City Mall">
