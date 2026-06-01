@@ -1666,8 +1666,25 @@ window.closeCheckoutModal = function() {
     if (closeOrdersBtn) {
         closeOrdersBtn.addEventListener('click', () => ordersModal.classList.remove('active'));
     }
+       
 
-   async function loadOrderHistory() {
+   // --- TOGGLE ADDRESS POPUP LOGIC ---
+    window.toggleAddressPopup = function(orderId) {
+        const popup = document.getElementById('address-popup-' + orderId);
+        if (!popup) return;
+        
+        const isCurrentlyHidden = popup.style.display === 'none';
+        
+        // Hide all other open popups first so the screen stays clean
+        document.querySelectorAll('.address-popup').forEach(p => p.style.display = 'none');
+        
+        // Show the one that was clicked
+        if (isCurrentlyHidden) {
+            popup.style.display = 'block';
+        }
+    };
+
+    async function loadOrderHistory() {
         if (!currentUser) return;
         
         // Expand the modal width to fit the detailed Amazon-style layout
@@ -1705,7 +1722,7 @@ window.closeCheckoutModal = function() {
                     order.items.forEach(item => {
                         itemsHtml += `
                             <div class="order-item-row">
-                                <img src="${item.image}" alt="${item.title}" style="width: 70px; height: 90px; object-fit: cover; background: #FAFAFA; border: 1px solid var(--border-color);">
+                                <img src="${item.image}" alt="${item.title}" style="width: 70px; height: 90px; object-fit: cover; background: #FAFAFA; border: 1px solid var(--border-color);" decoding="async">
                                 <div style="flex: 1;">
                                     <h4 style="font-family: var(--font-serif); font-size: 16px; color: var(--dark-text); margin-bottom: 4px;"><a href="#" style="text-decoration: underline; text-underline-offset: 2px;">${item.title}</a></h4>
                                     <p style="font-size: 11px; color: var(--muted-gray); margin-bottom: 8px;">Size: ${item.size} | Qty: ${item.quantity}</p>
@@ -1718,17 +1735,43 @@ window.closeCheckoutModal = function() {
                     itemsHtml = '<p style="font-size: 12px; color: var(--muted-gray);">Item details unavailable for older legacy orders.</p>';
                 }
 
-                // Grab the customer's first name from shipping info
-                const shipName = order.shippingInfo ? escapeHTML(order.shippingInfo.firstName) : "Guest";
+                // --- SHIPPING ADDRESS POPUP HTML ---
+                const s = order.shippingInfo || {};
+                const shipFirstName = s.firstName ? escapeHTML(s.firstName) : "Guest";
+                const shipFullName = escapeHTML((s.firstName || "Guest") + " " + (s.lastName || ""));
+                const addressLine1 = escapeHTML((s.houseNo || "") + ", " + (s.street || ""));
+                const addressLine2 = escapeHTML((s.city || "") + ", " + (s.state || ""));
+                const zipCode = escapeHTML(s.zip || "");
 
                 html += `
                     <div style="border: 1px solid var(--border-color); border-radius: 4px; overflow: hidden; background: #FFFFFF; margin-bottom: 25px; box-shadow: 0 4px 15px rgba(0,0,0,0.02);">
                         
+                        <!-- Amazon-Style Grey Header Bar -->
                         <div style="background-color: #F8F8F8; padding: 14px 20px; border-bottom: 1px solid var(--border-color); display: flex; justify-content: space-between; align-items: flex-start; flex-wrap: wrap; gap: 15px; font-size: 10px; text-transform: uppercase; letter-spacing: 1px; color: var(--muted-gray);">
                             <div style="display: flex; gap: 40px;">
                                 <div><div style="margin-bottom: 4px;">Order Placed</div><strong style="color: var(--dark-text); font-size: 12px;">${formattedDate}</strong></div>
                                 <div><div style="margin-bottom: 4px;">Total</div><strong style="color: var(--dark-text); font-size: 12px;">₹${parseFloat(order.amount).toFixed(2)}</strong></div>
-                                <div><div style="margin-bottom: 4px;">Ship To</div><strong style="color: var(--dark-text); font-size: 12px; cursor: pointer; text-decoration: underline; text-underline-offset: 3px;">${shipName} ▾</strong></div>
+                                
+                                <!-- Clickable Ship To Module -->
+                                <div style="position: relative;">
+                                    <div style="margin-bottom: 4px;">Ship To</div>
+                                    <strong onclick="toggleAddressPopup('${order.id}')" style="color: var(--dark-text); font-size: 12px; cursor: pointer; text-decoration: underline; text-underline-offset: 3px;">${shipFirstName} ▾</strong>
+                                    
+                                    <!-- Hidden Address Box -->
+                                    <div id="address-popup-${order.id}" class="address-popup" style="display: none; position: absolute; top: 100%; left: 0; background: #fff; border: 1px solid var(--border-color); padding: 15px; border-radius: 4px; box-shadow: 0 5px 25px rgba(0,0,0,0.15); z-index: 100; width: 220px; margin-top: 8px; text-transform: none; font-size: 11px; line-height: 1.6; color: var(--dark-text);">
+                                        <div style="display: flex; justify-content: space-between; margin-bottom: 8px; border-bottom: 1px solid var(--border-color); padding-bottom: 6px;">
+                                            <strong style="font-size: 12px; font-family: var(--font-sans);">${shipFullName}</strong>
+                                            <span onclick="toggleAddressPopup('${order.id}')" style="cursor: pointer; font-size: 16px; line-height: 1; color: var(--muted-gray);">&times;</span>
+                                        </div>
+                                        <div>
+                                            ${addressLine1}<br>
+                                            ${addressLine2}<br>
+                                            ${zipCode}<br>
+                                            India
+                                        </div>
+                                    </div>
+                                </div>
+
                             </div>
                             <div style="text-align: right;">
                                 <div style="margin-bottom: 4px;">Order # ${order.id.substring(0,10).toUpperCase()}</div>
@@ -1736,15 +1779,18 @@ window.closeCheckoutModal = function() {
                             </div>
                         </div>
 
+                        <!-- Order Body & Action Buttons -->
                         <div style="padding: 20px;">
                             <h3 style="font-family: var(--font-serif); font-size: 22px; color: ${statusColor}; margin-bottom: 5px;">${statusIcon} ${escapeHTML(order.status)}</h3>
                             <p style="font-size: 12px; color: var(--dark-text); margin-bottom: 25px;">Estimated delivery in 4-6 business days. Package processing via concierge.</p>
 
                             <div style="display: flex; gap: 30px; flex-wrap: wrap;">
+                                <!-- Left Column: Item List -->
                                 <div style="flex: 2; min-width: 250px;">
                                     ${itemsHtml}
                                 </div>
 
+                                <!-- Right Column: Amazon-Style Action Buttons -->
                                 <div style="flex: 1; min-width: 220px; display: flex; flex-direction: column;">
                                     <button class="order-action-btn primary-action-btn" onclick="alert('Tracking ID: RZP-${order.paymentId.substring(4, 12).toUpperCase()}\\n\\nLive tracking pipeline will be integrated here.')">Track Package</button>
                                     <button class="order-action-btn" onclick="alert('Return window is active. Redirecting to concierge support...')">Return or Replace Items</button>
@@ -1763,7 +1809,6 @@ window.closeCheckoutModal = function() {
             orderHistoryContainer.innerHTML = '<p style="text-align: center; color: #CC0C39; font-size: 13px;">Could not retrieve orders at this time.</p>';
         }
     }
-    
     (function() {
         function proxyGoogleDriveImage(img) {
             const src = img.getAttribute('src');
