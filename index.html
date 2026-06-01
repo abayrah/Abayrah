@@ -55,6 +55,20 @@
             z-index: -1; pointer-events: none; will-change: transform;
             animation: backgroundFlow 15s ease-in-out infinite alternate;
         }
+        /* --- Custom Star Logo Loading Animation --- */
+        @keyframes starSpin {
+            from { transform: rotate(0deg); }
+            to { transform: rotate(360deg); }
+        }
+        .loading-star-icon {
+            width: 20px;
+            height: 20px;
+            animation: starSpin 1.2s linear infinite;
+            display: inline-block;
+            vertical-align: middle;
+            margin-right: 10px;
+            filter: brightness(0) invert(1); /* Makes the logo white so it stands out on the black button */
+        }
 
         @keyframes backgroundFlow {
             0% { transform: translate3d(0, 0, 0); }
@@ -1488,8 +1502,8 @@ window.closeCheckoutModal = function() {
             e.preventDefault();
             if (!currentUser) return;
             
-            const proceedBtn = document.getElementById('proceedToPaymentBtn');
-            proceedBtn.textContent = "Opening Secure Gateway...";
+           const proceedBtn = document.getElementById('proceedToPaymentBtn');
+            proceedBtn.textContent = "Opening up secure gateway (30s)..."; 
             proceedBtn.disabled = true;
 
             // Save user shipping choices securely
