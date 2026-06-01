@@ -762,6 +762,49 @@
             </div>
         </div>
     </div>
+    <div id="order-details-section" style="display: none; padding: 100px 40px; min-height: 60vh; max-width: 1440px; margin: 0 auto; font-family: inherit;">
+        
+        <span onclick="closeOrderDetails()" style="display: inline-block; margin-bottom: 30px; cursor: pointer; color: var(--muted-gray); text-decoration: underline; text-underline-offset: 4px;">← Back to Your Vault</span>
+        
+        <h2 style="font-family: var(--font-serif); font-size: 32px; color: var(--dark-text); margin-bottom: 10px; text-transform: uppercase; letter-spacing: 2px;">Order Details</h2>
+        <div style="font-size: 13px; color: var(--muted-gray); margin-bottom: 30px; display: flex; gap: 30px;">
+            <span id="detail-order-date">Ordered on Date</span>
+            <span id="detail-order-id">Order # ID</span>
+        </div>
+
+        <div style="border: 1px solid var(--border-color); border-radius: 2px; padding: 30px; display: flex; flex-wrap: wrap; gap: 40px; background: #FAFAFA; margin-bottom: 30px;">
+            <div style="flex: 1; min-width: 200px;">
+                <h4 style="font-size: 11px; text-transform: uppercase; letter-spacing: 1px; color: var(--dark-text); margin-bottom: 15px;">Shipping Address</h4>
+                <div id="detail-shipping-address" style="font-size: 13px; color: var(--muted-gray); line-height: 1.6;">
+                    </div>
+            </div>
+            
+            <div style="flex: 1; min-width: 200px;">
+                <h4 style="font-size: 11px; text-transform: uppercase; letter-spacing: 1px; color: var(--dark-text); margin-bottom: 15px;">Payment Method</h4>
+                <div style="font-size: 13px; color: var(--muted-gray); line-height: 1.6;">
+                    Secure Razorpay Checkout<br>
+                    <span id="detail-payment-id" style="font-size: 11px; font-family: monospace;">TXN: </span>
+                </div>
+            </div>
+            
+            <div style="flex: 1; min-width: 250px;">
+                <h4 style="font-size: 11px; text-transform: uppercase; letter-spacing: 1px; color: var(--dark-text); margin-bottom: 15px;">Order Summary</h4>
+                <div style="font-size: 13px; color: var(--muted-gray); line-height: 1.6; display: flex; flex-direction: column; gap: 8px;">
+                    <div style="display: flex; justify-content: space-between;"><span>Item(s) Subtotal:</span> <span id="detail-subtotal">₹0.00</span></div>
+                    <div style="display: flex; justify-content: space-between;"><span>Shipping:</span> <span>₹0.00</span></div>
+                    <div style="display: flex; justify-content: space-between; font-weight: 500; color: var(--dark-text); border-top: 1px solid var(--border-color); padding-top: 8px; margin-top: 5px;"><span>Grand Total:</span> <span id="detail-total">₹0.00</span></div>
+                </div>
+            </div>
+        </div>
+
+        <div style="border: 1px solid var(--border-color); border-radius: 2px; padding: 30px; background: #FFFFFF;">
+            <h3 id="detail-status" style="font-family: var(--font-serif); font-size: 24px; color: var(--dark-text); margin-bottom: 5px;">Processing</h3>
+            <p style="font-size: 12px; color: var(--dark-text); margin-bottom: 30px;">Estimated delivery in 4-6 business days via Concierge.</p>
+            
+            <div id="detail-items-container" style="display: flex; flex-direction: column; gap: 30px;">
+                </div>
+        </div>
+    </div>
     <footer class="premium-footer">
         <div class="footer-grid">
             <div class="footer-brand-column">
@@ -1732,6 +1775,7 @@ window.closeCheckoutModal = function() {
             const ordersList = [];
             snapshot.forEach(docSnap => ordersList.push({ id: docSnap.id, ...docSnap.data() }));
             ordersList.sort((a, b) => new Date(b.date) - new Date(a.date));
+            window.userOrderHistory = ordersList;
 
             let html = '';
             ordersList.forEach(order => {
@@ -1811,7 +1855,7 @@ window.closeCheckoutModal = function() {
                             </div>
                             <div style="text-align: right;">
                                 <div style="margin-bottom: 4px;">Order # ${order.id.substring(0,10).toUpperCase()}</div>
-                                <a href="#" style="color: var(--dark-text); font-weight: 500; text-decoration: underline; text-underline-offset: 3px; font-size: 11px;">View order details</a> <span style="margin: 0 8px;">|</span> <a href="#" style="color: var(--dark-text); font-weight: 500; text-decoration: underline; text-underline-offset: 3px; font-size: 11px;">Invoice ▾</a>
+                                <a href="javascript:void(0)" onclick="openOrderDetails('${order.id}')" style="color: var(--dark-text); font-weight: 500; text-decoration: underline; text-underline-offset: 3px; font-size: 11px;">View order details</a>
                             </div>
                         </div>
 
@@ -1845,6 +1889,85 @@ window.closeCheckoutModal = function() {
             orderHistoryContainer.innerHTML = '<p style="text-align: center; color: #CC0C39; font-size: 13px;">Could not retrieve orders at this time.</p>';
         }
     }
+       // --- OPEN FULL ORDER DETAILS PAGE ---
+    window.userOrderHistory = []; // We will save the fetched orders here
+
+    window.openOrderDetails = function(orderId) {
+        // 1. Find the specific order from our saved list
+        const order = window.userOrderHistory.find(o => o.id === orderId);
+        if (!order) return;
+
+        // 2. Hide everything else and show the Details page
+        document.getElementById('ordersModal').classList.remove('active');
+        document.getElementById('main-storefront').style.display = 'none';
+        document.getElementById('dynamic-shopping-section').style.display = 'none';
+        document.getElementById('order-details-section').style.display = 'block';
+
+        // 3. Populate Top Headers
+        const orderDateObj = new Date(order.date);
+        document.getElementById('detail-order-date').textContent = "Ordered on " + orderDateObj.toLocaleDateString('en-IN', { year: 'numeric', month: 'long', day: 'numeric' });
+        document.getElementById('detail-order-id').textContent = "Order # " + order.id.toUpperCase();
+        
+        // 4. Populate 3-Column Boxes
+        const s = order.shippingInfo || {};
+        const shipFullName = escapeHTML((s.firstName || "Guest") + " " + (s.lastName || ""));
+        document.getElementById('detail-shipping-address').innerHTML = `
+            <strong style="color: var(--dark-text);">${shipFullName}</strong><br>
+            ${escapeHTML(s.houseNo || "")}, ${escapeHTML(s.street || "")}<br>
+            ${escapeHTML(s.city || "")}, ${escapeHTML(s.state || "")} ${escapeHTML(s.zip || "")}<br>
+            India
+        `;
+        document.getElementById('detail-payment-id').textContent = "TXN: " + escapeHTML(order.paymentId || "N/A");
+        
+        const amt = parseFloat(order.amount).toFixed(2);
+        document.getElementById('detail-subtotal').textContent = "₹" + amt;
+        document.getElementById('detail-total').textContent = "₹" + amt;
+
+        // 5. Populate Status
+        let statusIcon = "📦";
+        if (order.status === "Cancelled" || order.status === "Failed") statusIcon = "⚠️";
+        if (order.status === "Delivered") statusIcon = "✓";
+        document.getElementById('detail-status').innerHTML = `${statusIcon} ${escapeHTML(order.status)}`;
+
+        // 6. Build Detailed Item Rows
+        let itemsHtml = '';
+        if (order.items && order.items.length > 0) {
+            order.items.forEach(item => {
+                itemsHtml += `
+                    <div style="display: flex; gap: 25px; align-items: flex-start; padding-bottom: 25px; border-bottom: 1px solid var(--border-color);">
+                        <img src="${item.image}" alt="${item.title}" style="width: 100px; height: 130px; object-fit: cover; background: #FAFAFA; border: 1px solid var(--border-color); cursor: pointer;" onclick="viewItemFromOrderDetails('${item.productId}')">
+                        <div style="flex: 1; display: flex; flex-direction: column; justify-content: center;">
+                            <h4 style="font-family: var(--font-serif); font-size: 20px; color: var(--dark-text); margin-bottom: 8px;">
+                                <a href="javascript:void(0)" onclick="viewItemFromOrderDetails('${item.productId}')" style="text-decoration: underline; text-underline-offset: 3px;">${item.title}</a>
+                            </h4>
+                            <p style="font-size: 12px; color: var(--muted-gray); margin-bottom: 4px;">Size: <strong style="color: var(--dark-text);">${item.size}</strong></p>
+                            <p style="font-size: 12px; color: var(--muted-gray); margin-bottom: 20px;">Quantity: <strong style="color: var(--dark-text);">${item.quantity}</strong></p>
+                            
+                            <div>
+                                <button class="order-action-btn" onclick="viewItemFromOrderDetails('${item.productId}')" style="width: auto; padding: 10px 20px;">Buy it again</button>
+                            </div>
+                        </div>
+                    </div>
+                `;
+            });
+        }
+        document.getElementById('detail-items-container').innerHTML = itemsHtml;
+        window.scrollTo({ top: 0, behavior: 'smooth' });
+    };
+
+    // Navigates back to the Vault from Details Page
+    window.closeOrderDetails = function() {
+        document.getElementById('order-details-section').style.display = 'none';
+        document.getElementById('main-storefront').style.display = 'block'; 
+        document.getElementById('ordersModal').classList.add('active'); // Pop the vault back up
+        window.scrollTo({ top: 0, behavior: 'smooth' });
+    };
+
+    // Navigates to the shopping page directly from the details view
+    window.viewItemFromOrderDetails = async function(productId) {
+         document.getElementById('order-details-section').style.display = 'none';
+         await window.viewItemFromOrder(productId);
+    };
     (function() {
         function proxyGoogleDriveImage(img) {
             const src = img.getAttribute('src');
