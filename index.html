@@ -1144,6 +1144,72 @@
             }
         });
     }
+        // --- PRO UPGRADE: Postal Code Auto-Fill Logic ---
+document.addEventListener('DOMContentLoaded', function() {
+    const shipZipInput = document.getElementById('shipZip');
+    const cityInput = document.getElementById('shipCity');
+    const stateSelect = document.getElementById('shipState');
+
+    if (shipZipInput) {
+        shipZipInput.addEventListener('input', async function(e) {
+            const pincode = e.target.value.trim();
+
+            // Trigger API call ONLY when exactly 6 digits are entered
+            if (pincode.length === 6 && /^\d+$/.test(pincode)) {
+                
+                // Optional: Show the user that the system is fetching the data
+                if (cityInput) {
+                    cityInput.value = "Fetching location...";
+                    cityInput.style.color = "var(--accent-gold)"; // Gives it a premium loading look
+                }
+
+                try {
+                    // Fetch location data from the public Indian Postal API
+                    const response = await fetch(`https://api.postalpincode.in/pincode/${pincode}`);
+                    const data = await response.json();
+
+                    if (data && data[0].Status === "Success") {
+                        const postOffice = data[0].PostOffice[0];
+                        
+                        // 1. Force update the City
+                        if (cityInput) {
+                            cityInput.style.color = "var(--dark-text)"; // Reset text color
+                            
+                            // Note: postOffice.District usually returns the main city (e.g. "Hyderabad" or "Rangareddy").
+                            // If you specifically want the local area name (e.g. "Manikonda"), change this to postOffice.Name
+                            cityInput.value = postOffice.District; 
+                        }
+                        
+                        // 2. Automatically select the corresponding State in the dropdown
+                        if (stateSelect) {
+                            const stateValue = postOffice.State;
+                            for (let i = 0; i < stateSelect.options.length; i++) {
+                                // .toLowerCase() ensures it matches perfectly even if capitalization differs
+                                if (stateSelect.options[i].value.toLowerCase() === stateValue.toLowerCase()) {
+                                    stateSelect.selectedIndex = i;
+                                    break;
+                                }
+                            }
+                        }
+                    } else {
+                        // If the user enters a fake 6-digit code
+                        if (cityInput) {
+                            cityInput.value = "";
+                            cityInput.placeholder = "Invalid Pincode";
+                            cityInput.style.color = "red";
+                        }
+                    }
+                } catch (error) {
+                    console.error("Failed to fetch pincode details:", error);
+                    if (cityInput) {
+                        cityInput.value = "";
+                        cityInput.style.color = "var(--dark-text)";
+                    }
+                }
+            }
+        });
+    }
+});
 
     // --- Size Chart Modal Logic ---
     const sizeChartLink = document.querySelector('.size-chart-link');
