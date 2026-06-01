@@ -864,15 +864,6 @@
         );
     }
 
-    // Safely attach Event Listeners
-    const searchTriggerBtn = document.getElementById('searchTriggerBtn');
-    const searchOverlay = document.getElementById('searchOverlay');
-    const closeSearchBtn = document.getElementById('closeSearchBtn');
-    const searchInput = document.getElementById('searchInput');
-    const noResultsMsg = document.getElementById('noResultsMsg');
-    const categoryCards = document.querySelectorAll('.category-card');
-    const collectionsSection = document.getElementById('catalogs');
-
     function closeSearch() { 
         if(searchOverlay) searchOverlay.classList.remove('active'); 
         if(searchInput) searchInput.value = ''; 
@@ -1083,7 +1074,6 @@
         sizeChartModal.addEventListener('click', (e) => { if (e.target === sizeChartModal) sizeChartModal.classList.remove('active'); });
     }
 </script>
-    </script>
 
    <script type="module">
     import { initializeApp } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-app.js";
