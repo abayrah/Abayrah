@@ -1233,10 +1233,17 @@
                         const productSnap = await getDoc(productRef);
                         if (productSnap.exists()) {
                             const prodData = productSnap.data();
-                            return { id: safeId, qty: item.quantity || 1, price: parseFloat(prodData.price) || 0, title: escapeHTML(prodData.title || "Item"), image: escapeHTML(prodData.image || "") };
+                            return { 
+                                id: safeId, 
+                                qty: item.quantity || 1, 
+                                size: escapeHTML(item.size || 'Standard'), // Grab size from cart doc
+                                price: parseFloat(prodData.price) || 0, 
+                                title: escapeHTML(prodData.title || "Item"), 
+                                image: escapeHTML(prodData.image || "") 
+                            };
                         }
                     } catch (error) { console.error("Fetch failed"); }
-                    return { id: safeId, qty: item.quantity || 1, price: 0, title: "Unavailable", image: "" };
+                    return { id: safeId, qty: item.quantity || 1, size: 'Standard', price: 0, title: "Unavailable", image: "" };
                 });
 
                 const resolvedItems = await Promise.all(cartPromises);
@@ -1247,9 +1254,19 @@
                             <div class="cart-item">
                                 <img src="${prod.image}" class="cart-item-img" decoding="async">
                                 <div class="cart-item-details">
-                                    <div><h4 class="cart-item-title">${prod.title}</h4><div class="cart-item-price">₹${prod.price.toFixed(2)}</div></div>
-                                    <div class="cart-item-actions"><span style="font-size: 11px; color: var(--muted-gray);">Qty: ${prod.qty}</span>
-                                    <button class="remove-item-btn" onclick="removeSecureItem('${prod.id}')">Remove</button></div>
+                                    <div>
+                                        <h4 class="cart-item-title">${prod.title}</h4>
+                                        <div class="cart-item-price">₹${prod.price.toFixed(2)}</div>
+                                        <div style="font-size: 10px; color: var(--muted-gray); margin-top: 4px; text-transform: uppercase; letter-spacing: 1px;">Size: ${prod.size}</div>
+                                    </div>
+                                    <div class="cart-item-actions" style="margin-top: 10px;">
+                                        <div style="display: flex; align-items: center; border: 1px solid var(--border-color); border-radius: 2px;">
+                                            <button onclick="updateCartItemQuantity('${prod.id}', -1)" style="padding: 5px 12px; background: none; border: none; cursor: pointer; color: var(--muted-gray); font-size: 14px; transition: 0.3s;" onmouseover="this.style.color='var(--dark-text)'" onmouseout="this.style.color='var(--muted-gray)'">-</button>
+                                            <span style="width: 25px; text-align: center; font-family: var(--font-sans); font-size: 12px; font-weight: 500; color: var(--dark-text);">${prod.qty}</span>
+                                            <button onclick="updateCartItemQuantity('${prod.id}', 1)" style="padding: 5px 12px; background: none; border: none; cursor: pointer; color: var(--muted-gray); font-size: 14px; transition: 0.3s;" onmouseover="this.style.color='var(--dark-text)'" onmouseout="this.style.color='var(--muted-gray)'">+</button>
+                                        </div>
+                                        <button class="remove-item-btn" onclick="removeSecureItem('${prod.id}')">Remove</button>
+                                    </div>
                                 </div>
                             </div>`;
                     }
@@ -1266,7 +1283,7 @@
         try { await deleteDoc(doc(db, "users", currentUser.uid, "cart", escapeHTML(productId))); } catch (error) {}
     };
 
-    window.addSecureProductToCart = async function(productId, quantityToAdd = 1) {
+   window.addSecureProductToCart = async function(productId, quantityToAdd = 1, size = 'Standard') {
         if (!currentUser) {
             const loginModal = document.getElementById('loginModal');
             if(loginModal) { loginModal.classList.add('active'); document.getElementById('modalTitle').textContent = "Sign In Required"; }
@@ -1274,13 +1291,43 @@
         }
         try {
             const safeProductId = escapeHTML(productId);
-            const cartItemRef = doc(db, "users", currentUser.uid, "cart", safeProductId);
+            // Create unique cart item ID based on product AND size
+            const cartItemId = `${safeProductId}_${size.replace(/\s+/g, '-')}`; 
+            const cartItemRef = doc(db, "users", currentUser.uid, "cart", cartItemId);
             const docSnap = await getDoc(cartItemRef);
+            
             let newQuantity = docSnap.exists() ? docSnap.data().quantity + quantityToAdd : quantityToAdd;
-            await setDoc(cartItemRef, { productId: safeProductId, quantity: newQuantity, updatedAt: new Date().toISOString() }, { merge: true });
+            
+            // Save the size alongside the product ID and quantity
+            await setDoc(cartItemRef, { 
+                productId: safeProductId, 
+                quantity: newQuantity, 
+                size: size, 
+                updatedAt: new Date().toISOString() 
+            }, { merge: true });
+            
             if(document.getElementById('cartOverlay')) document.getElementById('cartOverlay').classList.add('active');
             if(document.getElementById('cartDrawer')) document.getElementById('cartDrawer').classList.add('active');
-        } catch (error) {}
+        } catch (error) { console.error("Failed to add to cart"); }
+    };
+       window.updateCartItemQuantity = async function(cartItemId, change) {
+        if(!currentUser) return;
+        try {
+            const safeCartItemId = escapeHTML(cartItemId);
+            const cartItemRef = doc(db, "users", currentUser.uid, "cart", safeCartItemId);
+            const docSnap = await getDoc(cartItemRef);
+            
+            if (docSnap.exists()) {
+                let newQuantity = docSnap.data().quantity + change;
+                
+                if (newQuantity > 0) {
+                    await setDoc(cartItemRef, { quantity: newQuantity }, { merge: true });
+                } else {
+                    // If quantity drops to 0, automatically remove the item
+                    await deleteDoc(cartItemRef);
+                }
+            }
+        } catch (error) { console.error("Error updating cart quantity"); }
     };
 
     window.openCategoryStore = function(title, subtitle) {
@@ -1363,9 +1410,13 @@
         window.scrollTo({ top: 0, behavior: 'smooth' });
     };
 
-    window.addCurrentProductToCart = function() {
+   window.addCurrentProductToCart = function() {
         const qty = parseInt(document.getElementById('product-quantity').value) || 1;
-        addSecureProductToCart(currentProductView.id, qty);
+        const sizeText = document.getElementById('selected-size-text').textContent;
+        // Fallback to 'Standard' if they don't select a size
+        const size = sizeText !== 'Select a size' ? sizeText : 'Standard'; 
+        
+        addSecureProductToCart(currentProductView.id, qty, size);
     };
     
     (function() {
