@@ -356,6 +356,12 @@
         .size-chart-table th, .size-chart-table td { padding: 15px; border-bottom: 1px solid var(--border-color); }
         .size-chart-table th { font-weight: 500; color: var(--dark-text); text-transform: uppercase; letter-spacing: 1px; background-color: #FAFAFA; }
         .size-chart-table td { color: var(--muted-gray); font-weight: 400; }
+        /* --- Custom Measurements Grid Styling --- */
+.custom-measurements-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 15px; margin-bottom: 5px; }
+.custom-measurements-grid input[type="number"] { width: 100%; padding: 10px; border: 1px solid var(--border-color); border-radius: 2px; font-family: var(--font-sans); font-size: 13px; color: var(--dark-text); outline: none; box-sizing: border-box; background: transparent; }
+.custom-measurements-grid input[type="number"]:focus { border-color: var(--accent-gold); }
+#custom-notes { width: 100%; padding: 12px; border: 1px solid var(--border-color); border-radius: 2px; font-family: var(--font-sans); font-size: 13px; color: var(--dark-text); outline: none; resize: vertical; box-sizing: border-box; background: transparent; }
+#custom-notes:focus { border-color: var(--accent-gold); }
 
         @media (max-width: 1024px) {
             .category-grid { grid-template-columns: repeat(3, 1fr); }
@@ -670,10 +676,26 @@
                             <button class="size-btn" data-size="Custom">Custom</button>
                         </div>
             
-                        <div id="custom-size-container" style="display: none;">
-                            <label for="custom-measurements" class="custom-size-label">Enter Measurements (Length, Chest, Sleeves):</label>
-                            <textarea id="custom-measurements" placeholder="Specify your exact measurements..." rows="2"></textarea>
-                        </div>
+                       <div id="custom-size-container" style="display: none;">
+    <label class="custom-size-label">Enter Measurements (Inches)</label>
+    <div class="custom-measurements-grid">
+        <div class="input-group">
+            <label for="custom-length">Length</label>
+            <input type="number" id="custom-length" placeholder="e.g. 56" min="10" max="80">
+        </div>
+        <div class="input-group">
+            <label for="custom-chest">Chest</label>
+            <input type="number" id="custom-chest" placeholder="e.g. 22" min="10" max="50">
+        </div>
+        <div class="input-group">
+            <label for="custom-sleeves">Sleeves</label>
+            <input type="number" id="custom-sleeves" placeholder="e.g. 28" min="10" max="40">
+        </div>
+    </div>
+    
+    <label class="custom-size-label" style="margin-top: 15px;">Fitting Requirements & Notes</label>
+    <textarea id="custom-notes" placeholder="e.g., Slim fit, extra flare at the bottom, specific alterations..." rows="2"></textarea>
+</div>
                     </div>
                     <div style="display: flex; align-items: center; gap: 15px; margin-bottom: 25px;">
                         <span style="font-size: 11px; font-weight: 500; text-transform: uppercase; letter-spacing: 1px;">Quantity</span>
@@ -1283,7 +1305,7 @@
         try { await deleteDoc(doc(db, "users", currentUser.uid, "cart", escapeHTML(productId))); } catch (error) {}
     };
 
-   window.addSecureProductToCart = async function(productId, quantityToAdd = 1, size = 'Standard') {
+ window.addSecureProductToCart = async function(productId, quantityToAdd = 1, size = 'Standard') {
         if (!currentUser) {
             const loginModal = document.getElementById('loginModal');
             if(loginModal) { loginModal.classList.add('active'); document.getElementById('modalTitle').textContent = "Sign In Required"; }
@@ -1291,14 +1313,21 @@
         }
         try {
             const safeProductId = escapeHTML(productId);
-            // Create unique cart item ID based on product AND size
-            const cartItemId = `${safeProductId}_${size.replace(/\s+/g, '-')}`; 
+            
+            // Generate a unique Cart ID. If it's a highly bespoke custom order, we attach a timestamp 
+            // so they can add multiple custom versions of the same item without overwriting each other.
+            let cartItemId;
+            if (size.startsWith('Custom [')) {
+                cartItemId = `${safeProductId}_Custom_${Date.now()}`;
+            } else {
+                cartItemId = `${safeProductId}_${size.replace(/\s+/g, '-')}`; 
+            }
+            
             const cartItemRef = doc(db, "users", currentUser.uid, "cart", cartItemId);
             const docSnap = await getDoc(cartItemRef);
             
             let newQuantity = docSnap.exists() ? docSnap.data().quantity + quantityToAdd : quantityToAdd;
             
-            // Save the size alongside the product ID and quantity
             await setDoc(cartItemRef, { 
                 productId: safeProductId, 
                 quantity: newQuantity, 
@@ -1412,11 +1441,25 @@
 
    window.addCurrentProductToCart = function() {
         const qty = parseInt(document.getElementById('product-quantity').value) || 1;
-        const sizeText = document.getElementById('selected-size-text').textContent;
-        // Fallback to 'Standard' if they don't select a size
-        const size = sizeText !== 'Select a size' ? sizeText : 'Standard'; 
+        let sizeText = document.getElementById('selected-size-text').textContent;
+        let finalSize = sizeText !== 'Select a size' ? sizeText : 'Standard';
         
-        addSecureProductToCart(currentProductView.id, qty, size);
+        // If Custom is selected, format all the inputs into a single readable string
+        if (finalSize === 'Custom') {
+            const length = document.getElementById('custom-length').value || '-';
+            const chest = document.getElementById('custom-chest').value || '-';
+            const sleeves = document.getElementById('custom-sleeves').value || '-';
+            const notes = document.getElementById('custom-notes').value;
+            
+            finalSize = `Custom [L:${length}, C:${chest}, S:${sleeves}]`;
+            if (notes) {
+                // Truncate notes slightly for the cart preview to keep UI clean
+                const shortNotes = notes.length > 25 ? notes.substring(0, 25) + '...' : notes;
+                finalSize += ` - ${shortNotes}`;
+            }
+        }
+        
+        addSecureProductToCart(currentProductView.id, qty, finalSize);
     };
     
     (function() {
