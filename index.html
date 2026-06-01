@@ -1089,6 +1089,38 @@
             });
         });
     }
+        // --- ZOOM MAGNIFIER LOGIC (AMAZON STYLE) ---
+    const zoomWrapper = document.getElementById('zoom-img-wrapper');
+    const zoomImg = document.getElementById('detail-image');
+
+    if (zoomWrapper && zoomImg) {
+        zoomWrapper.addEventListener('mousemove', function(e) {
+            // Apply zoom only on desktop view (screens 769px and wider)
+            if (window.innerWidth >= 769) {
+                const rect = zoomWrapper.getBoundingClientRect();
+                
+                // Calculate the mouse position relative to the image wrapper
+                const x = e.clientX - rect.left;
+                const y = e.clientY - rect.top;
+                
+                // Convert coordinates to percentages
+                const xPercent = (x / rect.width) * 100;
+                const yPercent = (y / rect.height) * 100;
+                
+                // Move the transform origin to the cursor and scale up
+                zoomImg.style.transformOrigin = `${xPercent}% ${yPercent}%`;
+                zoomImg.style.transform = 'scale(2.2)'; // Adjust this number to increase/decrease zoom level
+            }
+        });
+
+        // Reset the image when the mouse leaves the box
+        zoomWrapper.addEventListener('mouseleave', function() {
+            if (window.innerWidth >= 769) {
+                zoomImg.style.transformOrigin = 'center center';
+                zoomImg.style.transform = 'scale(1)';
+            }
+        });
+    }
 
     // --- Size Chart Modal Logic ---
     const sizeChartLink = document.querySelector('.size-chart-link');
