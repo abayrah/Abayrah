@@ -1290,8 +1290,7 @@
                 alert("Error adding product."); submitBtn.disabled = false; submitBtn.innerText = "Push to Live Store";
             }
         };
-     // --- FETCH & RENDER INVENTORY ---
-      window.allProductsData = {}; 
+  window.allProductsData = {}; 
 
         window.loadInventory = async function() {
             const listContainer = document.getElementById('inventory-list');
@@ -1319,7 +1318,6 @@
                     
                     window.allProductsData[id] = data; 
                     
-                    // Handle both old string categories and new array categories safely
                     let itemCategories = Array.isArray(data.category) ? data.category : [data.category || "general"];
                     
                     if (filterVal !== 'all' && !itemCategories.includes(filterVal)) {
@@ -1328,14 +1326,14 @@
 
                     itemsFound++;
                     
-                    // 👇 NEW: Generate the SKU for the Admin view 👇
-                    const displayId = id.substring(0,8).toUpperCase();
+                    // 👇 NEW: Math formula to translate Firebase ID into a 6-digit number! 👇
+                    let hashVal = 0;
+                    for (let i = 0; i < id.length; i++) { hashVal = id.charCodeAt(i) + ((hashVal << 5) - hashVal); }
+                    const displayId = (Math.abs(hashVal) % 900000 + 100000).toString();
                     
-                    // For the badge display, show the primary category
                     let displayBadge = itemCategories[0];
                     if (itemCategories.includes("Archive Sale")) displayBadge += " + Sale";
 
-                    // 👇 NEW: Added data-id to the div, and the SKU text next to the price 👇
                     const itemHTML = `
                         <div class="inv-item ${!inStock ? 'out-of-stock' : ''}" data-id="${displayId}">
                             <div class="inv-info">
