@@ -1084,20 +1084,18 @@
     if(searchInput) searchInput.addEventListener('input', (e) => filterProducts(e.target.value));
 
 // --- LIVE DATABASE SEARCH LOGIC ---
+// --- LIVE DATABASE SEARCH LOGIC ---
     window.cachedStoreProducts = null;
 
     window.filterProducts = async function(term) {
-        // Removes the # and spaces
         const searchTerm = escapeHTML(term.toLowerCase().trim()).replace('#', '');
         
         const noResults = document.getElementById('noResultsMsg') || (typeof noResultsMsg !== 'undefined' ? noResultsMsg : null);
         const productsContainer = document.getElementById('collection-view');
         
-        // Target the main category boxes on the home page so we can hide them during a search
         const homeCategories = document.querySelectorAll('.category-card:not(.product-result)'); 
         const dynamicTitle = document.getElementById('dynamic-main-title'); 
 
-        // If the user clears the search bar, restore the original Home Page view
         if (searchTerm === '') {
             if (productsContainer) { productsContainer.innerHTML = ''; productsContainer.style.display = 'none'; }
             if (dynamicTitle) dynamicTitle.style.display = 'block';
@@ -1106,7 +1104,6 @@
             return;
         }
 
-        // Hide home categories and prepare to show products
         homeCategories.forEach(card => card.style.display = 'none');
         if (dynamicTitle) dynamicTitle.style.display = 'none';
         if (productsContainer) {
@@ -1114,10 +1111,8 @@
             productsContainer.innerHTML = '<p style="text-align: center; width: 100%; color: var(--muted-gray); grid-column: 1 / -1; margin-top: 50px; letter-spacing: 2px; font-size: 11px;">SEARCHING VAULT...</p>';
         }
 
-        // Fetch the whole catalog from Firebase ONCE per visit to save your free reads!
         if (!window.cachedStoreProducts) {
             try {
-                // IT CAN NOW SEE getDocs AND db SUCCESSFULLY!
                 const querySnapshot = await getDocs(collection(db, "products"));
                 window.cachedStoreProducts = [];
                 querySnapshot.forEach(docSnap => {
@@ -1133,11 +1128,15 @@
         let resultsHTML = '';
 
         window.cachedStoreProducts.forEach(product => {
+            // 👇 NEW: Convert database ID to 6-digit search number 👇
+            let hashVal = 0;
+            for (let i = 0; i < product._docId.length; i++) { hashVal = product._docId.charCodeAt(i) + ((hashVal << 5) - hashVal); }
+            const numericSku = (Math.abs(hashVal) % 900000 + 100000).toString();
+
             const title = (product.title || '').toLowerCase();
-            const sku = product._docId.substring(0,8).toLowerCase();
             const categoryName = Array.isArray(product.category) ? product.category.join(' ').toLowerCase() : (product.category || '').toLowerCase();
 
-            if (title.includes(searchTerm) || sku.includes(searchTerm) || categoryName.includes(searchTerm)) {
+            if (title.includes(searchTerm) || numericSku.includes(searchTerm) || categoryName.includes(searchTerm)) {
                 matchCount++;
                 const price = parseFloat(product.price) || 0;
                 const originalPrice = parseFloat(product.originalPrice) || null; 
@@ -1154,7 +1153,7 @@
                 
                 const imgFilter = inStock ? "" : "filter: grayscale(100%); opacity: 0.6;";
                 const outOfStockBadge = inStock ? "" : `<div style="position: absolute; top: 50%; left: 50%; transform: translate(-50%, -50%); background: rgba(28,27,26,0.85); color: #fff; padding: 8px 15px; font-size: 10px; letter-spacing: 3px; text-transform: uppercase; z-index: 10;">Sold Out</div>`;
-                const displayId = product._docId.substring(0,8).toUpperCase();
+                const displayId = numericSku;
 
                 resultsHTML += `
                     <div class="category-card product-result" data-id="${displayId}" onclick="openProduct('${escapeHTML(product._docId)}', '${escapeHTML(product.title||'').replace(/'/g, "\\'")}', ${price}, '${escapeHTML(product.description||'').replace(/'/g, "\\'")}', '${escapeHTML(product.image||'')}', ${originalPrice}, '${actualCategory}', '${colorsStr}', ${inStock}, '${stockOutVariantsStr}', '${displayId}')" style="background: var(--primary-bg); border: 1px solid var(--border-color); padding: 12px; border-radius: 2px; text-align: center; cursor: pointer;">
@@ -1181,7 +1180,6 @@
             }
         }
     };
-    
 
     const hamburgerBtn = document.getElementById('hamburgerBtn');
     const navLinks = document.getElementById('navLinks');
@@ -1649,13 +1647,11 @@ window.currentCategoryListener = null;
         const productsContainer = document.getElementById('collection-view');
         if(!productsContainer) return;
 
-        // Disconnect from the previous category if the user switches pages
         if (window.currentCategoryListener) window.currentCategoryListener();
 
         try {
             const q = query(collection(db, "products"), where("category", "array-contains", categoryFilter));
 
-            // NEW: onSnapshot actively listens to the database live!
             window.currentCategoryListener = onSnapshot(q, (querySnapshot) => {
                 productsContainer.innerHTML = ''; 
                 if(querySnapshot.empty) { productsContainer.innerHTML = `<p style="text-align: center; width: 100%; color: var(--muted-gray);">No products available.</p>`; return; }
@@ -1684,10 +1680,11 @@ window.currentCategoryListener = null;
                     const imgFilter = inStock ? "" : "filter: grayscale(100%); opacity: 0.6;";
                     const outOfStockBadge = inStock ? "" : `<div style="position: absolute; top: 50%; left: 50%; transform: translate(-50%, -50%); background: rgba(28,27,26,0.85); color: #fff; padding: 8px 15px; font-size: 10px; letter-spacing: 3px; text-transform: uppercase; z-index: 10;">Sold Out</div>`;
 
-                    // 👇 NEW: GENERATE THE SKU 👇
-                    const displayId = docSnap.id.substring(0,8).toUpperCase();
+                    // 👇 NEW: Math formula to translate Firebase ID into a 6-digit number! 👇
+                    let hashVal = 0;
+                    for (let i = 0; i < docSnap.id.length; i++) { hashVal = docSnap.id.charCodeAt(i) + ((hashVal << 5) - hashVal); }
+                    const displayId = (Math.abs(hashVal) % 900000 + 100000).toString();
 
-                    // 👇 NEW: Added data-id and passed displayId to openProduct 👇
                     productsContainer.insertAdjacentHTML('beforeend', `
                         <div class="category-card" data-id="${displayId}" onclick="openProduct('${escapeHTML(docSnap.id)}', '${escapeHTML(product.title||'').replace(/'/g, "\\'")}', ${price}, '${escapeHTML(product.description||'').replace(/'/g, "\\'")}', '${escapeHTML(product.image||'')}', ${originalPrice}, '${actualCategory}', '${colorsStr}', ${inStock}, '${stockOutVariantsStr}', '${displayId}')" style="background: var(--primary-bg); border: 1px solid var(--border-color); padding: 12px; border-radius: 2px; text-align: center; cursor: pointer;">
                             <div style="width: 100%; aspect-ratio: 3/4; background: #FAFAFA; overflow: hidden; margin-bottom: 15px; position:relative;">
