@@ -2010,17 +2010,24 @@ window.openCheckoutModal = function() {
         return;
     }
     
+    // 1. Force the cart to close immediately
     document.getElementById('cartDrawer').classList.remove('active');
     document.getElementById('cartOverlay').classList.remove('active');
     
-    // NEW: Copy the exact discounted total (or subtotal) to the checkout screen
+    // 2. Set the price
     let finalAmount = window.cartRawSubtotal;
     if (window.activeCoupon === 'WELCOME10') {
-        finalAmount = window.cartRawSubtotal * 0.90; // Apply the 10%
+        finalAmount = window.cartRawSubtotal * 0.90; 
     }
     document.getElementById('checkoutTotalDisplay').textContent = `₹${finalAmount.toFixed(2)}`;
     
-    document.getElementById('checkoutModal').classList.add('active');
+    // 3. Add a tiny delay (100ms) before opening checkout. 
+    // This gives the browser time to "clear" the previous drawer animation.
+    setTimeout(() => {
+        document.getElementById('checkoutModal').classList.add('active');
+        // Force the body to scroll properly
+        document.body.style.overflow = 'auto';
+    }, 100);
 };
 
 // 2. Function to close the checkout modal
