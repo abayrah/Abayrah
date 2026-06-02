@@ -1366,6 +1366,7 @@
     let currentUser = null;
     let currentProductView = {};
        // --- OMNI-SEARCH LOGIC (ALL-ROUNDER) ---
+   // --- OMNI-SEARCH LOGIC (ALL-ROUNDER) ---
     window.cachedStoreProducts = null;
 
     window.filterProducts = async function(term) {
@@ -1374,19 +1375,27 @@
         const noResults = document.getElementById('noResultsMsg') || (typeof noResultsMsg !== 'undefined' ? noResultsMsg : null);
         const productsContainer = document.getElementById('collection-view');
         
-        const homeCategories = document.querySelectorAll('.category-card:not(.product-result)'); 
+        // 🌟 NEW: Grab the main sections of your website so we can hide/show them!
+        const mainStorefront = document.getElementById('main-storefront');
+        const dynamicShoppingSection = document.getElementById('dynamic-shopping-section');
+        const productDetailView = document.getElementById('product-detail-view');
         const dynamicTitle = document.getElementById('dynamic-main-title'); 
 
+        // If the search bar is empty, show the regular Home Page
         if (searchTerm === '') {
-            if (productsContainer) { productsContainer.innerHTML = ''; productsContainer.style.display = 'none'; }
-            if (dynamicTitle) dynamicTitle.style.display = 'block';
-            homeCategories.forEach(card => card.style.display = 'flex');
+            if (mainStorefront) mainStorefront.style.display = 'block';
+            if (dynamicShoppingSection) dynamicShoppingSection.style.display = 'none';
+            if (productsContainer) productsContainer.innerHTML = '';
             if (noResults) noResults.style.display = 'none';
             return;
         }
 
-        homeCategories.forEach(card => card.style.display = 'none');
+        // The moment they type a letter, hide the Home Page and show the Results Area!
+        if (mainStorefront) mainStorefront.style.display = 'none';
+        if (dynamicShoppingSection) dynamicShoppingSection.style.display = 'block';
+        if (productDetailView) productDetailView.style.display = 'none';
         if (dynamicTitle) dynamicTitle.style.display = 'none';
+
         if (productsContainer) {
             productsContainer.style.display = 'grid'; 
             productsContainer.innerHTML = '<p style="text-align: center; width: 100%; color: var(--muted-gray); grid-column: 1 / -1; margin-top: 50px; letter-spacing: 2px; font-size: 11px;">SEARCHING VAULT...</p>';
@@ -1394,7 +1403,6 @@
 
         if (!window.cachedStoreProducts) {
             try {
-                // IT CAN NOW SEE getDocs BECAUSE IT IS IN THE FIREBASE MODULE!
                 const querySnapshot = await getDocs(collection(db, "products"));
                 window.cachedStoreProducts = [];
                 querySnapshot.forEach(docSnap => {
@@ -1411,7 +1419,6 @@
 
         // 🌟 1. SMART INTENT CARDS (Customer Care, Policies, Catalogs) 🌟
         
-        // A. Customer Care / Contact
         if (['care', 'contact', 'support', 'email', 'phone', 'number', 'help', 'whatsapp'].some(v => searchTerm.includes(v))) {
             matchCount++;
             resultsHTML += `
@@ -1423,7 +1430,6 @@
             `;
         }
 
-        // B. Exchange & Returns
         if (['exchange', 'return', 'refund', 'policy'].some(v => searchTerm.includes(v))) {
             matchCount++;
             resultsHTML += `
@@ -1434,7 +1440,6 @@
             `;
         }
 
-        // C. Direct Catalog Links
         const catalogShortcuts = [
             { keywords: ['abaya', 'burqa'], title: 'Luxury Abayas', sub: 'The Complete Collection' },
             { keywords: ['hamper', 'gift'], title: 'Curated Hampers', sub: 'Explore Gifting' },
@@ -1447,7 +1452,7 @@
             if (cat.keywords.some(v => searchTerm.includes(v))) {
                 matchCount++;
                 resultsHTML += `
-                    <div style="grid-column: 1 / -1; padding: 25px; text-align: center; border: 1px solid var(--accent-gold); background: rgba(197, 168, 128, 0.03); cursor: pointer; margin-bottom: 20px; transition: 0.3s;" onmouseover="this.style.background='rgba(197, 168, 128, 0.1)'" onmouseout="this.style.background='rgba(197, 168, 128, 0.03)'" onclick="closeSearch(); openCategoryStore('${cat.title}', '${cat.sub}');">
+                    <div style="grid-column: 1 / -1; padding: 25px; text-align: center; border: 1px solid var(--accent-gold); background: rgba(197, 168, 128, 0.03); cursor: pointer; margin-bottom: 20px; transition: 0.3s;" onmouseover="this.style.background='rgba(197, 168, 128, 0.1)'" onmouseout="this.style.background='rgba(197, 168, 128, 0.03)'" onclick="document.getElementById('searchOverlay').classList.remove('active'); document.getElementById('searchInput').value = ''; openCategoryStore('${cat.title}', '${cat.sub}');">
                         <h3 style="font-family: var(--font-serif); font-size: 22px; color: var(--dark-text); text-transform: uppercase; letter-spacing: 3px; margin-bottom: 8px;">View All ${cat.title} &rarr;</h3>
                         <p style="font-size: 10px; color: var(--muted-gray); text-transform: uppercase; letter-spacing: 2px;">Click to explore the full collection</p>
                     </div>
@@ -1484,7 +1489,7 @@
                 const displayId = numericSku;
 
                 resultsHTML += `
-                    <div class="category-card product-result" data-id="${displayId}" onclick="closeSearch(); openProduct('${escapeHTML(product._docId)}', '${escapeHTML(product.title||'').replace(/'/g, "\\'")}', ${price}, '${escapeHTML(product.description||'').replace(/'/g, "\\'")}', '${escapeHTML(product.image||'')}', ${originalPrice}, '${actualCategory}', '${colorsStr}', ${inStock}, '${stockOutVariantsStr}', '${displayId}')" style="background: var(--primary-bg); border: 1px solid var(--border-color); padding: 12px; border-radius: 2px; text-align: center; cursor: pointer;">
+                    <div class="category-card product-result" data-id="${displayId}" onclick="document.getElementById('searchOverlay').classList.remove('active'); document.getElementById('searchInput').value = ''; document.getElementById('main-storefront').style.display='none'; document.getElementById('dynamic-shopping-section').style.display='block'; openProduct('${escapeHTML(product._docId)}', '${escapeHTML(product.title||'').replace(/'/g, "\\'")}', ${price}, '${escapeHTML(product.description||'').replace(/'/g, "\\'")}', '${escapeHTML(product.image||'')}', ${originalPrice}, '${actualCategory}', '${colorsStr}', ${inStock}, '${stockOutVariantsStr}', '${displayId}')" style="background: var(--primary-bg); border: 1px solid var(--border-color); padding: 12px; border-radius: 2px; text-align: center; cursor: pointer;">
                         <div style="width: 100%; aspect-ratio: 3/4; background: #FAFAFA; overflow: hidden; margin-bottom: 15px; position:relative;">
                             ${outOfStockBadge}
                             <img src="${escapeHTML(product.image||'')}" style="position:absolute; top:0; left:0; width: 100%; height: 100%; object-fit: contain; transition: 0.5s; ${imgFilter}">
@@ -1508,7 +1513,6 @@
             }
         }
     };
-       
 
     // --- Firebase UI Elements ---
     const googleSignInBtn = document.getElementById('googleSignInBtn');
