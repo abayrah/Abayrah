@@ -301,6 +301,9 @@
         .btn-delete { color: #c9302c; }
 
         .btn-delete:hover { background: #c9302c; color: #fff; border-color: #c9302c; }
+        /* Styling for Out of Stock Variant Buttons in Admin */
+.variant-toggle-btn { margin-bottom: 5px; }
+.variant-toggle-btn.is-out { background: #c9302c; color: #fff; border-color: #c9302c; text-decoration: line-through; }
 
         @media (max-width: 900px) {
             .admin-layout { flex-direction: column; }
@@ -620,9 +623,14 @@
     <input type="number" id="prod-discount" placeholder="e.g. 20 (Leave 0 for no discount)" value="0" min="0" max="100">
 </div>
 
-<div class="form-group">
-    <label>Out of Stock Variants (Sizes/Colors)</label>
-    <input type="text" id="prod-out-variants" class="out-stock-input" placeholder="e.g. 54, 56, Dusty Rose (Leave blank if all in stock)">
+<div class="form-group" id="color-inputs-container" style="display: none; background: #FAFAFA; padding: 15px; border: 1px solid var(--border-color); border-radius: 2px;">
+    <label>Available Colors (For Hijabs & Accessories)</label>
+    <div id="dynamic-color-list">
+        <div class="color-row" style="display: flex; gap: 10px; margin-bottom: 10px;">
+            <input type="text" class="color-input" placeholder="e.g. Dusty Rose" style="flex: 1;">
+            <button type="button" class="action-btn" onclick="addAnotherColor()">+ Add Color</button>
+        </div>
+    </div>
 </div>
 
 
@@ -814,9 +822,11 @@
     <input type="number" id="edit-discount" placeholder="e.g. 20" value="0" min="0" max="100">
 </div>
 
-<div class="form-group">
-    <label>Out of Stock Variants (Sizes/Colors)</label>
-    <input type="text" id="edit-out-variants" class="out-stock-input" placeholder="e.g. 54, 56, Dusty Rose (Leave blank if all in stock)">
+<div class="form-group" style="background: #FAFAFA; padding: 15px; border: 1px solid var(--border-color); border-radius: 2px;">
+    <label>Out of Stock Variants</label>
+    <p style="font-size: 10px; color: var(--muted-gray); margin-bottom: 10px; text-transform: uppercase;">Click a size/color below to mark it as OUT OF STOCK.</p>
+    <div id="edit-dynamic-variants" style="display: flex; gap: 8px; flex-wrap: wrap;">
+        </div>
 </div>
 <div class="form-group">
     <label>Image Link</label>
@@ -1183,7 +1193,32 @@
 
         });
 
-    // --- UPLOAD PRODUCT ---
+        // --- DYNAMIC COLOR INPUTS ---
+        window.addAnotherColor = function() {
+            const list = document.getElementById('dynamic-color-list');
+            const newRow = document.createElement('div');
+            newRow.className = 'color-row';
+            newRow.style = 'display: flex; gap: 10px; margin-bottom: 10px;';
+            newRow.innerHTML = `
+                <input type="text" class="color-input" placeholder="Enter another color" style="flex: 1;">
+                <button type="button" class="action-btn btn-delete" onclick="this.parentElement.remove()">Remove</button>
+            `;
+            list.appendChild(newRow);
+        };
+
+        // Show Color inputs ONLY when Hijabs or Accessories are selected
+        categoryInput.addEventListener('change', (e) => {
+            const cat = e.target.value;
+            previewCategory.textContent = e.target.options[e.target.selectedIndex].text;
+            
+            const colorContainer = document.getElementById('color-inputs-container');
+            if (cat === 'Essential Hijabs' || cat === 'Signature Accessories') {
+                colorContainer.style.display = 'block';
+            } else {
+                colorContainer.style.display = 'none';
+            }
+        });
+   // --- UPLOAD PRODUCT ---
         window.uploadProduct = async function() {
             const category = categoryInput.value;
             const title = titleInput.value.trim();
@@ -1192,9 +1227,11 @@
             const rawImageUrl = imageInput.value.trim();
             const desc = document.getElementById('prod-desc').value.trim();
             
-            // Grab the out of stock variants and turn them into an array
-            const outVariantsStr = document.getElementById('prod-out-variants').value;
-            const stockOutVariants = outVariantsStr ? outVariantsStr.split(',').map(s => s.trim()) : [];
+            // Gather colors if they exist
+            let colorsArray = [];
+            document.querySelectorAll('.color-input').forEach(input => {
+                if (input.value.trim() !== '') colorsArray.push(input.value.trim());
+            });
 
             const submitBtn = document.getElementById('submit-btn');
             const successMsg = document.getElementById('success-msg');
@@ -1206,10 +1243,7 @@
             submitBtn.disabled = true; submitBtn.innerText = "Pushing to Vault...";
 
             try {
-                let finalPrice = basePrice;
-                let originalPriceToSave = null;
-                let categories = [category]; 
-
+                let finalPrice = basePrice; let originalPriceToSave = null; let categories = [category]; 
                 if (discountPercent > 0) {
                     finalPrice = basePrice - (basePrice * (discountPercent / 100));
                     originalPriceToSave = basePrice;
@@ -1223,16 +1257,19 @@
                     originalPrice: originalPriceToSave,
                     image: convertDriveLink(rawImageUrl), 
                     description: desc,
-                    inStock: true, // Master switch for the WHOLE product
-                    stockOutVariants: stockOutVariants, // List of specific sizes/colors out of stock
+                    colors: colorsArray, // Save colors to DB!
+                    inStock: true, // Whole product is in stock initially
+                    stockOutVariants: [], // No variants out of stock initially
                     createdAt: new Date().toISOString()
                 });
                 
                 successMsg.style.display = 'block'; submitBtn.disabled = false; submitBtn.innerText = "Push to Live Store";
                 // Reset form
                 categoryInput.value = ''; titleInput.value = ''; priceInput.value = ''; 
-                document.getElementById('prod-discount').value = '0'; document.getElementById('prod-out-variants').value = '';
+                document.getElementById('prod-discount').value = '0';
                 imageInput.value = ''; document.getElementById('prod-desc').value = '';
+                document.getElementById('color-inputs-container').style.display = 'none';
+                document.getElementById('dynamic-color-list').innerHTML = `<div class="color-row" style="display: flex; gap: 10px; margin-bottom: 10px;"><input type="text" class="color-input" placeholder="e.g. Dusty Rose" style="flex: 1;"><button type="button" class="action-btn" onclick="addAnotherColor()">+ Add Color</button></div>`;
                 previewCategory.textContent = 'Select Catalog'; previewTitle.textContent = 'Product Title'; previewPrice.textContent = '₹0.00';
                 previewImage.src = ''; previewImage.style.display = 'none'; previewImgText.style.display = 'block';
                 setTimeout(() => { successMsg.style.display = 'none'; }, 4000);
@@ -1240,7 +1277,6 @@
                 alert("Error adding product."); submitBtn.disabled = false; submitBtn.innerText = "Push to Live Store";
             }
         };
-
      // --- FETCH & RENDER INVENTORY ---
         window.allProductsData = {}; 
 
@@ -1389,8 +1425,6 @@
 
         };
 
-        // --- EDIT PRODUCT LOGIC ---
-
      // --- EDIT MODAL ---
         window.openEditModal = function(id) {
             const product = window.allProductsData[id];
@@ -1409,12 +1443,32 @@
                 existingDiscount = Math.round(((product.originalPrice - product.price) / product.originalPrice) * 100);
             }
             document.getElementById('edit-discount').value = existingDiscount;
-            
-            // Load existing out of stock variants
-            document.getElementById('edit-out-variants').value = product.stockOutVariants ? product.stockOutVariants.join(', ') : '';
-
             document.getElementById('edit-image').value = product.image; 
             document.getElementById('edit-desc').value = product.description || '';
+
+            // Generate clickable size/color buttons!
+            const variantContainer = document.getElementById('edit-dynamic-variants');
+            variantContainer.innerHTML = '';
+            let availableVariants = [];
+
+            if (primaryCategory === 'Luxury Abayas') availableVariants = ['52', '54', '56', '58', '60'];
+            else if (primaryCategory === 'Curated Hampers') availableVariants = ['Standard (10x8x4)', 'Large (12x10x6)'];
+            else if (primaryCategory === 'Premium Niqabs') availableVariants = ['5 inches', '7 inches', '9 inches', '12 inches', '24 inches'];
+            else if (primaryCategory === 'Essential Hijabs' || primaryCategory === 'Signature Accessories') {
+                availableVariants = product.colors || [];
+            }
+
+            const outVariants = product.stockOutVariants || [];
+
+            availableVariants.forEach(variant => {
+                const btn = document.createElement('button');
+                btn.type = 'button';
+                // If it is saved as out of stock, add the 'is-out' class so it turns red
+                btn.className = `action-btn variant-toggle-btn ${outVariants.includes(variant) ? 'is-out' : ''}`;
+                btn.textContent = variant;
+                btn.onclick = function() { this.classList.toggle('is-out'); }; // Toggle on click
+                variantContainer.appendChild(btn);
+            });
 
             document.getElementById('edit-modal').style.display = 'flex';
         };
@@ -1436,11 +1490,6 @@
             const title = document.getElementById('edit-title').value.trim();
             const basePrice = parseFloat(document.getElementById('edit-price').value);
             const discountPercent = parseFloat(document.getElementById('edit-discount').value) || 0; 
-            
-            // Grab edited variants
-            const outVariantsStr = document.getElementById('edit-out-variants').value;
-            const stockOutVariants = outVariantsStr ? outVariantsStr.split(',').map(s => s.trim()) : [];
-
             const rawImageUrl = document.getElementById('edit-image').value.trim();
             const desc = document.getElementById('edit-desc').value.trim();
 
@@ -1449,8 +1498,11 @@
             btn.innerText = "Saving..."; btn.disabled = true;
 
             try {
-                let finalPrice = basePrice; let originalPriceToSave = null; let categories = [category];
+                // Find all the buttons that are marked RED (out of stock)
+                const outVariantBtns = document.querySelectorAll('#edit-dynamic-variants .is-out');
+                const stockOutVariants = Array.from(outVariantBtns).map(b => b.textContent);
 
+                let finalPrice = basePrice; let originalPriceToSave = null; let categories = [category];
                 if (discountPercent > 0) {
                     finalPrice = basePrice - (basePrice * (discountPercent / 100)); 
                     originalPriceToSave = basePrice; 
@@ -1460,13 +1512,10 @@
                 const finalImage = rawImageUrl.includes('drive.google.com/thumbnail') ? rawImageUrl : convertDriveLink(rawImageUrl);
 
                 await updateDoc(doc(db, "products", id), {
-                    category: categories,
-                    title: title,
-                    price: finalPrice, 
-                    originalPrice: originalPriceToSave, 
-                    image: finalImage,
-                    description: desc,
-                    stockOutVariants: stockOutVariants // Save changes
+                    category: categories, title: title,
+                    price: finalPrice, originalPrice: originalPriceToSave, 
+                    image: finalImage, description: desc,
+                    stockOutVariants: stockOutVariants // Save the red buttons to the database!
                 });
 
                 closeEditModal(); loadInventory(); 
