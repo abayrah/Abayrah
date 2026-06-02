@@ -1083,33 +1083,50 @@
     if(searchOverlay) searchOverlay.addEventListener('click', (e) => { if (e.target === searchOverlay) closeSearch(); });
     if(searchInput) searchInput.addEventListener('input', (e) => filterProducts(e.target.value));
 
-   function filterProducts(term) {
-        const searchTerm = escapeHTML(term.toLowerCase().trim());
+ function filterProducts(term) {
+        // Removes the # just in case the customer types it
+        const searchTerm = escapeHTML(term.toLowerCase().trim()).replace('#', '');
         let matchCount = 0;
-        if (searchTerm.length > 0 && collectionsSection) collectionsSection.scrollIntoView({behavior: 'smooth', block: 'start'});
+        
+        if (searchTerm.length > 0 && typeof collectionsSection !== 'undefined' && collectionsSection) {
+            collectionsSection.scrollIntoView({behavior: 'smooth', block: 'start'});
+        }
 
-        categoryCards.forEach(card => {
-            const titleElement = card.querySelector('.category-name');
+        // NEW: Grab the LIVE products directly from the screen the moment you type
+        const liveCards = document.querySelectorAll('.category-card');
+
+        liveCards.forEach(card => {
+            // NEW: Look for the <h3> tag, which is what your Firebase products use for the title!
+            const titleElement = card.querySelector('h3') || card.querySelector('.category-name');
             const title = titleElement ? titleElement.textContent.toLowerCase() : '';
-            const keywords = card.getAttribute('data-keywords') ? card.getAttribute('data-keywords').toLowerCase() : '';
             
-            // NEW: Extract the Product ID (SKU) we attached to the card's HTML
+            const keywords = card.getAttribute('data-keywords') ? card.getAttribute('data-keywords').toLowerCase() : '';
             const prodId = card.getAttribute('data-id') ? card.getAttribute('data-id').toLowerCase() : '';
             
-            // NEW: Check if the search matches the title, keywords, OR the Product ID
+            // Check if title, keywords, or SKU matches
             if (title.includes(searchTerm) || keywords.includes(searchTerm) || prodId.includes(searchTerm)) { 
-                card.style.display = 'flex'; 
+                card.style.display = 'block'; 
                 matchCount++; 
             } else { 
                 card.style.display = 'none'; 
             }
         });
 
-        if (noResultsMsg) {
-            if (matchCount === 0 && searchTerm !== '') { noResultsMsg.style.display = 'block'; noResultsMsg.innerHTML = `No results found for "<strong>${searchTerm}</strong>"`; } 
-            else { noResultsMsg.style.display = 'none'; }
+        // Handle the "No Results" message safely
+        const noResults = document.getElementById('noResultsMsg') || (typeof noResultsMsg !== 'undefined' ? noResultsMsg : null);
+        if (noResults) {
+            if (matchCount === 0 && searchTerm !== '') { 
+                noResults.style.display = 'block'; 
+                noResults.innerHTML = `No results found for "<strong>${searchTerm}</strong>"`; 
+            } else { 
+                noResults.style.display = 'none'; 
+            }
         }
-        if (searchTerm === '') { categoryCards.forEach(card => card.style.display = 'flex'); }
+        
+        // If the search bar is cleared, show all live cards again
+        if (searchTerm === '') { 
+            liveCards.forEach(card => card.style.display = 'block'); 
+        }
     }
 
     const hamburgerBtn = document.getElementById('hamburgerBtn');
