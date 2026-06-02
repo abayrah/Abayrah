@@ -571,8 +571,9 @@
             </div>
         </section>
 
-        <section class="vault-sale-section" id="shop-sale">
-            <div class="vault-sale-banner" onclick="addSecureProductToCart('archive_sale', 1)">
+       <section class="vault-sale-section" id="shop-sale">
+            <!-- Changed onclick to open the store viewer instead of adding to cart -->
+            <div class="vault-sale-banner" onclick="openCategoryStore('Archive Sale', '50% Off Collection')">
                 <div class="vault-ambient-light"></div>
                 <div class="vault-promo-content">
                     <span class="vault-subtitle">The Archive Event</span>
@@ -581,7 +582,8 @@
                         <div class="vault-value-text">OFF</div>
                     </div>
                     <p class="vault-desc">Unlock exceptional savings on our most sought-after silhouettes.</p>
-                    <span class="vault-cta">Add to Cart</span>
+                    <!-- Changed the text from Add to Cart to View Collection -->
+                    <span class="vault-cta">View Collection</span>
                 </div>
             </div>
         </section>
