@@ -343,8 +343,21 @@
         .search-overlay { position: fixed; top: 0; left: 0; width: 100%; height: auto; background-color: rgba(255, 255, 255, 0.98); backdrop-filter: blur(10px); z-index: 9999; display: flex; justify-content: center; align-items: flex-start; opacity: 0; pointer-events: none; transition: all 0.4s ease; transform: translateY(-100%); box-shadow: 0 10px 30px rgba(0, 0, 0, 0.08); padding-bottom: 20px; }
         .search-overlay.active { opacity: 1; pointer-events: auto; transform: translateY(0); }
         .search-container { width: 100%; max-width: 800px; padding: 60px 40px 20px 40px; position: relative; text-align: center; }
-        #searchInput { width: 100%; padding: 15px 0; font-size: 28px; font-family: var(--font-serif); border: none; border-bottom: 2px solid var(--dark-text); background: transparent; outline: none; color: var(--dark-text); text-align: center; }
-        #searchInput::placeholder { color: var(--muted-gray); font-weight: 300; }
+       #searchInput { 
+            width: 100%; 
+            padding: 15px 0; 
+            font-size: 18px; /* Clean, readable size */
+            font-family: var(--font-sans); /* Swapped to the modern Montserrat font! */
+            font-weight: 400;
+            letter-spacing: 2px; /* Spaced out for a luxury feel */
+            border: none; 
+            border-bottom: 2px solid var(--dark-text); 
+            background: transparent; 
+            outline: none; 
+            color: var(--dark-text); 
+            text-align: center; 
+        }
+        #searchInput::placeholder { color: var(--muted-gray); font-weight: 300; font-style: italic; font-family: var(--font-serif); font-size: 24px; letter-spacing: 0; }
         .no-results-msg { margin-top: 20px; font-size: 16px; color: #E24C4C; font-family: var(--font-sans); letter-spacing: 1px; }
 
         .cart-overlay { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background-color: rgba(13, 12, 11, 0.6); backdrop-filter: blur(4px); z-index: 3000; opacity: 0; visibility: hidden; transition: var(--transition-smooth); }
@@ -1085,6 +1098,7 @@
 
 // --- LIVE DATABASE SEARCH LOGIC ---
 // --- LIVE DATABASE SEARCH LOGIC ---
+ // --- OMNI-SEARCH LOGIC (ALL-ROUNDER) ---
     window.cachedStoreProducts = null;
 
     window.filterProducts = async function(term) {
@@ -1127,8 +1141,54 @@
         let matchCount = 0;
         let resultsHTML = '';
 
+        // 🌟 1. SMART INTENT CARDS (Customer Care, Policies, Catalogs) 🌟
+        
+        // A. Customer Care / Contact
+        if (['care', 'contact', 'support', 'email', 'phone', 'number', 'help', 'customer support'].some(v => searchTerm.includes(v))) {
+            matchCount++;
+            resultsHTML += `
+                <div style="grid-column: 1 / -1; background: #1C1B1A; color: #fff; padding: 40px; text-align: center; border-radius: 2px; margin-bottom: 20px;">
+                    <h3 style="font-family: var(--font-serif); font-size: 28px; margin-bottom: 10px; color: var(--accent-gold); letter-spacing: 2px; text-transform: uppercase;">Concierge Support</h3>
+                    <p style="font-size: 13px; font-weight: 300; letter-spacing: 1px; margin-bottom: 20px; color: #ECEAE6;">We are here to assist you with your modest wardrobe needs.</p>
+                    <p style="font-size: 14px; font-weight: 500; letter-spacing: 1px;">Email: care@abayrah.com <br><br> WhatsApp / Phone: +91 78423 58753</p>
+                </div>
+            `;
+        }
+
+        // B. Exchange & Returns
+        if (['exchange', 'return', 'refund', 'policy'].some(v => searchTerm.includes(v))) {
+            matchCount++;
+            resultsHTML += `
+                <div style="grid-column: 1 / -1; background: #FAFAFA; border: 1px solid var(--border-color); padding: 40px; text-align: center; border-radius: 2px; margin-bottom: 20px;">
+                    <h3 style="font-family: var(--font-serif); font-size: 24px; margin-bottom: 15px; text-transform: uppercase; letter-spacing: 2px; color: var(--dark-text);">Exchange & Return Policy</h3>
+                    <p style="font-size: 13px; color: var(--muted-gray); line-height: 1.8; max-width: 700px; margin: 0 auto;">We offer a hassle-free 7-day exchange policy. Items must be unworn, unwashed, and retain all original tags. For hygiene and safety reasons, Niqabs and inner caps are non-returnable and non-exchangeable.</p>
+                </div>
+            `;
+        }
+
+        // C. Direct Catalog Links
+        const catalogShortcuts = [
+            { keywords: ['abaya', 'burqa'], title: 'Luxury Abayas', sub: 'The Complete Collection' },
+            { keywords: ['hamper', 'gift'], title: 'Curated Hampers', sub: 'Explore Gifting' },
+            { keywords: ['hijab', 'scarf'], title: 'Essential Hijabs', sub: 'The Complete Collection' },
+            { keywords: ['niqab', 'naqab', 'veil'], title: 'Premium Niqabs', sub: 'The Complete Collection' },
+            { keywords: ['accessory', 'accessories', 'pins', 'hijab pins', 'magnetic pins', 'hijab caps'], title: 'Signature Accessories', sub: 'Explore Finery' }
+        ];
+
+        catalogShortcuts.forEach(cat => {
+            if (cat.keywords.some(v => searchTerm.includes(v))) {
+                matchCount++;
+                resultsHTML += `
+                    <div style="grid-column: 1 / -1; padding: 25px; text-align: center; border: 1px solid var(--accent-gold); background: rgba(197, 168, 128, 0.03); cursor: pointer; margin-bottom: 20px; transition: 0.3s;" onmouseover="this.style.background='rgba(197, 168, 128, 0.1)'" onmouseout="this.style.background='rgba(197, 168, 128, 0.03)'" onclick="closeSearch(); openCategoryStore('${cat.title}', '${cat.sub}');">
+                        <h3 style="font-family: var(--font-serif); font-size: 22px; color: var(--dark-text); text-transform: uppercase; letter-spacing: 3px; margin-bottom: 8px;">View All ${cat.title} &rarr;</h3>
+                        <p style="font-size: 10px; color: var(--muted-gray); text-transform: uppercase; letter-spacing: 2px;">Click to explore the full collection</p>
+                    </div>
+                `;
+            }
+        });
+
+        // 🌟 2. PRODUCT DATABASE SEARCH (SKU, Title, Category) 🌟
         window.cachedStoreProducts.forEach(product => {
-            // 👇 NEW: Convert database ID to 6-digit search number 👇
             let hashVal = 0;
             for (let i = 0; i < product._docId.length; i++) { hashVal = product._docId.charCodeAt(i) + ((hashVal << 5) - hashVal); }
             const numericSku = (Math.abs(hashVal) % 900000 + 100000).toString();
@@ -1156,7 +1216,7 @@
                 const displayId = numericSku;
 
                 resultsHTML += `
-                    <div class="category-card product-result" data-id="${displayId}" onclick="openProduct('${escapeHTML(product._docId)}', '${escapeHTML(product.title||'').replace(/'/g, "\\'")}', ${price}, '${escapeHTML(product.description||'').replace(/'/g, "\\'")}', '${escapeHTML(product.image||'')}', ${originalPrice}, '${actualCategory}', '${colorsStr}', ${inStock}, '${stockOutVariantsStr}', '${displayId}')" style="background: var(--primary-bg); border: 1px solid var(--border-color); padding: 12px; border-radius: 2px; text-align: center; cursor: pointer;">
+                    <div class="category-card product-result" data-id="${displayId}" onclick="closeSearch(); openProduct('${escapeHTML(product._docId)}', '${escapeHTML(product.title||'').replace(/'/g, "\\'")}', ${price}, '${escapeHTML(product.description||'').replace(/'/g, "\\'")}', '${escapeHTML(product.image||'')}', ${originalPrice}, '${actualCategory}', '${colorsStr}', ${inStock}, '${stockOutVariantsStr}', '${displayId}')" style="background: var(--primary-bg); border: 1px solid var(--border-color); padding: 12px; border-radius: 2px; text-align: center; cursor: pointer;">
                         <div style="width: 100%; aspect-ratio: 3/4; background: #FAFAFA; overflow: hidden; margin-bottom: 15px; position:relative;">
                             ${outOfStockBadge}
                             <img src="${escapeHTML(product.image||'')}" style="position:absolute; top:0; left:0; width: 100%; height: 100%; object-fit: contain; transition: 0.5s; ${imgFilter}">
