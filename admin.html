@@ -1174,143 +1174,71 @@
 
 
 
+       // --- UPLOAD PRODUCT ---
         window.uploadProduct = async function() {
-
-
-
             const category = categoryInput.value;
-
-
-
             const title = titleInput.value.trim();
-
-
-
-            const price = parseFloat(priceInput.value);
-
-
-
+            const basePrice = parseFloat(priceInput.value);
+            const discountPercent = parseFloat(document.getElementById('prod-discount').value) || 0;
             const rawImageUrl = imageInput.value.trim();
-
-
-
             const desc = document.getElementById('prod-desc').value.trim();
-
-
-
             const submitBtn = document.getElementById('submit-btn');
-
-
-
             const successMsg = document.getElementById('success-msg');
 
-            if(!category || !title || isNaN(price) || !rawImageUrl || !desc) {
-
-
-
+            if(!category || !title || isNaN(basePrice) || !rawImageUrl || !desc) {
                 alert("Please select a catalog and fill in all fields before pushing to the store.");
-
-
-
                 return;
-
-
-
             }
 
-
             submitBtn.disabled = true;
-
-
-
             submitBtn.innerText = "Pushing to Vault...";
 
-
             try {
+                let finalPrice = basePrice;
+                let originalPriceToSave = null;
+                
+                // Always start by keeping it in its specific category
+                let categories = [category]; 
 
-
+                // 1. If there is ANY discount, calculate the new price
+                if (discountPercent > 0) {
+                    finalPrice = basePrice - (basePrice * (discountPercent / 100));
+                    originalPriceToSave = basePrice;
+                    
+                    // 2. ONLY if the discount is 50% or more, push it to the Archive Sale too!
+                    if (discountPercent >= 50) {
+                        categories.push("Archive Sale"); 
+                    }
+                }
 
                 await addDoc(collection(db, "products"), {
-
-
-
-                    category: category, 
-
-
-
+                    category: categories, // Saves the array correctly
                     title: title,
-
-
-
-                    price: price,
-
-
-
+                    price: finalPrice,
+                    originalPrice: originalPriceToSave,
                     image: convertDriveLink(rawImageUrl), 
-
-
-
                     description: desc,
-
-
-
                     inStock: true, 
-
-
-
                     createdAt: new Date().toISOString()
-
-
-
                 });
+                
                 successMsg.style.display = 'block';
-
-
-
                 submitBtn.disabled = false;
-
-
-
                 submitBtn.innerText = "Push to Live Store";
 
                 // Reset form
-
-
-
-                categoryInput.value = ''; titleInput.value = ''; priceInput.value = ''; imageInput.value = ''; document.getElementById('prod-desc').value = '';
-
-
-
+                categoryInput.value = ''; titleInput.value = ''; priceInput.value = ''; 
+                document.getElementById('prod-discount').value = '0';
+                imageInput.value = ''; document.getElementById('prod-desc').value = '';
                 previewCategory.textContent = 'Select Catalog'; previewTitle.textContent = 'Product Title'; previewPrice.textContent = '₹0.00';
-
-
-
                 previewImage.src = ''; previewImage.style.display = 'none'; previewImgText.style.display = 'block';
 
                 setTimeout(() => { successMsg.style.display = 'none'; }, 4000);
-
-
-
             } catch (error) {
-
-
-
                 alert("Error adding product. Please try again.");
-
-
-
                 submitBtn.disabled = false;
-
-
-
                 submitBtn.innerText = "Push to Live Store";
-
-
-
             }
-
-
-
         };
 
         // --- FETCH & RENDER INVENTORY ---
@@ -1497,14 +1425,15 @@
 
         };
 
-       window.saveEditedProduct = async function(event) {
+     // --- EDIT PRODUCT LOGIC (SAVE) ---
+        window.saveEditedProduct = async function(event) {
             const id = document.getElementById('edit-doc-id').value;
             const btn = event.target;
 
             const category = document.getElementById('edit-category').value;
             const title = document.getElementById('edit-title').value.trim();
             const basePrice = parseFloat(document.getElementById('edit-price').value);
-            const discountPercent = parseFloat(document.getElementById('edit-discount').value) || 0; // Gets the discount %
+            const discountPercent = parseFloat(document.getElementById('edit-discount').value) || 0; 
             const rawImageUrl = document.getElementById('edit-image').value.trim();
             const desc = document.getElementById('edit-desc').value.trim();
 
@@ -1517,22 +1446,29 @@
             btn.disabled = true;
 
             try {
-                // Calculate final selling price based on discount
                 let finalPrice = basePrice;
                 let originalPriceToSave = null;
+                
+                // Always start by keeping it in its specific category
+                let categories = [category];
 
+                // 1. If there is ANY discount, calculate the new price
                 if (discountPercent > 0) {
-                    finalPrice = basePrice - (basePrice * (discountPercent / 100)); // Math: 999 - 20% = 799.20
-                    originalPriceToSave = basePrice; // Save the high M.R.P to show strikethrough
+                    finalPrice = basePrice - (basePrice * (discountPercent / 100)); 
+                    originalPriceToSave = basePrice; 
+                    
+                    // 2. ONLY if the discount is 50% or more, push it to the Archive Sale too!
+                    if (discountPercent >= 50) {
+                        categories.push("Archive Sale"); 
+                    }
                 }
 
                 const finalImage = rawImageUrl.includes('drive.google.com/thumbnail') 
                     ? rawImageUrl 
                     : convertDriveLink(rawImageUrl);
 
-                // Update the database with both the final price and original price
                 await updateDoc(doc(db, "products", id), {
-                    category: category,
+                    category: categories, // Updates the array correctly
                     title: title,
                     price: finalPrice, 
                     originalPrice: originalPriceToSave, 
@@ -1541,7 +1477,7 @@
                 });
 
                 closeEditModal();
-                loadInventory(); // Refresh the UI to show changes
+                loadInventory(); 
             } catch (error) {
                 console.error("Error updating product:", error);
                 alert("Error updating product. Check console for details.");
@@ -1550,7 +1486,6 @@
                 btn.disabled = false;
             }
         };
-
 
     </script>
 </body>
