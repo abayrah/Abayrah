@@ -1083,9 +1083,10 @@
     if(searchOverlay) searchOverlay.addEventListener('click', (e) => { if (e.target === searchOverlay) closeSearch(); });
     if(searchInput) searchInput.addEventListener('input', (e) => filterProducts(e.target.value));
 
-window.cachedStoreProducts = null;
+// --- LIVE DATABASE SEARCH LOGIC ---
+    window.cachedStoreProducts = null;
 
-    async function filterProducts(term) {
+    window.filterProducts = async function(term) {
         // Removes the # and spaces
         const searchTerm = escapeHTML(term.toLowerCase().trim()).replace('#', '');
         
@@ -1116,6 +1117,7 @@ window.cachedStoreProducts = null;
         // Fetch the whole catalog from Firebase ONCE per visit to save your free reads!
         if (!window.cachedStoreProducts) {
             try {
+                // IT CAN NOW SEE getDocs AND db SUCCESSFULLY!
                 const querySnapshot = await getDocs(collection(db, "products"));
                 window.cachedStoreProducts = [];
                 querySnapshot.forEach(docSnap => {
@@ -1130,13 +1132,11 @@ window.cachedStoreProducts = null;
         let matchCount = 0;
         let resultsHTML = '';
 
-        // Search through the cached database memory
         window.cachedStoreProducts.forEach(product => {
             const title = (product.title || '').toLowerCase();
             const sku = product._docId.substring(0,8).toLowerCase();
             const categoryName = Array.isArray(product.category) ? product.category.join(' ').toLowerCase() : (product.category || '').toLowerCase();
 
-            // If the Title, SKU, or Category matches what the user typed:
             if (title.includes(searchTerm) || sku.includes(searchTerm) || categoryName.includes(searchTerm)) {
                 matchCount++;
                 const price = parseFloat(product.price) || 0;
@@ -1156,7 +1156,6 @@ window.cachedStoreProducts = null;
                 const outOfStockBadge = inStock ? "" : `<div style="position: absolute; top: 50%; left: 50%; transform: translate(-50%, -50%); background: rgba(28,27,26,0.85); color: #fff; padding: 8px 15px; font-size: 10px; letter-spacing: 3px; text-transform: uppercase; z-index: 10;">Sold Out</div>`;
                 const displayId = product._docId.substring(0,8).toUpperCase();
 
-                // Inject the product card onto the screen dynamically (adding the .product-result class)
                 resultsHTML += `
                     <div class="category-card product-result" data-id="${displayId}" onclick="openProduct('${escapeHTML(product._docId)}', '${escapeHTML(product.title||'').replace(/'/g, "\\'")}', ${price}, '${escapeHTML(product.description||'').replace(/'/g, "\\'")}', '${escapeHTML(product.image||'')}', ${originalPrice}, '${actualCategory}', '${colorsStr}', ${inStock}, '${stockOutVariantsStr}', '${displayId}')" style="background: var(--primary-bg); border: 1px solid var(--border-color); padding: 12px; border-radius: 2px; text-align: center; cursor: pointer;">
                         <div style="width: 100%; aspect-ratio: 3/4; background: #FAFAFA; overflow: hidden; margin-bottom: 15px; position:relative;">
@@ -1170,21 +1169,18 @@ window.cachedStoreProducts = null;
             }
         });
 
-        if (productsContainer) {
-            productsContainer.innerHTML = resultsHTML;
-        }
+        if (productsContainer) productsContainer.innerHTML = resultsHTML;
 
-        // Handle the 'No Results' Message
-        if (noResults) {
+        const noResMsg = document.getElementById('noResultsMsg');
+        if (noResMsg) {
             if (matchCount === 0) { 
-                noResults.style.display = 'block'; 
-                noResults.innerHTML = `No results found for "<strong>${searchTerm}</strong>"`; 
+                noResMsg.style.display = 'block'; 
+                noResMsg.innerHTML = `No results found for "<strong>${searchTerm}</strong>"`; 
             } else { 
-                noResults.style.display = 'none'; 
+                noResMsg.style.display = 'none'; 
             }
         }
-    }
-       
+    };
     
 
     const hamburgerBtn = document.getElementById('hamburgerBtn');
