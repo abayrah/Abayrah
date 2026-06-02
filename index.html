@@ -2153,6 +2153,7 @@ window.closeCheckoutModal = function() {
                         alert("Payment Successful! Your modest wardrobe statement order has been placed.");
                         document.getElementById('checkoutModal').classList.remove('active');
                         document.getElementById('catalogs').scrollIntoView({behavior: 'smooth'});
+                        },
                     "prefill": {
                         "name": `${savedShippingData.firstName} ${savedShippingData.lastName}`,
                         "email": savedShippingData.email,
