@@ -740,11 +740,10 @@
                     </div>
                     <p class="welcome-text">View all live products across all catalogs, toggle their availability, or permanently remove them.</p>
                     
-                    <!-- SEARCH & FILTER BAR -->
                     <div style="display: flex; gap: 20px; max-width: 700px; margin-bottom: 25px;">
                         <div class="form-group" style="flex: 1; margin-bottom: 0;">
-                            <label>Filter by Catalog</label>
-                            <select id="filter-category" onchange="loadInventory()">
+                            <label style="font-size: 10px; letter-spacing: 1px; color: var(--muted-gray); text-transform: uppercase;">Filter by Catalog</label>
+                            <select id="filter-category" onchange="loadInventory()" style="width: 100%; padding: 12px; border: 1px solid var(--border-color); background: #fafafa; font-family: var(--font-sans); font-size: 13px;">
                                 <option value="all" selected>All Products</option>
                                 <option value="Luxury Abayas">Abayas</option>
                                 <option value="Curated Hampers">Hampers</option>
@@ -754,21 +753,15 @@
                             </select>
                         </div>
                         <div class="form-group" style="flex: 1; margin-bottom: 0;">
-                            <label>Search by Title or SKU</label>
-                            <input type="text" id="search-inventory" placeholder="e.g. Silk Abaya or 7AX8BY9Z" oninput="filterInventoryList()">
+                            <label style="font-size: 10px; letter-spacing: 1px; color: var(--muted-gray); text-transform: uppercase;">Search by Title or SKU</label>
+                            <input type="text" id="search-inventory" placeholder="e.g. Silk Abaya or 7AX8BY9Z" oninput="filterInventoryList()" style="width: 100%; padding: 12px; border: 1px solid var(--border-color); background: #fafafa; font-family: var(--font-sans); font-size: 13px;">
                         </div>
                     </div> 
 
-                    <!-- THIS IS THE LIST CONTAINER THAT GOT DELETED -->
-                    <div id="inventory-list" class="inventory-list"></div>
+                    <div id="inventory-list" class="inventory-list" style="margin-top: 20px;"></div>
                     
                 </div>
             </div>
-
-                    <div id="inventory-list" class="inventory-list"></div>
-                </div>
-            </div>
-
 
         </div>
 
