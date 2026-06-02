@@ -1143,18 +1143,17 @@
 
         // 🌟 1. SMART INTENT CARDS (Customer Care, Policies, Catalogs) 🌟
         
-        // A. Customer Care / Contact
-        if (['care', 'contact', 'support', 'email', 'phone', 'number', 'help', 'customer support'].some(v => searchTerm.includes(v))) {
+      // A. Customer Care / Contact
+        if (['care', 'contact', 'support', 'email', 'phone', 'number', 'help', 'whatsapp'].some(v => searchTerm.includes(v))) {
             matchCount++;
             resultsHTML += `
                 <div style="grid-column: 1 / -1; background: #1C1B1A; color: #fff; padding: 40px; text-align: center; border-radius: 2px; margin-bottom: 20px;">
                     <h3 style="font-family: var(--font-serif); font-size: 28px; margin-bottom: 10px; color: var(--accent-gold); letter-spacing: 2px; text-transform: uppercase;">Concierge Support</h3>
                     <p style="font-size: 13px; font-weight: 300; letter-spacing: 1px; margin-bottom: 20px; color: #ECEAE6;">We are here to assist you with your modest wardrobe needs.</p>
-                    <p style="font-size: 14px; font-weight: 500; letter-spacing: 1px;">Email: care@abayrah.com <br><br> WhatsApp / Phone: +91 78423 58753</p>
+                    <p style="font-size: 14px; font-weight: 500; letter-spacing: 1px;">Email: Abayrah.18@gmail.com <br><br> WhatsApp & Phone: +91 7842358753</p>
                 </div>
             `;
         }
-
         // B. Exchange & Returns
         if (['exchange', 'return', 'refund', 'policy'].some(v => searchTerm.includes(v))) {
             matchCount++;
