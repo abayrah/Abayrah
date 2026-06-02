@@ -732,14 +732,15 @@
                     </div>
                     <p class="welcome-text">View all live products across all catalogs, toggle their availability, or permanently remove them.</p>
                     
-                    <!-- NEW CATEGORY FILTER DROPDOWN -->
-                   <div id="view-manage" style="display: none;">
+                   <!-- MANAGE INVENTORY VIEW -->
+            <div id="view-manage" style="display: none;">
                 <div class="admin-form-section" style="width: 100%;">
                     <div class="admin-header">
                         <h2>Inventory Management</h2>
                     </div>
                     <p class="welcome-text">View all live products across all catalogs, toggle their availability, or permanently remove them.</p>
                     
+                    <!-- SEARCH & FILTER BAR -->
                     <div style="display: flex; gap: 20px; max-width: 700px; margin-bottom: 25px;">
                         <div class="form-group" style="flex: 1; margin-bottom: 0;">
                             <label>Filter by Catalog</label>
@@ -757,7 +758,10 @@
                             <input type="text" id="search-inventory" placeholder="e.g. Silk Abaya or 7AX8BY9Z" oninput="filterInventoryList()">
                         </div>
                     </div> 
+
+                    <!-- THIS IS THE LIST CONTAINER THAT GOT DELETED -->
                     <div id="inventory-list" class="inventory-list"></div>
+                    
                 </div>
             </div>
 
