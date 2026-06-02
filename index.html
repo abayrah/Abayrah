@@ -218,6 +218,48 @@
         .category-grid { display: grid; grid-template-columns: repeat(5, 1fr); gap: 24px; width: 100%; max-width: 1480px; margin: 0 auto; box-sizing: border-box; }
         .category-card { position: relative; width: 100%; background-color: var(--primary-bg); border: 1px solid var(--border-color); padding: 12px; cursor: pointer; border-radius: 2px; display: flex; flex-direction: column; transform: translate3d(0,0,0); transition: all 0.7s cubic-bezier(0.16, 1, 0.3, 1); }
         .img-wrapper { width: 100%; aspect-ratio: 3 / 4; overflow: hidden; position: relative; background-color: #FAFAFA; }
+        /* --- SHIPPING ADDRESS POPUP STYLING --- */
+.address-popup {
+    display: none; 
+    position: absolute; 
+    top: 100%; 
+    left: 0; 
+    background: #FFFFFF; 
+    border: 1px solid var(--border-color); 
+    padding: 20px; 
+    border-radius: 2px; 
+    box-shadow: 0 10px 30px rgba(0,0,0,0.15); 
+    z-index: 100; 
+    width: 260px; 
+    margin-top: 10px; 
+    text-transform: none; 
+    font-size: 12px; 
+    line-height: 1.6; 
+    color: var(--dark-text);
+    text-align: left;
+}
+
+/* Arrow pointer to indicate the trigger link */
+.address-popup::before {
+    content: '';
+    position: absolute;
+    top: -6px;
+    left: 20px;
+    width: 10px;
+    height: 10px;
+    background: #FFFFFF;
+    border-top: 1px solid var(--border-color);
+    border-left: 1px solid var(--border-color);
+    transform: rotate(45deg);
+}
+
+.address-popup-header {
+    display: flex; 
+    justify-content: space-between; 
+    margin-bottom: 12px; 
+    border-bottom: 1px solid var(--border-color); 
+    padding-bottom: 8px;
+}
         
         /* --- Synchronized Sliding CSS --- */
         .category-img { 
@@ -2385,24 +2427,27 @@ window.viewItemFromOrder = async function(productId) {
                                 <div><div style="margin-bottom: 4px;">Order Placed</div><strong style="color: var(--dark-text); font-size: 12px;">${formattedDate}</strong></div>
                                 <div><div style="margin-bottom: 4px;">Total</div><strong style="color: var(--dark-text); font-size: 12px;">₹${parseFloat(order.amount).toFixed(2)}</strong></div>
                                 
-                                <div style="position: relative;">
-                                    <div style="margin-bottom: 4px;">Ship To</div>
-                                    <strong onclick="toggleAddressPopup('${order.id}')" style="color: var(--dark-text); font-size: 12px; cursor: pointer; text-decoration: underline; text-underline-offset: 3px;">${shipFirstName} ▾</strong>
-                                    
-                                    <div id="address-popup-${order.id}" class="address-popup" style="display: none; position: absolute; top: 100%; left: 0; background: #fff; border: 1px solid var(--border-color); padding: 15px; border-radius: 4px; box-shadow: 0 5px 25px rgba(0,0,0,0.15); z-index: 100; width: 220px; margin-top: 8px; text-transform: none; font-size: 11px; line-height: 1.6; color: var(--dark-text);">
-                                        <div style="display: flex; justify-content: space-between; margin-bottom: 8px; border-bottom: 1px solid var(--border-color); padding-bottom: 6px;">
-                                            <strong style="font-size: 12px; font-family: var(--font-sans);">${shipFullName}</strong>
-                                            <span onclick="toggleAddressPopup('${order.id}')" style="cursor: pointer; font-size: 16px; line-height: 1; color: var(--muted-gray);">&times;</span>
-                                        </div>
-                                        <div>
-                                            ${addressLine1}<br>
-                                            ${addressLine2}<br>
-                                            ${zipCode}<br>
-                                            India
-                                        </div>
-                                    </div>
-                                </div>
-
+                               <div style="position: relative; display: inline-block;">
+    
+    <strong onclick="toggleAddressPopup('${order.id}')" 
+            style="color: var(--dark-text); font-size: 12px; cursor: pointer; text-decoration: underline; text-underline-offset: 3px;">
+        ${shipFirstName} ▾
+    </strong>
+    
+    <div id="address-popup-${order.id}" class="address-popup">
+        <div class="address-popup-header">
+            <strong style="font-size: 13px; font-family: var(--font-serif); text-transform: uppercase;">Shipping To</strong>
+            <span onclick="toggleAddressPopup('${order.id}')" style="cursor: pointer; font-size: 18px; line-height: 1; color: var(--muted-gray);">&times;</span>
+        </div>
+        <div>
+            <strong style="font-size: 13px; color: var(--dark-text);">${shipFullName}</strong><br>
+            ${addressLine1}<br>
+            ${addressLine2}<br>
+            <strong>PIN:</strong> ${zipCode}<br>
+            India
+        </div>
+    </div>
+</div>
                             </div>
                             <div style="text-align: right;">
                                 <div style="margin-bottom: 4px;">Order # ${displayOrderId}</div>
