@@ -620,6 +620,12 @@
     <input type="number" id="prod-discount" placeholder="e.g. 20 (Leave 0 for no discount)" value="0" min="0" max="100">
 </div>
 
+<div class="form-group">
+    <label>Out of Stock Variants (Sizes/Colors)</label>
+    <input type="text" id="prod-out-variants" class="out-stock-input" placeholder="e.g. 54, 56, Dusty Rose (Leave blank if all in stock)">
+</div>
+
+
 
                     <div class="form-group">
 
@@ -807,10 +813,17 @@
     <label>Discount Percentage (%)</label>
     <input type="number" id="edit-discount" placeholder="e.g. 20" value="0" min="0" max="100">
 </div>
+
+<div class="form-group">
+    <label>Out of Stock Variants (Sizes/Colors)</label>
+    <input type="text" id="edit-out-variants" class="out-stock-input" placeholder="e.g. 54, 56, Dusty Rose (Leave blank if all in stock)">
+</div>
 <div class="form-group">
     <label>Image Link</label>
     <input type="text" id="edit-image" required>
-</div>                <div class="form-group">
+</div>
+                
+                <div class="form-group">
 
 
 
@@ -1170,11 +1183,7 @@
 
         });
 
-        // --- UPLOAD PRODUCT ---
-
-
-
-       // --- UPLOAD PRODUCT ---
+    // --- UPLOAD PRODUCT ---
         window.uploadProduct = async function() {
             const category = categoryInput.value;
             const title = titleInput.value.trim();
@@ -1182,62 +1191,53 @@
             const discountPercent = parseFloat(document.getElementById('prod-discount').value) || 0;
             const rawImageUrl = imageInput.value.trim();
             const desc = document.getElementById('prod-desc').value.trim();
+            
+            // Grab the out of stock variants and turn them into an array
+            const outVariantsStr = document.getElementById('prod-out-variants').value;
+            const stockOutVariants = outVariantsStr ? outVariantsStr.split(',').map(s => s.trim()) : [];
+
             const submitBtn = document.getElementById('submit-btn');
             const successMsg = document.getElementById('success-msg');
 
             if(!category || !title || isNaN(basePrice) || !rawImageUrl || !desc) {
-                alert("Please select a catalog and fill in all fields before pushing to the store.");
-                return;
+                alert("Please fill in all fields."); return;
             }
 
-            submitBtn.disabled = true;
-            submitBtn.innerText = "Pushing to Vault...";
+            submitBtn.disabled = true; submitBtn.innerText = "Pushing to Vault...";
 
             try {
                 let finalPrice = basePrice;
                 let originalPriceToSave = null;
-                
-                // Always start by keeping it in its specific category
                 let categories = [category]; 
 
-                // 1. If there is ANY discount, calculate the new price
                 if (discountPercent > 0) {
                     finalPrice = basePrice - (basePrice * (discountPercent / 100));
                     originalPriceToSave = basePrice;
-                    
-                    // 2. ONLY if the discount is 50% or more, push it to the Archive Sale too!
-                    if (discountPercent >= 50) {
-                        categories.push("Archive Sale"); 
-                    }
+                    if (discountPercent >= 50) categories.push("Archive Sale"); 
                 }
 
                 await addDoc(collection(db, "products"), {
-                    category: categories, // Saves the array correctly
+                    category: categories, 
                     title: title,
                     price: finalPrice,
                     originalPrice: originalPriceToSave,
                     image: convertDriveLink(rawImageUrl), 
                     description: desc,
-                    inStock: true, 
+                    inStock: true, // Master switch for the WHOLE product
+                    stockOutVariants: stockOutVariants, // List of specific sizes/colors out of stock
                     createdAt: new Date().toISOString()
                 });
                 
-                successMsg.style.display = 'block';
-                submitBtn.disabled = false;
-                submitBtn.innerText = "Push to Live Store";
-
+                successMsg.style.display = 'block'; submitBtn.disabled = false; submitBtn.innerText = "Push to Live Store";
                 // Reset form
                 categoryInput.value = ''; titleInput.value = ''; priceInput.value = ''; 
-                document.getElementById('prod-discount').value = '0';
+                document.getElementById('prod-discount').value = '0'; document.getElementById('prod-out-variants').value = '';
                 imageInput.value = ''; document.getElementById('prod-desc').value = '';
                 previewCategory.textContent = 'Select Catalog'; previewTitle.textContent = 'Product Title'; previewPrice.textContent = '₹0.00';
                 previewImage.src = ''; previewImage.style.display = 'none'; previewImgText.style.display = 'block';
-
                 setTimeout(() => { successMsg.style.display = 'none'; }, 4000);
             } catch (error) {
-                alert("Error adding product. Please try again.");
-                submitBtn.disabled = false;
-                submitBtn.innerText = "Push to Live Store";
+                alert("Error adding product."); submitBtn.disabled = false; submitBtn.innerText = "Push to Live Store";
             }
         };
 
@@ -1391,16 +1391,14 @@
 
         // --- EDIT PRODUCT LOGIC ---
 
-       window.openEditModal = function(id) {
+     // --- EDIT MODAL ---
+        window.openEditModal = function(id) {
             const product = window.allProductsData[id];
             if(!product) return;
 
             document.getElementById('edit-doc-id').value = id;
-            
-            // Get the primary category (index 0) if it's an array
             const primaryCategory = Array.isArray(product.category) ? product.category[0] : (product.category || 'Luxury Abayas');
             document.getElementById('edit-category').value = primaryCategory;
-            
             document.getElementById('edit-title').value = product.title;
             
             const basePrice = product.originalPrice ? product.originalPrice : product.price;
@@ -1411,6 +1409,10 @@
                 existingDiscount = Math.round(((product.originalPrice - product.price) / product.originalPrice) * 100);
             }
             document.getElementById('edit-discount').value = existingDiscount;
+            
+            // Load existing out of stock variants
+            document.getElementById('edit-out-variants').value = product.stockOutVariants ? product.stockOutVariants.join(', ') : '';
+
             document.getElementById('edit-image').value = product.image; 
             document.getElementById('edit-desc').value = product.description || '';
 
@@ -1427,65 +1429,51 @@
 
         };
 
-     // --- EDIT PRODUCT LOGIC (SAVE) ---
-        window.saveEditedProduct = async function(event) {
+   window.saveEditedProduct = async function(event) {
             const id = document.getElementById('edit-doc-id').value;
             const btn = event.target;
-
             const category = document.getElementById('edit-category').value;
             const title = document.getElementById('edit-title').value.trim();
             const basePrice = parseFloat(document.getElementById('edit-price').value);
             const discountPercent = parseFloat(document.getElementById('edit-discount').value) || 0; 
+            
+            // Grab edited variants
+            const outVariantsStr = document.getElementById('edit-out-variants').value;
+            const stockOutVariants = outVariantsStr ? outVariantsStr.split(',').map(s => s.trim()) : [];
+
             const rawImageUrl = document.getElementById('edit-image').value.trim();
             const desc = document.getElementById('edit-desc').value.trim();
 
-            if(!title || isNaN(basePrice) || !rawImageUrl || !desc) {
-                alert("Please fill in all fields.");
-                return;
-            }
+            if(!title || isNaN(basePrice) || !rawImageUrl || !desc) { alert("Fill in all fields."); return; }
 
-            btn.innerText = "Saving...";
-            btn.disabled = true;
+            btn.innerText = "Saving..."; btn.disabled = true;
 
             try {
-                let finalPrice = basePrice;
-                let originalPriceToSave = null;
-                
-                // Always start by keeping it in its specific category
-                let categories = [category];
+                let finalPrice = basePrice; let originalPriceToSave = null; let categories = [category];
 
-                // 1. If there is ANY discount, calculate the new price
                 if (discountPercent > 0) {
                     finalPrice = basePrice - (basePrice * (discountPercent / 100)); 
                     originalPriceToSave = basePrice; 
-                    
-                    // 2. ONLY if the discount is 50% or more, push it to the Archive Sale too!
-                    if (discountPercent >= 50) {
-                        categories.push("Archive Sale"); 
-                    }
+                    if (discountPercent >= 50) categories.push("Archive Sale"); 
                 }
 
-                const finalImage = rawImageUrl.includes('drive.google.com/thumbnail') 
-                    ? rawImageUrl 
-                    : convertDriveLink(rawImageUrl);
+                const finalImage = rawImageUrl.includes('drive.google.com/thumbnail') ? rawImageUrl : convertDriveLink(rawImageUrl);
 
                 await updateDoc(doc(db, "products", id), {
-                    category: categories, // Updates the array correctly
+                    category: categories,
                     title: title,
                     price: finalPrice, 
                     originalPrice: originalPriceToSave, 
                     image: finalImage,
-                    description: desc
+                    description: desc,
+                    stockOutVariants: stockOutVariants // Save changes
                 });
 
-                closeEditModal();
-                loadInventory(); 
+                closeEditModal(); loadInventory(); 
             } catch (error) {
-                console.error("Error updating product:", error);
-                alert("Error updating product. Check console for details.");
+                alert("Error updating product.");
             } finally {
-                btn.innerText = "Save Changes";
-                btn.disabled = false;
+                btn.innerText = "Save Changes"; btn.disabled = false;
             }
         };
 
