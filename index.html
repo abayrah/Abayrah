@@ -1613,8 +1613,12 @@ window.currentCategoryListener = null;
                     const imgFilter = inStock ? "" : "filter: grayscale(100%); opacity: 0.6;";
                     const outOfStockBadge = inStock ? "" : `<div style="position: absolute; top: 50%; left: 50%; transform: translate(-50%, -50%); background: rgba(28,27,26,0.85); color: #fff; padding: 8px 15px; font-size: 10px; letter-spacing: 3px; text-transform: uppercase; z-index: 10;">Sold Out</div>`;
 
+                    // 👇 NEW: GENERATE THE SKU 👇
+                    const displayId = docSnap.id.substring(0,8).toUpperCase();
+
+                    // 👇 NEW: Added data-id and passed displayId to openProduct 👇
                     productsContainer.insertAdjacentHTML('beforeend', `
-                        <div class="category-card" onclick="openProduct('${escapeHTML(docSnap.id)}', '${escapeHTML(product.title||'').replace(/'/g, "\\'")}', ${price}, '${escapeHTML(product.description||'').replace(/'/g, "\\'")}', '${escapeHTML(product.image||'')}', ${originalPrice}, '${actualCategory}', '${colorsStr}', ${inStock}, '${stockOutVariantsStr}')" style="background: var(--primary-bg); border: 1px solid var(--border-color); padding: 12px; border-radius: 2px; text-align: center; cursor: pointer;">
+                        <div class="category-card" data-id="${displayId}" onclick="openProduct('${escapeHTML(docSnap.id)}', '${escapeHTML(product.title||'').replace(/'/g, "\\'")}', ${price}, '${escapeHTML(product.description||'').replace(/'/g, "\\'")}', '${escapeHTML(product.image||'')}', ${originalPrice}, '${actualCategory}', '${colorsStr}', ${inStock}, '${stockOutVariantsStr}', '${displayId}')" style="background: var(--primary-bg); border: 1px solid var(--border-color); padding: 12px; border-radius: 2px; text-align: center; cursor: pointer;">
                             <div style="width: 100%; aspect-ratio: 3/4; background: #FAFAFA; overflow: hidden; margin-bottom: 15px; position:relative;">
                                 ${outOfStockBadge}
                                 <img src="${escapeHTML(product.image||'')}" style="position:absolute; top:0; left:0; width: 100%; height: 100%; object-fit: contain; transition: 0.5s; ${imgFilter}">
@@ -1631,11 +1635,17 @@ window.currentCategoryListener = null;
     }
 window.currentProductListener = null;
 
-    window.openProduct = function(id, title, price, description, imageSrc, originalPrice, category, colorsStr, initialInStock, initialStockOutVariantsStr) {
+   window.currentProductListener = null;
+
+    // 👇 NEW: Added displayId to the end of this line 👇
+    window.openProduct = function(id, title, price, description, imageSrc, originalPrice, category, colorsStr, initialInStock, initialStockOutVariantsStr, displayId) {
         document.getElementById('collection-view').style.display = 'none';
         document.getElementById('product-detail-view').style.display = 'block';
         document.getElementById('dynamic-main-title').style.display = 'none'; 
         if(document.getElementById('product-quantity')) document.getElementById('product-quantity').value = 1;
+
+        // 👇 NEW: Display the SKU on the page! 👇
+        if(document.getElementById('detail-product-id')) document.getElementById('detail-product-id').textContent = 'SKU: #' + displayId;
 
         if (window.currentProductListener) window.currentProductListener();
 
@@ -1734,7 +1744,6 @@ window.currentProductListener = null;
             document.getElementById('detail-desc').textContent = product.description || description;
             document.getElementById('detail-image').src = product.image || imageSrc;
             
-            // FIXED SYNTAX ERROR HERE (Removed the extra slashes causing the crash)
             const addToCartBtn = document.querySelector('button[onclick="addCurrentProductToCart()"]');
             const buyNowBtn = document.querySelector('button[onclick="addCurrentProductToCart(); setTimeout(() => document.getElementById(\'cartIconBtn\').click(), 200);"]');
             
@@ -1779,7 +1788,6 @@ window.currentProductListener = null;
             isFirstLoad = false;
         });
     };
-
 // 1. Function to open the checkout modal
 window.openCheckoutModal = function() {
     // Require user to be logged in
