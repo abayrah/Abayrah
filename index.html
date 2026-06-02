@@ -1563,187 +1563,224 @@
         document.getElementById('catalogs').scrollIntoView({ behavior: 'smooth' });
     };
 
-   async function loadProducts(categoryFilter) {
+window.currentCategoryListener = null;
+
+    async function loadProducts(categoryFilter) {
         const productsContainer = document.getElementById('collection-view');
         if(!productsContainer) return;
+
+        // Disconnect from the previous category if the user switches pages
+        if (window.currentCategoryListener) window.currentCategoryListener();
+
         try {
             const q = query(collection(db, "products"), where("category", "array-contains", categoryFilter));
-            const querySnapshot = await getDocs(q);
-            productsContainer.innerHTML = ''; 
-            if(querySnapshot.empty) { productsContainer.innerHTML = `<p style="text-align: center; width: 100%; color: var(--muted-gray);">No products available.</p>`; return; }
 
-            querySnapshot.forEach((docSnap) => {
-                const product = docSnap.data();
-                const price = parseFloat(product.price) || 0;
-                const originalPrice = parseFloat(product.originalPrice) || null; 
-                const colorsStr = product.colors ? escapeHTML(product.colors.join(',')) : ''; 
-                
-                // NEW: Stock checks
-                const inStock = product.inStock !== false; 
-                const stockOutVariantsStr = product.stockOutVariants ? escapeHTML(product.stockOutVariants.join(',')) : '';
+            // NEW: onSnapshot actively listens to the database live!
+            window.currentCategoryListener = onSnapshot(q, (querySnapshot) => {
+                productsContainer.innerHTML = ''; 
+                if(querySnapshot.empty) { productsContainer.innerHTML = `<p style="text-align: center; width: 100%; color: var(--muted-gray);">No products available.</p>`; return; }
 
-                let actualCategory = categoryFilter;
-                if (Array.isArray(product.category)) {
-                    actualCategory = product.category.find(c => c !== "Archive Sale") || 'Luxury Abayas';
-                } else { actualCategory = product.category || 'Luxury Abayas'; }
+                querySnapshot.forEach((docSnap) => {
+                    const product = docSnap.data();
+                    const price = parseFloat(product.price) || 0;
+                    const originalPrice = parseFloat(product.originalPrice) || null; 
+                    const colorsStr = product.colors ? escapeHTML(product.colors.join(',')) : ''; 
+                    
+                    const inStock = product.inStock !== false; 
+                    const stockOutVariantsStr = product.stockOutVariants ? escapeHTML(product.stockOutVariants.join(',')) : '';
 
-                let priceDisplay = `<p style="font-size: 11px; color: var(--muted-gray); font-weight: 500;">₹${price.toFixed(2)}</p>`;
-                if (originalPrice && originalPrice > price) {
-                    priceDisplay = `<div style="display: flex; justify-content: center; gap: 6px;"><p style="font-size: 11px; color: var(--muted-gray); text-decoration: line-through;">₹${originalPrice.toFixed(2)}</p><p style="font-size: 11px; color: #CC0C39; font-weight: 600;">₹${price.toFixed(2)}</p></div>`;
-                }
-                
-                // NEW: Apply Black and White Filter and Overlay if Whole Product is Out of Stock
-                const imgFilter = inStock ? "" : "filter: grayscale(100%); opacity: 0.6;";
-                const outOfStockBadge = inStock ? "" : `<div style="position: absolute; top: 50%; left: 50%; transform: translate(-50%, -50%); background: rgba(28,27,26,0.85); color: #fff; padding: 8px 15px; font-size: 10px; letter-spacing: 3px; text-transform: uppercase; z-index: 10;">Sold Out</div>`;
+                    let actualCategory = categoryFilter;
+                    if (Array.isArray(product.category)) {
+                        actualCategory = product.category.find(c => c !== "Archive Sale") || 'Luxury Abayas';
+                    } else {
+                        actualCategory = product.category || 'Luxury Abayas';
+                    }
 
-                productsContainer.insertAdjacentHTML('beforeend', `
-                    <div class="category-card" onclick="openProduct('${escapeHTML(docSnap.id)}', '${escapeHTML(product.title||'').replace(/'/g, "\\'")}', ${price}, '${escapeHTML(product.description||'').replace(/'/g, "\\'")}', '${escapeHTML(product.image||'')}', ${originalPrice}, '${actualCategory}', '${colorsStr}', ${inStock}, '${stockOutVariantsStr}')" style="background: var(--primary-bg); border: 1px solid var(--border-color); padding: 12px; border-radius: 2px; text-align: center; cursor: pointer;">
-                        <div style="width: 100%; aspect-ratio: 3/4; background: #FAFAFA; overflow: hidden; margin-bottom: 15px; position:relative;">
-                            ${outOfStockBadge}
-                            <img src="${escapeHTML(product.image||'')}" style="position:absolute; top:0; left:0; width: 100%; height: 100%; object-fit: contain; transition: 0.5s; ${imgFilter}">
+                    let priceDisplay = `<p style="font-size: 11px; color: var(--muted-gray); font-weight: 500;">₹${price.toFixed(2)}</p>`;
+                    if (originalPrice && originalPrice > price) {
+                        priceDisplay = `<div style="display: flex; justify-content: center; gap: 6px;"><p style="font-size: 11px; color: var(--muted-gray); text-decoration: line-through;">₹${originalPrice.toFixed(2)}</p><p style="font-size: 11px; color: #CC0C39; font-weight: 600;">₹${price.toFixed(2)}</p></div>`;
+                    }
+                    
+                    const imgFilter = inStock ? "" : "filter: grayscale(100%); opacity: 0.6;";
+                    const outOfStockBadge = inStock ? "" : `<div style="position: absolute; top: 50%; left: 50%; transform: translate(-50%, -50%); background: rgba(28,27,26,0.85); color: #fff; padding: 8px 15px; font-size: 10px; letter-spacing: 3px; text-transform: uppercase; z-index: 10;">Sold Out</div>`;
+
+                    productsContainer.insertAdjacentHTML('beforeend', `
+                        <div class="category-card" onclick="openProduct('${escapeHTML(docSnap.id)}', '${escapeHTML(product.title||'').replace(/'/g, "\\'")}', ${price}, '${escapeHTML(product.description||'').replace(/'/g, "\\'")}', '${escapeHTML(product.image||'')}', ${originalPrice}, '${actualCategory}', '${colorsStr}', ${inStock}, '${stockOutVariantsStr}')" style="background: var(--primary-bg); border: 1px solid var(--border-color); padding: 12px; border-radius: 2px; text-align: center; cursor: pointer;">
+                            <div style="width: 100%; aspect-ratio: 3/4; background: #FAFAFA; overflow: hidden; margin-bottom: 15px; position:relative;">
+                                ${outOfStockBadge}
+                                <img src="${escapeHTML(product.image||'')}" style="position:absolute; top:0; left:0; width: 100%; height: 100%; object-fit: contain; transition: 0.5s; ${imgFilter}">
+                            </div>
+                            <h3 style="font-family: var(--font-serif); font-size: 16px; margin-bottom: 5px; color: var(--dark-text); text-transform: uppercase;">${escapeHTML(product.title||'')}</h3>
+                            ${priceDisplay}
                         </div>
-                        <h3 style="font-family: var(--font-serif); font-size: 16px; margin-bottom: 5px; color: var(--dark-text); text-transform: uppercase;">${escapeHTML(product.title||'')}</h3>
-                        ${priceDisplay}
-                    </div>
-                `);
+                    `);
+                });
             });
-        } catch (error) { console.error(error); }
+        } catch (error) {
+            console.error("Error loading products:", error);
+        }
     }
-window.openProduct = function(id, title, price, description, imageSrc, originalPrice, category, colorsStr, inStock, stockOutVariantsStr) {
-        currentProductView = { id, title, price, imageSrc, category, colorsStr, inStock, stockOutVariantsStr }; 
+window.currentProductListener = null;
+
+    window.openProduct = function(id, title, price, description, imageSrc, originalPrice, category, colorsStr, initialInStock, initialStockOutVariantsStr) {
         document.getElementById('collection-view').style.display = 'none';
         document.getElementById('product-detail-view').style.display = 'block';
         document.getElementById('dynamic-main-title').style.display = 'none'; 
-        
         if(document.getElementById('product-quantity')) document.getElementById('product-quantity').value = 1;
 
-        // Clean out-of-stock variants (makes matching case-insensitive and safer)
-        const outVariants = stockOutVariantsStr ? stockOutVariantsStr.split(',').map(s => s.trim().toLowerCase()) : [];
+        // Disconnect from any previously viewed product
+        if (window.currentProductListener) window.currentProductListener();
 
-        // Helper Function: Forces the gray out & strike-through directly onto the HTML
-        const applyStockStyle = (btn, isOut) => {
-            if (isOut) {
-                btn.classList.add('out-of-stock-btn');
-                btn.style.cssText = "text-decoration: line-through !important; color: #ccc !important; border-color: #eee !important; background-color: #fafafa !important; opacity: 0.6 !important; cursor: not-allowed !important; pointer-events: none !important;";
-            } else {
-                btn.classList.remove('out-of-stock-btn');
-                btn.style.cssText = ""; // Resets the button to normal if it is in stock
-            }
-        };
+        let isFirstLoad = true;
 
-        // Hide all selectors first
-        document.getElementById('apparel-size-selector').style.display = 'none';
-        document.getElementById('hamper-size-selector').style.display = 'none';
-        document.getElementById('niqab-size-selector').style.display = 'none';
-        document.getElementById('color-selector-container').style.display = 'none';
+        // NEW: Real-time listener specifically for this single product!
+        window.currentProductListener = onSnapshot(doc(db, "products", id), (docSnap) => {
+            if (!docSnap.exists()) return;
 
-        // Route the UI & cross out specific variants
-        if (category === 'Curated Hampers') {
-            document.getElementById('hamper-size-selector').style.display = 'block';
-            document.querySelectorAll('.hamper-size-btn').forEach(btn => {
-                btn.classList.remove('selected');
-                const btnData = btn.getAttribute('data-size').toLowerCase();
-                const btnText = btn.textContent.trim().toLowerCase();
-                const isOut = outVariants.includes(btnData) || outVariants.includes(btnText);
-                applyStockStyle(btn, isOut);
-            });
-            if(document.getElementById('selected-hamper-size-text')) document.getElementById('selected-hamper-size-text').textContent = 'Select a box size';
-            if(document.getElementById('custom-hamper-size-container')) document.getElementById('custom-hamper-size-container').style.display = 'none';
-            
-        } else if (category === 'Premium Niqabs') {
-            document.getElementById('niqab-size-selector').style.display = 'block';
-            document.querySelectorAll('.niqab-size-btn').forEach(btn => {
-                btn.classList.remove('selected');
-                const btnData = btn.getAttribute('data-size').toLowerCase();
-                const btnDataShort = btnData.replace(' inches', '');
-                const isOut = outVariants.includes(btnData) || outVariants.includes(btnDataShort);
-                applyStockStyle(btn, isOut);
-            });
-            if(document.getElementById('selected-niqab-size-text')) document.getElementById('selected-niqab-size-text').textContent = 'Select length';
-            
-        } else if (category === 'Essential Hijabs' || category === 'Signature Accessories') {
-            if (colorsStr && colorsStr.length > 0) {
-                document.getElementById('color-selector-container').style.display = 'block';
-                const colorOptionsDiv = document.getElementById('dynamic-color-options');
-                colorOptionsDiv.innerHTML = ''; 
-                if(document.getElementById('selected-color-text')) document.getElementById('selected-color-text').textContent = 'Select a color';
-                
-                colorsStr.split(',').forEach(color => {
-                    if (!color.trim()) return; 
-                    const btn = document.createElement('button');
-                    btn.className = 'size-btn color-btn';
-                    btn.setAttribute('data-color', color.trim());
-                    btn.textContent = color.trim();
+            const product = docSnap.data();
+            const currentInStock = product.inStock !== false;
+            const outVariants = product.stockOutVariants ? product.stockOutVariants.map(s => s.trim().toLowerCase()) : [];
+
+            // Update global view for cart verification
+            currentProductView = {
+                id: id, title: product.title || title, price: product.price || price, 
+                imageSrc: product.image || imageSrc, category: category, colorsStr: colorsStr, 
+                inStock: currentInStock, stockOutVariantsStr: product.stockOutVariants ? product.stockOutVariants.join(',') : ''
+            };
+
+            // Helper to apply strike-throughs and trigger alerts
+            const applyStockStyle = (btn, isOut) => {
+                if (isOut) {
+                    btn.classList.add('out-of-stock-btn');
+                    btn.style.cssText = "text-decoration: line-through !important; color: #ccc !important; border-color: #eee !important; background-color: #fafafa !important; opacity: 0.6 !important; cursor: not-allowed !important; pointer-events: none !important;";
                     
-                    const isOut = outVariants.includes(color.trim().toLowerCase());
-                    applyStockStyle(btn, isOut);
-                    
-                    btn.addEventListener('click', function(e) {
-                        e.preventDefault();
-                        if(this.classList.contains('out-of-stock-btn')) return; 
-                        document.querySelectorAll('.color-btn').forEach(b => b.classList.remove('selected'));
-                        this.classList.add('selected');
-                        document.getElementById('selected-color-text').textContent = this.getAttribute('data-color');
-                    });
-                    colorOptionsDiv.appendChild(btn);
+                    // If the customer had it selected, boot them off and alert them
+                    if (btn.classList.contains('selected')) {
+                        btn.classList.remove('selected');
+                        if(document.getElementById('selected-size-text')) document.getElementById('selected-size-text').textContent = 'Select a size';
+                        if(document.getElementById('selected-hamper-size-text')) document.getElementById('selected-hamper-size-text').textContent = 'Select a box size';
+                        if(document.getElementById('selected-niqab-size-text')) document.getElementById('selected-niqab-size-text').textContent = 'Select length';
+                        if(document.getElementById('selected-color-text')) document.getElementById('selected-color-text').textContent = 'Select a color';
+
+                        // Only alert if they are actively viewing the page, not on initial click
+                        if (!isFirstLoad) alert("Notice: The variant you selected just went out of stock!");
+                    }
+                } else {
+                    btn.classList.remove('out-of-stock-btn');
+                    if (!btn.classList.contains('selected')) btn.style.cssText = "";
+                }
+            };
+
+            // Reset UI Visibility
+            document.getElementById('apparel-size-selector').style.display = 'none';
+            document.getElementById('hamper-size-selector').style.display = 'none';
+            document.getElementById('niqab-size-selector').style.display = 'none';
+            document.getElementById('color-selector-container').style.display = 'none';
+
+            // Process Sizes Live
+            if (category === 'Curated Hampers') {
+                document.getElementById('hamper-size-selector').style.display = 'block';
+                document.querySelectorAll('.hamper-size-btn').forEach(btn => {
+                    const btnData = btn.getAttribute('data-size').toLowerCase();
+                    const btnText = btn.textContent.trim().toLowerCase();
+                    applyStockStyle(btn, outVariants.includes(btnData) || outVariants.includes(btnText));
                 });
-            }
-        } else {
-            // Luxury Abayas
-            document.getElementById('apparel-size-selector').style.display = 'block';
-            document.querySelectorAll('.size-btn:not(.hamper-size-btn):not(.niqab-size-btn):not(.color-btn)').forEach(btn => {
-                btn.classList.remove('selected');
-                const btnData = btn.getAttribute('data-size').toLowerCase();
-                const isOut = outVariants.includes(btnData);
-                applyStockStyle(btn, isOut);
-            });
-            if(document.getElementById('selected-size-text')) document.getElementById('selected-size-text').textContent = 'Select a size';
-            if(document.getElementById('custom-size-container')) document.getElementById('custom-size-container').style.display = 'none';
-        }
-        
-        document.getElementById('detail-title').textContent = title;
-        document.getElementById('detail-desc').textContent = description;
-        document.getElementById('detail-image').src = imageSrc;
-        
-        // --- Master Stock Check for Cart Buttons ---
-        const addToCartBtn = document.querySelector('button[onclick="addCurrentProductToCart()"]');
-        const buyNowBtn = document.querySelector('button[onclick="addCurrentProductToCart(); setTimeout(() => document.getElementById(\'cartIconBtn\').click(), 200);"]');
-        
-        if (addToCartBtn && buyNowBtn) {
-            if (!inStock) {
-                // Disable buttons if whole product is out of stock
-                addToCartBtn.classList.add('action-btn-disabled');
-                addToCartBtn.style.cssText = "background-color: #f5f5f5 !important; color: #a0a0a0 !important; border-color: #e0e0e0 !important; cursor: not-allowed !important;";
-                addToCartBtn.textContent = "Sold Out";
-                addToCartBtn.onclick = null; 
-                
-                buyNowBtn.classList.add('action-btn-disabled');
-                buyNowBtn.style.cssText = "background-color: #f5f5f5 !important; color: #a0a0a0 !important; border-color: #e0e0e0 !important; cursor: not-allowed !important;";
-                buyNowBtn.textContent = "Sold Out";
-                buyNowBtn.onclick = null;
-            } else {
-                // Reset buttons if it IS in stock 
-                addToCartBtn.classList.remove('action-btn-disabled');
-                addToCartBtn.style.cssText = "flex: 1; padding: 18px; font-size: 11px; font-family: var(--font-sans); font-weight: 500; background-color: var(--primary-bg); color: var(--dark-text); border: 1px solid var(--border-color); cursor: pointer; text-transform: uppercase; letter-spacing: 2px; transition: all 0.3s ease;";
-                addToCartBtn.textContent = "Add to Cart";
-                addToCartBtn.onclick = addCurrentProductToCart;
-                
-                buyNowBtn.classList.remove('action-btn-disabled');
-                buyNowBtn.style.cssText = "flex: 1; padding: 18px; font-size: 11px; font-family: var(--font-sans); font-weight: 500; background-color: var(--dark-text); color: #fff; border: 1px solid var(--dark-text); cursor: pointer; text-transform: uppercase; letter-spacing: 2px; transition: all 0.3s ease;";
-                buyNowBtn.textContent = "Buy Now";
-                buyNowBtn.onclick = function() { addCurrentProductToCart(); setTimeout(() => document.getElementById('cartIconBtn').click(), 200); };
-            }
-        }
+                if(document.getElementById('custom-hamper-size-container')) document.getElementById('custom-hamper-size-container').style.display = 'none';
 
-        let priceHTML = '';
-        if (originalPrice && originalPrice > price) {
-            const discountPercent = Math.round(((originalPrice - price) / originalPrice) * 100);
-            priceHTML = `<div style="display: flex; align-items: baseline; gap: 10px; margin-bottom: 5px;"><span style="color: #CC0C39; font-size: 28px; font-weight: 300;">-${discountPercent}%</span><span style="font-size: 32px; font-weight: 500; color: var(--dark-text);">₹${parseFloat(price).toFixed(2)}</span></div><div style="font-size: 13px; color: var(--muted-gray);">M.R.P.: <span style="text-decoration: line-through;">₹${parseFloat(originalPrice).toFixed(2)}</span></div><div style="font-size: 13px; color: var(--dark-text); margin-top: 5px;">Inclusive of all taxes</div>`;
-        } else {
-            priceHTML = `<div style="font-size: 32px; font-weight: 500; color: var(--dark-text); margin-bottom: 5px;">₹${parseFloat(price).toFixed(2)}</div><div style="font-size: 13px; color: var(--dark-text);">Inclusive of all taxes</div>`;
-        }
-        document.getElementById('price-container').innerHTML = priceHTML;
-        window.scrollTo({ top: 0, behavior: 'smooth' });
+            } else if (category === 'Premium Niqabs') {
+                document.getElementById('niqab-size-selector').style.display = 'block';
+                document.querySelectorAll('.niqab-size-btn').forEach(btn => {
+                    const btnData = btn.getAttribute('data-size').toLowerCase();
+                    applyStockStyle(btn, outVariants.includes(btnData) || outVariants.includes(btnData.replace(' inches', '')));
+                });
+
+            } else if (category === 'Essential Hijabs' || category === 'Signature Accessories') {
+                if (colorsStr && colorsStr.length > 0) {
+                    document.getElementById('color-selector-container').style.display = 'block';
+                    // We only rebuild the actual buttons on first load to prevent flickering
+                    if (isFirstLoad) {
+                        const colorOptionsDiv = document.getElementById('dynamic-color-options');
+                        colorOptionsDiv.innerHTML = ''; 
+                        if(document.getElementById('selected-color-text')) document.getElementById('selected-color-text').textContent = 'Select a color';
+                        colorsStr.split(',').forEach(color => {
+                            if (!color.trim()) return; 
+                            const btn = document.createElement('button');
+                            btn.className = 'size-btn color-btn';
+                            btn.setAttribute('data-color', color.trim());
+                            btn.textContent = color.trim();
+                            btn.addEventListener('click', function(e) {
+                                e.preventDefault();
+                                if(this.classList.contains('out-of-stock-btn')) return; 
+                                document.querySelectorAll('.color-btn').forEach(b => b.classList.remove('selected'));
+                                this.classList.add('selected');
+                                document.getElementById('selected-color-text').textContent = this.getAttribute('data-color');
+                            });
+                            colorOptionsDiv.appendChild(btn);
+                        });
+                    }
+                    // Apply live styles to the existing buttons
+                    document.querySelectorAll('.color-btn').forEach(btn => {
+                        applyStockStyle(btn, outVariants.includes(btn.getAttribute('data-color').toLowerCase()));
+                    });
+                }
+            } else {
+                document.getElementById('apparel-size-selector').style.display = 'block';
+                document.querySelectorAll('.size-btn:not(.hamper-size-btn):not(.niqab-size-btn):not(.color-btn)').forEach(btn => {
+                    applyStockStyle(btn, outVariants.includes(btn.getAttribute('data-size').toLowerCase()));
+                });
+                if(document.getElementById('custom-size-container')) document.getElementById('custom-size-container').style.display = 'none';
+            }
+            
+            // Live update text & images
+            document.getElementById('detail-title').textContent = product.title || title;
+            document.getElementById('detail-desc').textContent = product.description || description;
+            document.getElementById('detail-image').src = product.image || imageSrc;
+            
+            // Live update Master Cart Buttons
+            const addToCartBtn = document.querySelector('button[onclick="addCurrentProductToCart()"]');
+            const buyNowBtn = document.querySelector('button[onclick="addCurrentProductToCart(); setTimeout(() => document.getElementById(\\'cartIconBtn\\').click(), 200);"]');
+            
+            if (addToCartBtn && buyNowBtn) {
+                if (!currentInStock) {
+                    addToCartBtn.classList.add('action-btn-disabled');
+                    addToCartBtn.style.cssText = "background-color: #f5f5f5 !important; color: #a0a0a0 !important; border-color: #e0e0e0 !important; cursor: not-allowed !important;";
+                    addToCartBtn.textContent = "Sold Out";
+                    addToCartBtn.onclick = null; 
+                    
+                    buyNowBtn.classList.add('action-btn-disabled');
+                    buyNowBtn.style.cssText = "background-color: #f5f5f5 !important; color: #a0a0a0 !important; border-color: #e0e0e0 !important; cursor: not-allowed !important;";
+                    buyNowBtn.textContent = "Sold Out";
+                    buyNowBtn.onclick = null;
+
+                    if (!isFirstLoad) alert("Notice: This entire product just sold out!");
+                } else {
+                    addToCartBtn.classList.remove('action-btn-disabled');
+                    addToCartBtn.style.cssText = "flex: 1; padding: 18px; font-size: 11px; font-family: var(--font-sans); font-weight: 500; background-color: var(--primary-bg); color: var(--dark-text); border: 1px solid var(--border-color); cursor: pointer; text-transform: uppercase; letter-spacing: 2px; transition: all 0.3s ease;";
+                    addToCartBtn.textContent = "Add to Cart";
+                    addToCartBtn.onclick = addCurrentProductToCart;
+                    
+                    buyNowBtn.classList.remove('action-btn-disabled');
+                    buyNowBtn.style.cssText = "flex: 1; padding: 18px; font-size: 11px; font-family: var(--font-sans); font-weight: 500; background-color: var(--dark-text); color: #fff; border: 1px solid var(--dark-text); cursor: pointer; text-transform: uppercase; letter-spacing: 2px; transition: all 0.3s ease;";
+                    buyNowBtn.textContent = "Buy Now";
+                    buyNowBtn.onclick = function() { addCurrentProductToCart(); setTimeout(() => document.getElementById('cartIconBtn').click(), 200); };
+                }
+            }
+
+            // Live Pricing Update
+            const displayPrice = product.price || price;
+            const displayOriginal = product.originalPrice || originalPrice;
+            let priceHTML = '';
+            if (displayOriginal && displayOriginal > displayPrice) {
+                const discountPercent = Math.round(((displayOriginal - displayPrice) / displayOriginal) * 100);
+                priceHTML = `<div style="display: flex; align-items: baseline; gap: 10px; margin-bottom: 5px;"><span style="color: #CC0C39; font-size: 28px; font-weight: 300;">-${discountPercent}%</span><span style="font-size: 32px; font-weight: 500; color: var(--dark-text);">₹${parseFloat(displayPrice).toFixed(2)}</span></div><div style="font-size: 13px; color: var(--muted-gray);">M.R.P.: <span style="text-decoration: line-through;">₹${parseFloat(displayOriginal).toFixed(2)}</span></div><div style="font-size: 13px; color: var(--dark-text); margin-top: 5px;">Inclusive of all taxes</div>`;
+            } else {
+                priceHTML = `<div style="font-size: 32px; font-weight: 500; color: var(--dark-text); margin-bottom: 5px;">₹${parseFloat(displayPrice).toFixed(2)}</div><div style="font-size: 13px; color: var(--dark-text);">Inclusive of all taxes</div>`;
+            }
+            document.getElementById('price-container').innerHTML = priceHTML;
+
+            if (isFirstLoad) window.scrollTo({ top: 0, behavior: 'smooth' });
+            isFirstLoad = false;
+        });
     };
        
        // --- ADD THIS TO YOUR JAVASCRIPT ---
