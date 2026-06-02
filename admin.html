@@ -1241,22 +1241,20 @@
             }
         };
 
-        // --- FETCH & RENDER INVENTORY ---
+     // --- FETCH & RENDER INVENTORY ---
+        window.allProductsData = {}; 
 
-        window.allProductsData = {}; // Store data locally so the modal can access it
-
-
-       window.loadInventory = async function() {
+        window.loadInventory = async function() {
             const listContainer = document.getElementById('inventory-list');
             const filterDropdown = document.getElementById('filter-category');
-            const filterVal = filterDropdown ? filterDropdown.value : 'all'; // Gets the current dropdown selection
+            const filterVal = filterDropdown ? filterDropdown.value : 'all'; 
             
             listContainer.innerHTML = '<p style="color:var(--muted-gray); font-size: 12px; text-transform:uppercase;">Loading Database...</p>';
             
             try {
                 const querySnapshot = await getDocs(collection(db, "products"));
                 listContainer.innerHTML = ''; 
-                window.allProductsData = {}; // Clear previous data
+                window.allProductsData = {}; 
 
                 if (querySnapshot.empty) {
                     listContainer.innerHTML = '<p style="color:var(--muted-gray); font-size: 12px;">No products found in the database.</p>';
@@ -1271,14 +1269,19 @@
                     const inStock = data.inStock !== false; 
                     
                     window.allProductsData[id] = data; 
-                    const itemCategory = data.category ? data.category : "general"; 
                     
-                    // NEW FILTER LOGIC: Skip items that don't match the dropdown
-                    if (filterVal !== 'all' && itemCategory !== filterVal) {
-                        return; // Acts as a "continue" in a forEach loop
+                    // Handle both old string categories and new array categories safely
+                    let itemCategories = Array.isArray(data.category) ? data.category : [data.category || "general"];
+                    
+                    if (filterVal !== 'all' && !itemCategories.includes(filterVal)) {
+                        return; 
                     }
 
                     itemsFound++;
+                    
+                    // For the badge display, show the primary category
+                    let displayBadge = itemCategories[0];
+                    if (itemCategories.includes("Archive Sale")) displayBadge += " + Sale";
 
                     const itemHTML = `
                         <div class="inv-item ${!inStock ? 'out-of-stock' : ''}">
@@ -1288,7 +1291,7 @@
                                     <h4 class="inv-title">${data.title}</h4>
                                     <span class="inv-price">₹${parseFloat(data.price).toFixed(2)}</span>
                                     <div class="badge-group">
-                                        <span class="status-badge catalog-badge">${itemCategory}</span>
+                                        <span class="status-badge catalog-badge">${displayBadge}</span>
                                         <span class="status-badge">${inStock ? 'Live - In Stock' : 'Out of Stock'}</span>
                                     </div>
                                 </div>
@@ -1305,11 +1308,9 @@
                     listContainer.insertAdjacentHTML('beforeend', itemHTML);
                 });
 
-                // Display a message if a specific category is empty
                 if (itemsFound === 0) {
                     listContainer.innerHTML = '<p style="color:var(--muted-gray); font-size: 12px;">No products found in this category.</p>';
                 }
-
             } catch (error) {
                 console.error("Error fetching inventory:", error);
                 listContainer.innerHTML = '<p style="color:red; font-size:12px;">Error loading products.</p>';
@@ -1395,20 +1396,21 @@
             if(!product) return;
 
             document.getElementById('edit-doc-id').value = id;
-            document.getElementById('edit-category').value = product.category || 'Luxury Abayas';
+            
+            // Get the primary category (index 0) if it's an array
+            const primaryCategory = Array.isArray(product.category) ? product.category[0] : (product.category || 'Luxury Abayas');
+            document.getElementById('edit-category').value = primaryCategory;
+            
             document.getElementById('edit-title').value = product.title;
             
-            // Set original price if it exists, otherwise use regular price
             const basePrice = product.originalPrice ? product.originalPrice : product.price;
             document.getElementById('edit-price').value = basePrice;
             
-            // Calculate and show the existing discount percentage in the input box
             let existingDiscount = 0;
             if (product.originalPrice && product.originalPrice > product.price) {
                 existingDiscount = Math.round(((product.originalPrice - product.price) / product.originalPrice) * 100);
             }
             document.getElementById('edit-discount').value = existingDiscount;
-
             document.getElementById('edit-image').value = product.image; 
             document.getElementById('edit-desc').value = product.description || '';
 
