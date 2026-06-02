@@ -733,17 +733,33 @@
                     <p class="welcome-text">View all live products across all catalogs, toggle their availability, or permanently remove them.</p>
                     
                     <!-- NEW CATEGORY FILTER DROPDOWN -->
-                    <div class="form-group" style="max-width: 300px; margin-bottom: 25px;">
-                        <label>Filter by Catalog</label>
-                        <select id="filter-category" onchange="loadInventory()">
-                            <option value="all" selected>All Products</option>
-                            <option value="Luxury Abayas">Abayas</option>
-                            <option value="Curated Hampers">Hampers</option>
-                            <option value="Premium Niqabs">Naqabs</option>
-                            <option value="Essential Hijabs">Hijabs</option>
-                            <option value="Signature Accessories">Accessories</option>
-                        </select>
+                   <div id="view-manage" style="display: none;">
+                <div class="admin-form-section" style="width: 100%;">
+                    <div class="admin-header">
+                        <h2>Inventory Management</h2>
+                    </div>
+                    <p class="welcome-text">View all live products across all catalogs, toggle their availability, or permanently remove them.</p>
+                    
+                    <div style="display: flex; gap: 20px; max-width: 700px; margin-bottom: 25px;">
+                        <div class="form-group" style="flex: 1; margin-bottom: 0;">
+                            <label>Filter by Catalog</label>
+                            <select id="filter-category" onchange="loadInventory()">
+                                <option value="all" selected>All Products</option>
+                                <option value="Luxury Abayas">Abayas</option>
+                                <option value="Curated Hampers">Hampers</option>
+                                <option value="Premium Niqabs">Naqabs</option>
+                                <option value="Essential Hijabs">Hijabs</option>
+                                <option value="Signature Accessories">Accessories</option>
+                            </select>
+                        </div>
+                        <div class="form-group" style="flex: 1; margin-bottom: 0;">
+                            <label>Search by Title or SKU</label>
+                            <input type="text" id="search-inventory" placeholder="e.g. Silk Abaya or 7AX8BY9Z" oninput="filterInventoryList()">
+                        </div>
                     </div> 
+                    <div id="inventory-list" class="inventory-list"></div>
+                </div>
+            </div>
 
                     <div id="inventory-list" class="inventory-list"></div>
                 </div>
@@ -1278,7 +1294,7 @@
             }
         };
      // --- FETCH & RENDER INVENTORY ---
-        window.allProductsData = {}; 
+      window.allProductsData = {}; 
 
         window.loadInventory = async function() {
             const listContainer = document.getElementById('inventory-list');
@@ -1315,17 +1331,21 @@
 
                     itemsFound++;
                     
+                    // 👇 NEW: Generate the SKU for the Admin view 👇
+                    const displayId = id.substring(0,8).toUpperCase();
+                    
                     // For the badge display, show the primary category
                     let displayBadge = itemCategories[0];
                     if (itemCategories.includes("Archive Sale")) displayBadge += " + Sale";
 
+                    // 👇 NEW: Added data-id to the div, and the SKU text next to the price 👇
                     const itemHTML = `
-                        <div class="inv-item ${!inStock ? 'out-of-stock' : ''}">
+                        <div class="inv-item ${!inStock ? 'out-of-stock' : ''}" data-id="${displayId}">
                             <div class="inv-info">
                                 <img src="${data.image}" alt="${data.title}" class="inv-img">
                                 <div class="inv-details">
                                     <h4 class="inv-title">${data.title}</h4>
-                                    <span class="inv-price">₹${parseFloat(data.price).toFixed(2)}</span>
+                                    <span class="inv-price">₹${parseFloat(data.price).toFixed(2)} <span style="margin-left: 10px; color: var(--accent-gold); letter-spacing: 1px;">SKU: #${displayId}</span></span>
                                     <div class="badge-group">
                                         <span class="status-badge catalog-badge">${displayBadge}</span>
                                         <span class="status-badge">${inStock ? 'Live - In Stock' : 'Out of Stock'}</span>
@@ -1351,6 +1371,23 @@
                 console.error("Error fetching inventory:", error);
                 listContainer.innerHTML = '<p style="color:red; font-size:12px;">Error loading products.</p>';
             }
+        };
+        // --- LIVE INVENTORY SEARCH ---
+        window.filterInventoryList = function() {
+            const term = document.getElementById('search-inventory').value.toLowerCase().trim();
+            const allItems = document.querySelectorAll('.inv-item');
+            
+            allItems.forEach(item => {
+                const title = item.querySelector('.inv-title').textContent.toLowerCase();
+                const pid = item.getAttribute('data-id').toLowerCase();
+                
+                // If it matches the title OR the SKU, show it!
+                if(title.includes(term) || pid.includes(term)) {
+                    item.style.display = 'flex';
+                } else {
+                    item.style.display = 'none';
+                }
+            });
         };
         window.toggleStockStatus = async function(docId, currentStatus) {
 
