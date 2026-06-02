@@ -695,41 +695,98 @@
                     
                     <div id="price-container" style="margin-bottom: 25px;"></div>
 
-                    <div class="size-selector-container">
-                        <div class="size-header">
-                            <span class="size-label">Size: <span id="selected-size-text">Select a size</span></span>
-                            <a class="size-chart-link">Size Chart</a>
-                        </div>
-            
-                        <div class="size-options" id="size-options">
-                            <button class="size-btn" data-size="52">52</button>
-                            <button class="size-btn" data-size="54">54</button>
-                            <button class="size-btn" data-size="56">56</button>
-                            <button class="size-btn" data-size="58">58</button>
-                            <button class="size-btn" data-size="60">60</button>
-                            <button class="size-btn" data-size="Custom">Custom</button>
-                        </div>
-            
-                       <div id="custom-size-container" style="display: none;">
-    <label class="custom-size-label">Enter Measurements (Inches)</label>
-    <div class="custom-measurements-grid">
-        <div class="input-group">
-            <label for="custom-length">Length</label>
-            <input type="number" id="custom-length" placeholder="e.g. 56" min="10" max="80">
-        </div>
-        <div class="input-group">
-            <label for="custom-chest">Chest</label>
-            <input type="number" id="custom-chest" placeholder="e.g. 22" min="10" max="50">
-        </div>
-        <div class="input-group">
-            <label for="custom-sleeves">Sleeves</label>
-            <input type="number" id="custom-sleeves" placeholder="e.g. 28" min="10" max="40">
-        </div>
+                  <div class="size-selector-container" id="apparel-size-selector">
+    <div class="size-header">
+        <span class="size-label">Size: <span id="selected-size-text">Select a size</span></span>
+        <a class="size-chart-link">Size Chart</a>
     </div>
-    
-    <label class="custom-size-label" style="margin-top: 15px;">Fitting Requirements & Notes</label>
-    <textarea id="custom-notes" placeholder="e.g., Slim fit, extra flare at the bottom, specific alterations..." rows="2"></textarea>
+
+    <div class="size-options" id="size-options">
+        <button class="size-btn" data-size="52">52</button>
+        <button class="size-btn" data-size="54">54</button>
+        <button class="size-btn" data-size="56">56</button>
+        <button class="size-btn" data-size="58">58</button>
+        <button class="size-btn" data-size="60">60</button>
+        <button class="size-btn" data-size="Custom">Custom</button>
+    </div>
+
+    <div id="custom-size-container" style="display: none;">
+        <label class="custom-size-label">Enter Measurements (Inches)</label>
+        <div class="custom-measurements-grid">
+            <div class="input-group">
+                <label for="custom-length">Length</label>
+                <input type="number" id="custom-length" placeholder="e.g. 56" min="10" max="80">
+            </div>
+            <div class="input-group">
+                <label for="custom-chest">Chest</label>
+                <input type="number" id="custom-chest" placeholder="e.g. 22" min="10" max="50">
+            </div>
+            <div class="input-group">
+                <label for="custom-sleeves">Sleeves</label>
+                <input type="number" id="custom-sleeves" placeholder="e.g. 28" min="10" max="40">
+            </div>
+        </div>
+        
+        <label class="custom-size-label" style="margin-top: 15px;">Fitting Requirements & Notes</label>
+        <textarea id="custom-notes" placeholder="e.g., Slim fit, extra flare at the bottom, specific alterations..." rows="2"></textarea>
+    </div>
 </div>
+
+<div class="size-selector-container" id="hamper-size-selector" style="display: none;">
+    <div class="size-header">
+        <span class="size-label">Box Size: <span id="selected-hamper-size-text">Select a box size</span></span>
+    </div>
+
+    <div class="size-options" id="hamper-size-options">
+        <button class="size-btn hamper-size-btn" data-size="Standard (10x8x4)">Standard</button>
+        <button class="size-btn hamper-size-btn" data-size="Large (12x10x6)">Large</button>
+        <button class="size-btn hamper-size-btn" data-size="Custom Box">Custom Box</button>
+    </div>
+
+    <div id="custom-hamper-size-container" style="display: none; margin-top: 15px; padding: 15px; background-color: #FAFAFA; border: 1px solid var(--border-color); border-radius: 2px;">
+        <label class="custom-size-label">Custom Box Dimensions (Inches)</label>
+        <div class="custom-measurements-grid">
+            <div class="input-group">
+                <label for="hamper-length">Length</label>
+                <input type="number" id="hamper-length" placeholder="e.g. 14" min="5" max="30">
+            </div>
+            <div class="input-group">
+                <label for="hamper-width">Width</label>
+                <input type="number" id="hamper-width" placeholder="e.g. 12" min="5" max="30">
+            </div>
+            <div class="input-group">
+                <label for="hamper-height">Height</label>
+                <input type="number" id="hamper-height" placeholder="e.g. 8" min="2" max="20">
+            </div>
+        </div>
+        
+        <label class="custom-size-label" style="margin-top: 15px;">Additions & Customization Notes</label>
+        <textarea id="hamper-custom-notes" placeholder="e.g., Please add a matching hijab pin, extra ribbons, extra chocolates..." rows="3" style="width: 100%; padding: 12px; border: 1px solid var(--border-color); border-radius: 2px; font-family: var(--font-sans); font-size: 13px; color: var(--dark-text); outline: none; resize: vertical; box-sizing: border-box; background: transparent;"></textarea>
+    </div>
+</div>
+                    <!-- === NIQAB SIZING === -->
+<div class="size-selector-container" id="niqab-size-selector" style="display: none;">
+    <div class="size-header">
+        <span class="size-label">Length: <span id="selected-niqab-size-text">Select length</span></span>
+    </div>
+    <div class="size-options" id="niqab-size-options">
+        <button class="size-btn niqab-size-btn" data-size="5 inches">5"</button>
+        <button class="size-btn niqab-size-btn" data-size="7 inches">7"</button>
+        <button class="size-btn niqab-size-btn" data-size="9 inches">9"</button>
+        <button class="size-btn niqab-size-btn" data-size="12 inches">12"</button>
+        <button class="size-btn niqab-size-btn" data-size="24 inches">24"</button>
+    </div>
+</div>
+
+<!-- === DYNAMIC COLOR SELECTOR (HIJABS & ACCESSORIES) === -->
+<div class="size-selector-container" id="color-selector-container" style="display: none;">
+    <div class="size-header">
+        <span class="size-label">Color: <span id="selected-color-text">Select a color</span></span>
+    </div>
+    <div class="size-options" id="dynamic-color-options">
+        <!-- Buttons will be injected here via JavaScript based on admin uploads -->
+    </div>
+</div>    
                     </div>
                     <div style="display: flex; align-items: center; gap: 15px; margin-bottom: 25px;">
                         <span style="font-size: 11px; font-weight: 500; text-transform: uppercase; letter-spacing: 1px;">Quantity</span>
@@ -1189,6 +1246,42 @@
             });
         });
     }
+        // Add event listeners for the Hamper Size buttons
+const hamperSizeButtons = document.querySelectorAll('.hamper-size-btn');
+const selectedHamperSizeText = document.getElementById('selected-hamper-size-text');
+const customHamperSizeContainer = document.getElementById('custom-hamper-size-container');
+
+if (hamperSizeButtons.length > 0) {
+    hamperSizeButtons.forEach(button => {
+        button.addEventListener('click', function(e) {
+            e.preventDefault();
+            hamperSizeButtons.forEach(btn => btn.classList.remove('selected'));
+            this.classList.add('selected');
+            
+            const selectedSize = this.getAttribute('data-size');
+            if(selectedHamperSizeText) selectedHamperSizeText.textContent = selectedSize;
+            
+            if (customHamperSizeContainer) {
+                customHamperSizeContainer.style.display = (selectedSize === 'Custom Box') ? 'block' : 'none';
+            }
+        });
+    });
+}
+        // Add event listeners for the Niqab Size buttons
+const niqabSizeButtons = document.querySelectorAll('.niqab-size-btn');
+const selectedNiqabSizeText = document.getElementById('selected-niqab-size-text');
+
+if (niqabSizeButtons.length > 0) {
+    niqabSizeButtons.forEach(button => {
+        button.addEventListener('click', function(e) {
+            e.preventDefault();
+            niqabSizeButtons.forEach(btn => btn.classList.remove('selected'));
+            this.classList.add('selected');
+            if(selectedNiqabSizeText) selectedNiqabSizeText.textContent = this.getAttribute('data-size');
+        });
+    });
+}   
+        
         // --- ZOOM MAGNIFIER LOGIC (AMAZON STYLE) ---
     const zoomWrapper = document.getElementById('zoom-img-wrapper');
     const zoomImg = document.getElementById('detail-image');
@@ -1468,12 +1561,18 @@
                 const product = docSnap.data();
                 const price = parseFloat(product.price) || 0;
                 const originalPrice = parseFloat(product.originalPrice) || null; 
+                
+                // 👇 THIS IS THE NEW COLOR EXTRACTION LINE 👇
+                const colorsStr = product.colors ? escapeHTML(product.colors.join(',')) : ''; 
+
                 let priceDisplay = `<p style="font-size: 11px; color: var(--muted-gray); font-weight: 500;">₹${price.toFixed(2)}</p>`;
                 if (originalPrice && originalPrice > price) {
                     priceDisplay = `<div style="display: flex; justify-content: center; gap: 6px;"><p style="font-size: 11px; color: var(--muted-gray); text-decoration: line-through;">₹${originalPrice.toFixed(2)}</p><p style="font-size: 11px; color: #CC0C39; font-weight: 600;">₹${price.toFixed(2)}</p></div>`;
                 }
+                
+                // 👇 THE ONCLICK HERE IS UPDATED TO PASS CATEGORY AND COLORS 👇
                 productsContainer.insertAdjacentHTML('beforeend', `
-                    <div class="category-card" onclick="openProduct('${escapeHTML(docSnap.id)}', '${escapeHTML(product.title||'').replace(/'/g, "\\'")}', ${price}, '${escapeHTML(product.description||'').replace(/'/g, "\\'")}', '${escapeHTML(product.image||'')}', ${originalPrice})" style="background: var(--primary-bg); border: 1px solid var(--border-color); padding: 12px; border-radius: 2px; text-align: center; cursor: pointer;">
+                    <div class="category-card" onclick="openProduct('${escapeHTML(docSnap.id)}', '${escapeHTML(product.title||'').replace(/'/g, "\\'")}', ${price}, '${escapeHTML(product.description||'').replace(/'/g, "\\'")}', '${escapeHTML(product.image||'')}', ${originalPrice}, '${categoryFilter}', '${colorsStr}')" style="background: var(--primary-bg); border: 1px solid var(--border-color); padding: 12px; border-radius: 2px; text-align: center; cursor: pointer;">
                         <div style="width: 100%; aspect-ratio: 3/4; background: #FAFAFA; overflow: hidden; margin-bottom: 15px; position:relative;">
                             <img src="${escapeHTML(product.image||'')}" style="position:absolute; top:0; left:0; width: 100%; height: 100%; object-fit: contain;">
                         </div>
@@ -1484,38 +1583,82 @@
             });
         } catch (error) {}
     }
+   // Update the openProduct function definition:
+window.openProduct = function(id, title, price, description, imageSrc, originalPrice, category, colorsStr) {
+    currentProductView = { id, title, price, imageSrc, category, colorsStr }; 
+    document.getElementById('collection-view').style.display = 'none';
+    document.getElementById('product-detail-view').style.display = 'block';
+    document.getElementById('dynamic-main-title').style.display = 'none'; 
+    
+    if(document.getElementById('product-quantity')) document.getElementById('product-quantity').value = 1;
 
-    window.openProduct = function(id, title, price, description, imageSrc, originalPrice) {
-        currentProductView = { id, title, price, imageSrc };
-        document.getElementById('collection-view').style.display = 'none';
-        document.getElementById('product-detail-view').style.display = 'block';
-        document.getElementById('dynamic-main-title').style.display = 'none'; 
+    // 1. Hide everything first to reset the view
+    document.getElementById('apparel-size-selector').style.display = 'none';
+    document.getElementById('hamper-size-selector').style.display = 'none';
+    document.getElementById('niqab-size-selector').style.display = 'none';
+    document.getElementById('color-selector-container').style.display = 'none';
+
+    // 2. Route the UI based on Category
+    if (category === 'Curated Hampers') {
+        document.getElementById('hamper-size-selector').style.display = 'block';
+        document.querySelectorAll('.hamper-size-btn').forEach(btn => btn.classList.remove('selected'));
+        if(document.getElementById('selected-hamper-size-text')) document.getElementById('selected-hamper-size-text').textContent = 'Select a box size';
         
-        if(document.getElementById('product-quantity')) document.getElementById('product-quantity').value = 1;
-        document.querySelectorAll('.size-btn').forEach(btn => btn.classList.remove('selected'));
-        if(document.getElementById('selected-size-text')) document.getElementById('selected-size-text').textContent = 'Select a size';
+    } else if (category === 'Premium Niqabs') {
+        document.getElementById('niqab-size-selector').style.display = 'block';
+        document.querySelectorAll('.niqab-size-btn').forEach(btn => btn.classList.remove('selected'));
+        if(document.getElementById('selected-niqab-size-text')) document.getElementById('selected-niqab-size-text').textContent = 'Select length';
         
-        document.getElementById('detail-title').textContent = title;
-        document.getElementById('detail-desc').textContent = description;
-        document.getElementById('detail-image').src = imageSrc;
-        
-        let priceHTML = '';
-        if (originalPrice && originalPrice > price) {
-            const discountPercent = Math.round(((originalPrice - price) / originalPrice) * 100);
-            priceHTML = `<div style="display: flex; align-items: baseline; gap: 10px; margin-bottom: 5px;"><span style="color: #CC0C39; font-size: 28px; font-weight: 300;">-${discountPercent}%</span><span style="font-size: 32px; font-weight: 500; color: var(--dark-text);">₹${parseFloat(price).toFixed(2)}</span></div><div style="font-size: 13px; color: var(--muted-gray);">M.R.P.: <span style="text-decoration: line-through;">₹${parseFloat(originalPrice).toFixed(2)}</span></div><div style="font-size: 13px; color: var(--dark-text); margin-top: 5px;">Inclusive of all taxes</div>`;
-        } else {
-            priceHTML = `<div style="font-size: 32px; font-weight: 500; color: var(--dark-text); margin-bottom: 5px;">₹${parseFloat(price).toFixed(2)}</div><div style="font-size: 13px; color: var(--dark-text);">Inclusive of all taxes</div>`;
+    } else if (category === 'Essential Hijabs' || category === 'Signature Accessories') {
+        // If the admin uploaded colors, show the color selector. If not, it stays hidden.
+        if (colorsStr && colorsStr.length > 0) {
+            document.getElementById('color-selector-container').style.display = 'block';
+            const colorOptionsDiv = document.getElementById('dynamic-color-options');
+            colorOptionsDiv.innerHTML = ''; // clear old colors
+            if(document.getElementById('selected-color-text')) document.getElementById('selected-color-text').textContent = 'Select a color';
+            
+            // Create buttons from the database colors
+            const colorsArray = colorsStr.split(',');
+            colorsArray.forEach(color => {
+                const btn = document.createElement('button');
+                btn.className = 'size-btn color-btn';
+                btn.setAttribute('data-color', color.trim());
+                btn.textContent = color.trim();
+                
+                // Add click listener to the new color buttons
+                btn.addEventListener('click', function(e) {
+                    e.preventDefault();
+                    document.querySelectorAll('.color-btn').forEach(b => b.classList.remove('selected'));
+                    this.classList.add('selected');
+                    document.getElementById('selected-color-text').textContent = this.getAttribute('data-color');
+                });
+                
+                colorOptionsDiv.appendChild(btn);
+            });
         }
-        document.getElementById('price-container').innerHTML = priceHTML;
-        window.scrollTo({ top: 0, behavior: 'smooth' });
-    };
-      
-    window.closeProduct = function() {
-        document.getElementById('product-detail-view').style.display = 'none';
-        document.getElementById('collection-view').style.display = 'grid';
-        document.getElementById('dynamic-main-title').style.display = 'block'; 
-        window.scrollTo({ top: 0, behavior: 'smooth' });
-    };
+    } else {
+        // Default to Luxury Abayas
+        document.getElementById('apparel-size-selector').style.display = 'block';
+        document.querySelectorAll('.size-btn:not(.hamper-size-btn):not(.niqab-size-btn):not(.color-btn)').forEach(btn => btn.classList.remove('selected'));
+        if(document.getElementById('selected-size-text')) document.getElementById('selected-size-text').textContent = 'Select a size';
+    }
+    
+    // Set Product Details
+    document.getElementById('detail-title').textContent = title;
+    document.getElementById('detail-desc').textContent = description;
+    document.getElementById('detail-image').src = imageSrc;
+    
+    // Set Pricing (same as your existing code)
+    let priceHTML = '';
+    if (originalPrice && originalPrice > price) {
+        const discountPercent = Math.round(((originalPrice - price) / originalPrice) * 100);
+        priceHTML = `<div style="display: flex; align-items: baseline; gap: 10px; margin-bottom: 5px;"><span style="color: #CC0C39; font-size: 28px; font-weight: 300;">-${discountPercent}%</span><span style="font-size: 32px; font-weight: 500; color: var(--dark-text);">₹${parseFloat(price).toFixed(2)}</span></div><div style="font-size: 13px; color: var(--muted-gray);">M.R.P.: <span style="text-decoration: line-through;">₹${parseFloat(originalPrice).toFixed(2)}</span></div><div style="font-size: 13px; color: var(--dark-text); margin-top: 5px;">Inclusive of all taxes</div>`;
+    } else {
+        priceHTML = `<div style="font-size: 32px; font-weight: 500; color: var(--dark-text); margin-bottom: 5px;">₹${parseFloat(price).toFixed(2)}</div><div style="font-size: 13px; color: var(--dark-text);">Inclusive of all taxes</div>`;
+    }
+    document.getElementById('price-container').innerHTML = priceHTML;
+    window.scrollTo({ top: 0, behavior: 'smooth' });
+};
        // --- ADD THIS TO YOUR JAVASCRIPT ---
 
 // 1. Function to open the checkout modal
@@ -1672,28 +1815,51 @@ window.closeCheckoutModal = function() {
             }
         });
     }
-   window.addCurrentProductToCart = function() {
-        const qty = parseInt(document.getElementById('product-quantity').value) || 1;
-        let sizeText = document.getElementById('selected-size-text').textContent;
-        let finalSize = sizeText !== 'Select a size' ? sizeText : 'Standard';
+ window.addCurrentProductToCart = function() {
+    const qty = parseInt(document.getElementById('product-quantity').value) || 1;
+    let finalVariant = 'Standard';
+
+    if (currentProductView.category === 'Curated Hampers') {
+        let sizeText = document.getElementById('selected-hamper-size-text').textContent;
+        finalVariant = sizeText !== 'Select a box size' ? `Box: ${sizeText}` : 'Standard Box';
         
-        // If Custom is selected, format all the inputs into a single readable string
-        if (finalSize === 'Custom') {
-            const length = document.getElementById('custom-length').value || '-';
-            const chest = document.getElementById('custom-chest').value || '-';
-            const sleeves = document.getElementById('custom-sleeves').value || '-';
-            const notes = document.getElementById('custom-notes').value;
-            
-            finalSize = `Custom [L:${length}, C:${chest}, S:${sleeves}]`;
-            if (notes) {
-                // Truncate notes slightly for the cart preview to keep UI clean
-                const shortNotes = notes.length > 25 ? notes.substring(0, 25) + '...' : notes;
-                finalSize += ` - ${shortNotes}`;
-            }
+        if (sizeText === 'Custom Box') {
+            const l = document.getElementById('hamper-length').value || '-';
+            const w = document.getElementById('hamper-width').value || '-';
+            const h = document.getElementById('hamper-height').value || '-';
+            const notes = document.getElementById('hamper-custom-notes').value;
+            finalVariant = `Custom Box [${l}x${w}x${h}]`;
+            if (notes) finalVariant += ` - ${notes.substring(0, 25)}...`;
         }
+
+    } else if (currentProductView.category === 'Premium Niqabs') {
+        let sizeText = document.getElementById('selected-niqab-size-text').textContent;
+        finalVariant = sizeText !== 'Select length' ? `Length: ${sizeText}` : 'Standard Length';
+
+    } else if (currentProductView.category === 'Essential Hijabs' || currentProductView.category === 'Signature Accessories') {
+        // If colors exist for this product, grab the color. Otherwise, it stays 'Standard'
+        if (currentProductView.colorsStr && currentProductView.colorsStr.length > 0) {
+            let colorText = document.getElementById('selected-color-text').textContent;
+            finalVariant = colorText !== 'Select a color' ? `Color: ${colorText}` : 'Standard Color';
+        }
+
+    } else {
+        // Luxury Abayas
+        let sizeText = document.getElementById('selected-size-text').textContent;
+        finalVariant = sizeText !== 'Select a size' ? `Size: ${sizeText}` : 'Standard Size';
         
-        addSecureProductToCart(currentProductView.id, qty, finalSize);
-    };
+        if (sizeText === 'Custom') {
+            const l = document.getElementById('custom-length').value || '-';
+            const c = document.getElementById('custom-chest').value || '-';
+            const s = document.getElementById('custom-sleeves').value || '-';
+            const notes = document.getElementById('custom-notes').value;
+            finalVariant = `Custom [L:${l}, C:${c}, S:${s}]`;
+            if (notes) finalVariant += ` - ${notes.substring(0, 25)}...`;
+        }
+    }
+    
+    addSecureProductToCart(currentProductView.id, qty, finalVariant);
+};
        // --- ORDER HISTORY LOGIC ---
     const myOrdersBtn = document.getElementById('myOrdersBtn');
     const ordersModal = document.getElementById('ordersModal');
@@ -1728,34 +1894,33 @@ window.closeCheckoutModal = function() {
             popup.style.display = 'block';
         }
     };
-       // --- VIEW ITEM FROM ORDER HISTORY LOGIC ---
-    window.viewItemFromOrder = async function(productId) {
-        // 1. Close the Orders Vault modal
-        document.getElementById('ordersModal').classList.remove('active');
+      
+   // Update viewItemFromOrder function to fetch the category
+window.viewItemFromOrder = async function(productId) {
+    document.getElementById('ordersModal').classList.remove('active');
+    
+    try {
+        const productRef = doc(db, "products", productId);
+        const productSnap = await getDoc(productRef);
         
-        try {
-            // 2. Fetch the freshest product data from your database
-            const productRef = doc(db, "products", productId);
-            const productSnap = await getDoc(productRef);
+        if (productSnap.exists()) {
+            const product = productSnap.data();
+            const price = parseFloat(product.price) || 0;
+            const originalPrice = parseFloat(product.originalPrice) || null;
+            const category = product.category || 'Luxury Abayas'; // Default fallback
             
-            if (productSnap.exists()) {
-                const product = productSnap.data();
-                const price = parseFloat(product.price) || 0;
-                const originalPrice = parseFloat(product.originalPrice) || null;
-                
-                // 3. Hide the main storefront and ensure the dynamic shopping section is visible
-                document.getElementById('main-storefront').style.display = 'none';
-                document.getElementById('dynamic-shopping-section').style.display = 'block';
-                
-                // 4. Open the product detail view using your existing function
-                openProduct(productId, product.title, price, product.description || '', product.image || '', originalPrice);
-            } else {
-                alert("This product is from an older collection and is no longer available in the store.");
-            }
-        } catch (error) {
-            console.error("Error loading product:", error);
+            document.getElementById('main-storefront').style.display = 'none';
+            document.getElementById('dynamic-shopping-section').style.display = 'block';
+            
+            // Now passing the category as the 7th argument
+            openProduct(productId, product.title, price, product.description || '', product.image || '', originalPrice, category);
+        } else {
+            alert("This product is from an older collection and is no longer available in the store.");
         }
-    };
+    } catch (error) {
+        console.error("Error loading product:", error);
+    }
+};
 
     async function loadOrderHistory() {
         if (!currentUser) return;
