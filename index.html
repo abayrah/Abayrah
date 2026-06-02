@@ -1558,7 +1558,8 @@ if (niqabSizeButtons.length > 0) {
         const productsContainer = document.getElementById('collection-view');
         if(!productsContainer) return;
         try {
-            const q = query(collection(db, "products"), where("category", "==", categoryFilter));
+            // CHANGE 1: Use 'array-contains' instead of '==' so Firebase can search inside the category lists!
+            const q = query(collection(db, "products"), where("category", "array-contains", categoryFilter));
             const querySnapshot = await getDocs(q);
             productsContainer.innerHTML = ''; 
             if(querySnapshot.empty) { productsContainer.innerHTML = `<p style="text-align: center; width: 100%; color: var(--muted-gray);">No products available.</p>`; return; }
@@ -1568,17 +1569,27 @@ if (niqabSizeButtons.length > 0) {
                 const price = parseFloat(product.price) || 0;
                 const originalPrice = parseFloat(product.originalPrice) || null; 
                 
-                // 👇 THIS IS THE NEW COLOR EXTRACTION LINE 👇
+                // Color extraction
                 const colorsStr = product.colors ? escapeHTML(product.colors.join(',')) : ''; 
+
+                // CHANGE 2: Figure out the TRUE category. 
+                // If they are viewing the "Archive Sale", we still need to know if the item is a Hamper or a Niqab so the correct sizes show up!
+                let actualCategory = categoryFilter;
+                if (Array.isArray(product.category)) {
+                    // Find the main category, ignoring "Archive Sale"
+                    actualCategory = product.category.find(c => c !== "Archive Sale") || 'Luxury Abayas';
+                } else {
+                    actualCategory = product.category || 'Luxury Abayas';
+                }
 
                 let priceDisplay = `<p style="font-size: 11px; color: var(--muted-gray); font-weight: 500;">₹${price.toFixed(2)}</p>`;
                 if (originalPrice && originalPrice > price) {
                     priceDisplay = `<div style="display: flex; justify-content: center; gap: 6px;"><p style="font-size: 11px; color: var(--muted-gray); text-decoration: line-through;">₹${originalPrice.toFixed(2)}</p><p style="font-size: 11px; color: #CC0C39; font-weight: 600;">₹${price.toFixed(2)}</p></div>`;
                 }
                 
-                // 👇 THE ONCLICK HERE IS UPDATED TO PASS CATEGORY AND COLORS 👇
+                // CHANGE 3: We pass '${actualCategory}' into the onclick function instead of '${categoryFilter}'
                 productsContainer.insertAdjacentHTML('beforeend', `
-                    <div class="category-card" onclick="openProduct('${escapeHTML(docSnap.id)}', '${escapeHTML(product.title||'').replace(/'/g, "\\'")}', ${price}, '${escapeHTML(product.description||'').replace(/'/g, "\\'")}', '${escapeHTML(product.image||'')}', ${originalPrice}, '${categoryFilter}', '${colorsStr}')" style="background: var(--primary-bg); border: 1px solid var(--border-color); padding: 12px; border-radius: 2px; text-align: center; cursor: pointer;">
+                    <div class="category-card" onclick="openProduct('${escapeHTML(docSnap.id)}', '${escapeHTML(product.title||'').replace(/'/g, "\\'")}', ${price}, '${escapeHTML(product.description||'').replace(/'/g, "\\'")}', '${escapeHTML(product.image||'')}', ${originalPrice}, '${actualCategory}', '${colorsStr}')" style="background: var(--primary-bg); border: 1px solid var(--border-color); padding: 12px; border-radius: 2px; text-align: center; cursor: pointer;">
                         <div style="width: 100%; aspect-ratio: 3/4; background: #FAFAFA; overflow: hidden; margin-bottom: 15px; position:relative;">
                             <img src="${escapeHTML(product.image||'')}" style="position:absolute; top:0; left:0; width: 100%; height: 100%; object-fit: contain;">
                         </div>
@@ -1587,7 +1598,9 @@ if (niqabSizeButtons.length > 0) {
                     </div>
                 `);
             });
-        } catch (error) {}
+        } catch (error) {
+            console.error("Error loading products:", error);
+        }
     }
    // Update the openProduct function definition:
 window.openProduct = function(id, title, price, description, imageSrc, originalPrice, category, colorsStr) {
