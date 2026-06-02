@@ -1425,8 +1425,7 @@
 
         };
 
-     // --- EDIT MODAL ---
-        window.openEditModal = function(id) {
+  window.openEditModal = function(id) {
             const product = window.allProductsData[id];
             if(!product) return;
 
@@ -1451,8 +1450,9 @@
             variantContainer.innerHTML = '';
             let availableVariants = [];
 
-            if (primaryCategory === 'Luxury Abayas') availableVariants = ['52', '54', '56', '58', '60'];
-            else if (primaryCategory === 'Curated Hampers') availableVariants = ['Standard (10x8x4)', 'Large (12x10x6)'];
+            // ADDED: 'Custom' and 'Custom Box' so you can disable custom orders if you are too busy!
+            if (primaryCategory === 'Luxury Abayas') availableVariants = ['52', '54', '56', '58', '60', 'Custom'];
+            else if (primaryCategory === 'Curated Hampers') availableVariants = ['Standard (10x8x4)', 'Large (12x10x6)', 'Custom Box'];
             else if (primaryCategory === 'Premium Niqabs') availableVariants = ['5 inches', '7 inches', '9 inches', '12 inches', '24 inches'];
             else if (primaryCategory === 'Essential Hijabs' || primaryCategory === 'Signature Accessories') {
                 availableVariants = product.colors || [];
