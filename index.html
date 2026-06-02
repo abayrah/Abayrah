@@ -703,6 +703,7 @@
                 </div>
                 
                <div style="flex: 1; display: flex; flex-direction: column; min-width: 300px; justify-content: center;">
+                   <div id="detail-product-id" style="font-size: 10px; color: var(--muted-gray); letter-spacing: 2px; text-transform: uppercase; margin-bottom: 8px;">SKU: #XXXXXX</div>
     <h2 id="detail-title" style="font-family: var(--font-serif); font-size: 34px; font-weight: 400; margin-bottom: 15px; color: var(--dark-text); text-transform: uppercase; letter-spacing: 2px;">Product Title</h2>
     
     <div id="price-container" style="margin-bottom: 25px;"></div>
@@ -1082,7 +1083,7 @@
     if(searchOverlay) searchOverlay.addEventListener('click', (e) => { if (e.target === searchOverlay) closeSearch(); });
     if(searchInput) searchInput.addEventListener('input', (e) => filterProducts(e.target.value));
 
-    function filterProducts(term) {
+   function filterProducts(term) {
         const searchTerm = escapeHTML(term.toLowerCase().trim());
         let matchCount = 0;
         if (searchTerm.length > 0 && collectionsSection) collectionsSection.scrollIntoView({behavior: 'smooth', block: 'start'});
@@ -1091,8 +1092,17 @@
             const titleElement = card.querySelector('.category-name');
             const title = titleElement ? titleElement.textContent.toLowerCase() : '';
             const keywords = card.getAttribute('data-keywords') ? card.getAttribute('data-keywords').toLowerCase() : '';
-            if (title.includes(searchTerm) || keywords.includes(searchTerm)) { card.style.display = 'flex'; matchCount++; } 
-            else { card.style.display = 'none'; }
+            
+            // NEW: Extract the Product ID (SKU) we attached to the card's HTML
+            const prodId = card.getAttribute('data-id') ? card.getAttribute('data-id').toLowerCase() : '';
+            
+            // NEW: Check if the search matches the title, keywords, OR the Product ID
+            if (title.includes(searchTerm) || keywords.includes(searchTerm) || prodId.includes(searchTerm)) { 
+                card.style.display = 'flex'; 
+                matchCount++; 
+            } else { 
+                card.style.display = 'none'; 
+            }
         });
 
         if (noResultsMsg) {
@@ -1120,7 +1130,6 @@
             });
         });
     }
-
     // --- Seamless Circular Hero Carousel ---
     const slides = document.querySelectorAll('.carousel-slide');
     const dots = document.querySelectorAll('.indicator-dot');
