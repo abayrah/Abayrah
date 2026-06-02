@@ -959,15 +959,32 @@
             <div id="cartItemsWrapper" style="display: none;">
                 </div>
         </div>
-       <div class="cart-footer" id="cartFooter" style="display: none;">
-    <div class="cart-subtotal">
-        <span>Subtotal</span>
-        <span class="subtotal-amount" id="cartSubtotalAmount">₹0.00</span>
-    </div>
-    <p class="shipping-note">Taxes and shipping calculated at checkout.</p>
-    
-    <button class="submit-btn" style="margin-bottom: 0;" onclick="openCheckoutModal()">Proceed to Checkout</button>
-</div>
+ <div class="cart-footer" id="cartFooter" style="display: none;">
+        
+        <!-- NEW: COUPON CODE SECTION -->
+        <div id="coupon-section" style="margin-bottom: 15px; display: flex; gap: 10px;">
+            <input type="text" id="coupon-input" placeholder="Promo Code (e.g. WELCOME10)" style="flex: 1; padding: 12px; border: 1px solid var(--border-color); font-family: var(--font-sans); font-size: 11px; text-transform: uppercase; outline: none;">
+            <button onclick="applyWelcomeCoupon()" style="background: var(--dark-text); color: #fff; border: none; padding: 0 20px; font-size: 10px; text-transform: uppercase; letter-spacing: 1px; cursor: pointer; transition: 0.3s;">Apply</button>
+        </div>
+        <div id="coupon-message" style="font-size: 11px; margin-top: -10px; margin-bottom: 20px; font-weight: 500;"></div>
+
+        <div class="cart-subtotal">
+            <span>Subtotal</span>
+            <span class="subtotal-amount" id="cartSubtotalAmount">₹0.00</span>
+        </div>
+        
+        <!-- NEW: DISCOUNT & GRAND TOTAL DISPLAY -->
+        <div class="cart-subtotal" id="discount-row" style="display: none; color: #CC0C39; font-size: 12px;">
+            <span>Discount (10%)</span>
+            <span class="subtotal-amount" id="cartDiscountAmount">-₹0.00</span>
+        </div>
+        <div class="cart-subtotal" id="grand-total-row" style="display: none; font-size: 16px; border-top: 1px solid var(--border-color); padding-top: 10px; margin-top: 5px;">
+            <span>Grand Total</span>
+            <span class="subtotal-amount" id="cartGrandTotalAmount">₹0.00</span>
+        </div>
+
+        <p class="shipping-note">Taxes and shipping calculated at checkout.</p>
+        <button class="submit-btn" style="margin-bottom: 0;" onclick="openCheckoutModal()">Proceed to Checkout</button>
     </div>
 
     <div class="modal-overlay" id="loginModal">
@@ -1562,6 +1579,61 @@
         }
     });
 
+   // --- COUPON & CART TOTALS LOGIC ---
+    window.activeCoupon = null;
+    window.cartRawSubtotal = 0;
+
+    window.applyWelcomeCoupon = async function() {
+        if (!currentUser) return;
+        const input = document.getElementById('coupon-input').value.trim().toUpperCase();
+        const msgBox = document.getElementById('coupon-message');
+        
+        if (input !== 'WELCOME10') {
+            msgBox.textContent = 'Invalid coupon code.';
+            msgBox.style.color = '#CC0C39';
+            return;
+        }
+
+        // Check Firebase to see if they already used it!
+        const userRef = doc(db, "users", currentUser.uid);
+        const userSnap = await getDoc(userRef);
+        if (userSnap.exists() && userSnap.data().usedCoupons && userSnap.data().usedCoupons.includes('WELCOME10')) {
+            msgBox.textContent = 'You have already used this welcome coupon!';
+            msgBox.style.color = '#CC0C39';
+            return;
+        }
+
+        window.activeCoupon = 'WELCOME10';
+        msgBox.textContent = '10% WELCOME discount applied!';
+        msgBox.style.color = 'var(--success-green)';
+        window.updateCartTotalsDisplay();
+    };
+
+    window.updateCartTotalsDisplay = function() {
+        const subtotalEl = document.getElementById('cartSubtotalAmount');
+        const discountRow = document.getElementById('discount-row');
+        const discountAmountEl = document.getElementById('cartDiscountAmount');
+        const grandTotalRow = document.getElementById('grand-total-row');
+        const grandTotalAmountEl = document.getElementById('cartGrandTotalAmount');
+
+        if(subtotalEl) subtotalEl.textContent = `₹${window.cartRawSubtotal.toFixed(2)}`;
+
+        // If coupon is active, calculate 10% off
+        if (window.activeCoupon === 'WELCOME10' && window.cartRawSubtotal > 0) {
+            const discount = window.cartRawSubtotal * 0.10;
+            const finalTotal = window.cartRawSubtotal - discount;
+            
+            if(discountRow) discountRow.style.display = 'flex';
+            if(discountAmountEl) discountAmountEl.textContent = `-₹${discount.toFixed(2)}`;
+            
+            if(grandTotalRow) grandTotalRow.style.display = 'flex';
+            if(grandTotalAmountEl) grandTotalAmountEl.textContent = `₹${finalTotal.toFixed(2)}`;
+        } else {
+            if(discountRow) discountRow.style.display = 'none';
+            if(grandTotalRow) grandTotalRow.style.display = 'none';
+        }
+    };
+
     function listenToCart(userId) {
         const cartRef = collection(db, "users", userId, "cart");
         onSnapshot(cartRef, async (snapshot) => {
@@ -1572,6 +1644,8 @@
                 if(cartItemsWrapper) { cartItemsWrapper.style.display = 'none'; cartItemsWrapper.innerHTML = ''; }
                 if(cartFooter) cartFooter.style.display = 'none';
                 if(cartCountBadge) cartCountBadge.style.display = 'none';
+                window.cartRawSubtotal = 0;
+                window.updateCartTotalsDisplay();
             } else {
                 if(emptyCartState) emptyCartState.style.display = 'none';
                 if(cartItemsWrapper) cartItemsWrapper.style.display = 'block';
@@ -1589,7 +1663,7 @@
                             return { 
                                 id: safeId, 
                                 qty: item.quantity || 1, 
-                                size: escapeHTML(item.size || 'Standard'), // Grab size from cart doc
+                                size: escapeHTML(item.size || 'Standard'), 
                                 price: parseFloat(prodData.price) || 0, 
                                 title: escapeHTML(prodData.title || "Item"), 
                                 image: escapeHTML(prodData.image || "") 
@@ -1624,8 +1698,13 @@
                             </div>`;
                     }
                 });
+                
                 if(cartItemsWrapper) cartItemsWrapper.innerHTML = htmlBuffer;
-                if(cartSubtotalAmount) cartSubtotalAmount.textContent = `₹${subtotal.toFixed(2)}`;
+                
+                // NEW: Save raw total and update discount displays!
+                window.cartRawSubtotal = subtotal;
+                window.updateCartTotalsDisplay();
+                
                 if(cartCountBadge) cartCountBadge.textContent = totalItems;
             }
         });
@@ -1925,22 +2004,22 @@ window.currentProductListener = null;
     };
 // 1. Function to open the checkout modal
 window.openCheckoutModal = function() {
-    // Require user to be logged in
     if (!currentUser) {
         document.getElementById('loginModal').classList.add('active');
         document.getElementById('modalTitle').textContent = "Sign In to Checkout";
         return;
     }
     
-    // Close the cart drawer
     document.getElementById('cartDrawer').classList.remove('active');
     document.getElementById('cartOverlay').classList.remove('active');
     
-    // Copy the subtotal amount to the checkout screen
-    const currentTotal = document.getElementById('cartSubtotalAmount').textContent;
-    document.getElementById('checkoutTotalDisplay').textContent = currentTotal;
+    // NEW: Copy the exact discounted total (or subtotal) to the checkout screen
+    let finalAmount = window.cartRawSubtotal;
+    if (window.activeCoupon === 'WELCOME10') {
+        finalAmount = window.cartRawSubtotal * 0.90; // Apply the 10%
+    }
+    document.getElementById('checkoutTotalDisplay').textContent = `₹${finalAmount.toFixed(2)}`;
     
-    // Show the checkout modal
     document.getElementById('checkoutModal').classList.add('active');
 };
 
@@ -2033,28 +2112,40 @@ window.closeCheckoutModal = function() {
                             });
                         }
 
-                        // 2. Save the detailed permanent Order Receipt to Firebase
+                     // 2. Save the detailed permanent Order Receipt to Firebase
                         const orderRef = doc(collection(db, "users", currentUser.uid, "orders"));
-                        const numericOrderId = Math.floor(100000000 + Math.random() * 900000000).toString(); // Generates a random 9-digit number
+                        const numericOrderId = Math.floor(100000000 + Math.random() * 900000000).toString(); 
                         
                         await setDoc(orderRef, {
-                            orderNumber: numericOrderId, // Saves our new clean number
+                            orderNumber: numericOrderId, 
                             paymentId: paymentResponse.razorpay_payment_id || "TEST_PAYMENT",
                             amount: orderAmount,
                             date: new Date().toISOString(),
                             status: "Processing", 
                             itemsCount: totalItemsCount,
                             shippingInfo: savedShippingData,
-                            items: orderItems 
+                            items: orderItems,
+                            couponUsed: window.activeCoupon || null // NEW: Save coupon info to receipt
                         });
+                        
                         // 3. Clear out the checkout cart nodes
                         const deletePromises = cartSnapshot.docs.map(cartDoc => deleteDoc(doc(db, "users", currentUser.uid, "cart", cartDoc.id)));
                         await Promise.all(deletePromises);
 
+                        // 4. NEW: LOCK THE COUPON IN FIREBASE SO IT CAN NEVER BE USED AGAIN
+                        if (window.activeCoupon) {
+                            const userRef = doc(db, "users", currentUser.uid);
+                            const userSnap = await getDoc(userRef);
+                            let usedArr = userSnap.exists() && userSnap.data().usedCoupons ? userSnap.data().usedCoupons : [];
+                            if (!usedArr.includes(window.activeCoupon)) {
+                                usedArr.push(window.activeCoupon);
+                                await setDoc(userRef, { usedCoupons: usedArr }, { merge: true });
+                            }
+                        }
+
                         alert("Payment Successful! Your modest wardrobe statement order has been placed.");
                         document.getElementById('checkoutModal').classList.remove('active');
                         document.getElementById('catalogs').scrollIntoView({behavior: 'smooth'});
-                    },
                     "prefill": {
                         "name": `${savedShippingData.firstName} ${savedShippingData.lastName}`,
                         "email": savedShippingData.email,
