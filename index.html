@@ -1628,12 +1628,10 @@ window.currentProductListener = null;
         document.getElementById('dynamic-main-title').style.display = 'none'; 
         if(document.getElementById('product-quantity')) document.getElementById('product-quantity').value = 1;
 
-        // Disconnect from any previously viewed product
         if (window.currentProductListener) window.currentProductListener();
 
         let isFirstLoad = true;
 
-        // NEW: Real-time listener specifically for this single product!
         window.currentProductListener = onSnapshot(doc(db, "products", id), (docSnap) => {
             if (!docSnap.exists()) return;
 
@@ -1641,20 +1639,17 @@ window.currentProductListener = null;
             const currentInStock = product.inStock !== false;
             const outVariants = product.stockOutVariants ? product.stockOutVariants.map(s => s.trim().toLowerCase()) : [];
 
-            // Update global view for cart verification
             currentProductView = {
                 id: id, title: product.title || title, price: product.price || price, 
                 imageSrc: product.image || imageSrc, category: category, colorsStr: colorsStr, 
                 inStock: currentInStock, stockOutVariantsStr: product.stockOutVariants ? product.stockOutVariants.join(',') : ''
             };
 
-            // Helper to apply strike-throughs and trigger alerts
             const applyStockStyle = (btn, isOut) => {
                 if (isOut) {
                     btn.classList.add('out-of-stock-btn');
                     btn.style.cssText = "text-decoration: line-through !important; color: #ccc !important; border-color: #eee !important; background-color: #fafafa !important; opacity: 0.6 !important; cursor: not-allowed !important; pointer-events: none !important;";
                     
-                    // If the customer had it selected, boot them off and alert them
                     if (btn.classList.contains('selected')) {
                         btn.classList.remove('selected');
                         if(document.getElementById('selected-size-text')) document.getElementById('selected-size-text').textContent = 'Select a size';
@@ -1662,7 +1657,6 @@ window.currentProductListener = null;
                         if(document.getElementById('selected-niqab-size-text')) document.getElementById('selected-niqab-size-text').textContent = 'Select length';
                         if(document.getElementById('selected-color-text')) document.getElementById('selected-color-text').textContent = 'Select a color';
 
-                        // Only alert if they are actively viewing the page, not on initial click
                         if (!isFirstLoad) alert("Notice: The variant you selected just went out of stock!");
                     }
                 } else {
@@ -1671,13 +1665,11 @@ window.currentProductListener = null;
                 }
             };
 
-            // Reset UI Visibility
             document.getElementById('apparel-size-selector').style.display = 'none';
             document.getElementById('hamper-size-selector').style.display = 'none';
             document.getElementById('niqab-size-selector').style.display = 'none';
             document.getElementById('color-selector-container').style.display = 'none';
 
-            // Process Sizes Live
             if (category === 'Curated Hampers') {
                 document.getElementById('hamper-size-selector').style.display = 'block';
                 document.querySelectorAll('.hamper-size-btn').forEach(btn => {
@@ -1697,7 +1689,6 @@ window.currentProductListener = null;
             } else if (category === 'Essential Hijabs' || category === 'Signature Accessories') {
                 if (colorsStr && colorsStr.length > 0) {
                     document.getElementById('color-selector-container').style.display = 'block';
-                    // We only rebuild the actual buttons on first load to prevent flickering
                     if (isFirstLoad) {
                         const colorOptionsDiv = document.getElementById('dynamic-color-options');
                         colorOptionsDiv.innerHTML = ''; 
@@ -1718,7 +1709,6 @@ window.currentProductListener = null;
                             colorOptionsDiv.appendChild(btn);
                         });
                     }
-                    // Apply live styles to the existing buttons
                     document.querySelectorAll('.color-btn').forEach(btn => {
                         applyStockStyle(btn, outVariants.includes(btn.getAttribute('data-color').toLowerCase()));
                     });
@@ -1731,14 +1721,13 @@ window.currentProductListener = null;
                 if(document.getElementById('custom-size-container')) document.getElementById('custom-size-container').style.display = 'none';
             }
             
-            // Live update text & images
             document.getElementById('detail-title').textContent = product.title || title;
             document.getElementById('detail-desc').textContent = product.description || description;
             document.getElementById('detail-image').src = product.image || imageSrc;
             
-            // Live update Master Cart Buttons
+            // FIXED SYNTAX ERROR HERE (Removed the extra slashes causing the crash)
             const addToCartBtn = document.querySelector('button[onclick="addCurrentProductToCart()"]');
-            const buyNowBtn = document.querySelector('button[onclick="addCurrentProductToCart(); setTimeout(() => document.getElementById(\\'cartIconBtn\\').click(), 200);"]');
+            const buyNowBtn = document.querySelector('button[onclick="addCurrentProductToCart(); setTimeout(() => document.getElementById(\'cartIconBtn\').click(), 200);"]');
             
             if (addToCartBtn && buyNowBtn) {
                 if (!currentInStock) {
@@ -1766,7 +1755,6 @@ window.currentProductListener = null;
                 }
             }
 
-            // Live Pricing Update
             const displayPrice = product.price || price;
             const displayOriginal = product.originalPrice || originalPrice;
             let priceHTML = '';
@@ -1782,8 +1770,6 @@ window.currentProductListener = null;
             isFirstLoad = false;
         });
     };
-       
-       // --- ADD THIS TO YOUR JAVASCRIPT ---
 
 // 1. Function to open the checkout modal
 window.openCheckoutModal = function() {
