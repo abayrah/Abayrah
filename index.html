@@ -1083,10 +1083,10 @@
         );
     }
 
-    function closeSearch() { 
+   function closeSearch() { 
         if(searchOverlay) searchOverlay.classList.remove('active'); 
         if(searchInput) searchInput.value = ''; 
-        filterProducts(''); 
+        if(window.filterProducts) window.filterProducts(''); 
     }
 
     if(searchTriggerBtn && searchOverlay) {
@@ -1094,151 +1094,11 @@
     }
     if(closeSearchBtn) closeSearchBtn.addEventListener('click', closeSearch);
     if(searchOverlay) searchOverlay.addEventListener('click', (e) => { if (e.target === searchOverlay) closeSearch(); });
-    if(searchInput) searchInput.addEventListener('input', (e) => filterProducts(e.target.value));
-
-// --- LIVE DATABASE SEARCH LOGIC ---
-// --- LIVE DATABASE SEARCH LOGIC ---
- // --- OMNI-SEARCH LOGIC (ALL-ROUNDER) ---
-    window.cachedStoreProducts = null;
-
-    window.filterProducts = async function(term) {
-        const searchTerm = escapeHTML(term.toLowerCase().trim()).replace('#', '');
-        
-        const noResults = document.getElementById('noResultsMsg') || (typeof noResultsMsg !== 'undefined' ? noResultsMsg : null);
-        const productsContainer = document.getElementById('collection-view');
-        
-        const homeCategories = document.querySelectorAll('.category-card:not(.product-result)'); 
-        const dynamicTitle = document.getElementById('dynamic-main-title'); 
-
-        if (searchTerm === '') {
-            if (productsContainer) { productsContainer.innerHTML = ''; productsContainer.style.display = 'none'; }
-            if (dynamicTitle) dynamicTitle.style.display = 'block';
-            homeCategories.forEach(card => card.style.display = 'flex');
-            if (noResults) noResults.style.display = 'none';
-            return;
-        }
-
-        homeCategories.forEach(card => card.style.display = 'none');
-        if (dynamicTitle) dynamicTitle.style.display = 'none';
-        if (productsContainer) {
-            productsContainer.style.display = 'grid'; 
-            productsContainer.innerHTML = '<p style="text-align: center; width: 100%; color: var(--muted-gray); grid-column: 1 / -1; margin-top: 50px; letter-spacing: 2px; font-size: 11px;">SEARCHING VAULT...</p>';
-        }
-
-        if (!window.cachedStoreProducts) {
-            try {
-                const querySnapshot = await getDocs(collection(db, "products"));
-                window.cachedStoreProducts = [];
-                querySnapshot.forEach(docSnap => {
-                    window.cachedStoreProducts.push({ _docId: docSnap.id, ...docSnap.data() });
-                });
-            } catch (e) {
-                console.error("Search Error:", e);
-                return;
-            }
-        }
-
-        let matchCount = 0;
-        let resultsHTML = '';
-
-        // 🌟 1. SMART INTENT CARDS (Customer Care, Policies, Catalogs) 🌟
-        
-      // A. Customer Care / Contact
-        if (['care', 'contact', 'support', 'email', 'phone', 'number', 'help', 'whatsapp'].some(v => searchTerm.includes(v))) {
-            matchCount++;
-            resultsHTML += `
-                <div style="grid-column: 1 / -1; background: #1C1B1A; color: #fff; padding: 40px; text-align: center; border-radius: 2px; margin-bottom: 20px;">
-                    <h3 style="font-family: var(--font-serif); font-size: 28px; margin-bottom: 10px; color: var(--accent-gold); letter-spacing: 2px; text-transform: uppercase;">Concierge Support</h3>
-                    <p style="font-size: 13px; font-weight: 300; letter-spacing: 1px; margin-bottom: 20px; color: #ECEAE6;">We are here to assist you with your modest wardrobe needs.</p>
-                    <p style="font-size: 14px; font-weight: 500; letter-spacing: 1px;">Email: Abayrah.18@gmail.com <br><br> WhatsApp & Phone: +91 7842358753</p>
-                </div>
-            `;
-        }
-        // B. Exchange & Returns
-        if (['exchange', 'return', 'refund', 'policy'].some(v => searchTerm.includes(v))) {
-            matchCount++;
-            resultsHTML += `
-                <div style="grid-column: 1 / -1; background: #FAFAFA; border: 1px solid var(--border-color); padding: 40px; text-align: center; border-radius: 2px; margin-bottom: 20px;">
-                    <h3 style="font-family: var(--font-serif); font-size: 24px; margin-bottom: 15px; text-transform: uppercase; letter-spacing: 2px; color: var(--dark-text);">Exchange & Return Policy</h3>
-                    <p style="font-size: 13px; color: var(--muted-gray); line-height: 1.8; max-width: 700px; margin: 0 auto;">We offer a hassle-free 7-day exchange policy. Items must be unworn, unwashed, and retain all original tags. For hygiene and safety reasons, Niqabs and inner caps are non-returnable and non-exchangeable.</p>
-                </div>
-            `;
-        }
-
-        // C. Direct Catalog Links
-        const catalogShortcuts = [
-            { keywords: ['abaya', 'burqa'], title: 'Luxury Abayas', sub: 'The Complete Collection' },
-            { keywords: ['hamper', 'gift'], title: 'Curated Hampers', sub: 'Explore Gifting' },
-            { keywords: ['hijab', 'scarf'], title: 'Essential Hijabs', sub: 'The Complete Collection' },
-            { keywords: ['niqab', 'naqab', 'veil'], title: 'Premium Niqabs', sub: 'The Complete Collection' },
-            { keywords: ['accessory', 'accessories', 'pins', 'hijab pins', 'magnetic pins', 'hijab caps'], title: 'Signature Accessories', sub: 'Explore Finery' }
-        ];
-
-        catalogShortcuts.forEach(cat => {
-            if (cat.keywords.some(v => searchTerm.includes(v))) {
-                matchCount++;
-                resultsHTML += `
-                    <div style="grid-column: 1 / -1; padding: 25px; text-align: center; border: 1px solid var(--accent-gold); background: rgba(197, 168, 128, 0.03); cursor: pointer; margin-bottom: 20px; transition: 0.3s;" onmouseover="this.style.background='rgba(197, 168, 128, 0.1)'" onmouseout="this.style.background='rgba(197, 168, 128, 0.03)'" onclick="closeSearch(); openCategoryStore('${cat.title}', '${cat.sub}');">
-                        <h3 style="font-family: var(--font-serif); font-size: 22px; color: var(--dark-text); text-transform: uppercase; letter-spacing: 3px; margin-bottom: 8px;">View All ${cat.title} &rarr;</h3>
-                        <p style="font-size: 10px; color: var(--muted-gray); text-transform: uppercase; letter-spacing: 2px;">Click to explore the full collection</p>
-                    </div>
-                `;
-            }
-        });
-
-        // 🌟 2. PRODUCT DATABASE SEARCH (SKU, Title, Category) 🌟
-        window.cachedStoreProducts.forEach(product => {
-            let hashVal = 0;
-            for (let i = 0; i < product._docId.length; i++) { hashVal = product._docId.charCodeAt(i) + ((hashVal << 5) - hashVal); }
-            const numericSku = (Math.abs(hashVal) % 900000 + 100000).toString();
-
-            const title = (product.title || '').toLowerCase();
-            const categoryName = Array.isArray(product.category) ? product.category.join(' ').toLowerCase() : (product.category || '').toLowerCase();
-
-            if (title.includes(searchTerm) || numericSku.includes(searchTerm) || categoryName.includes(searchTerm)) {
-                matchCount++;
-                const price = parseFloat(product.price) || 0;
-                const originalPrice = parseFloat(product.originalPrice) || null; 
-                const colorsStr = product.colors ? escapeHTML(product.colors.join(',')) : ''; 
-                const inStock = product.inStock !== false; 
-                const stockOutVariantsStr = product.stockOutVariants ? escapeHTML(product.stockOutVariants.join(',')) : '';
-                
-                let actualCategory = Array.isArray(product.category) ? (product.category.find(c => c !== "Archive Sale") || 'Luxury Abayas') : (product.category || 'Luxury Abayas');
-                let priceDisplay = `<p style="font-size: 11px; color: var(--muted-gray); font-weight: 500;">₹${price.toFixed(2)}</p>`;
-                
-                if (originalPrice && originalPrice > price) {
-                    priceDisplay = `<div style="display: flex; justify-content: center; gap: 6px;"><p style="font-size: 11px; color: var(--muted-gray); text-decoration: line-through;">₹${originalPrice.toFixed(2)}</p><p style="font-size: 11px; color: #CC0C39; font-weight: 600;">₹${price.toFixed(2)}</p></div>`;
-                }
-                
-                const imgFilter = inStock ? "" : "filter: grayscale(100%); opacity: 0.6;";
-                const outOfStockBadge = inStock ? "" : `<div style="position: absolute; top: 50%; left: 50%; transform: translate(-50%, -50%); background: rgba(28,27,26,0.85); color: #fff; padding: 8px 15px; font-size: 10px; letter-spacing: 3px; text-transform: uppercase; z-index: 10;">Sold Out</div>`;
-                const displayId = numericSku;
-
-                resultsHTML += `
-                    <div class="category-card product-result" data-id="${displayId}" onclick="closeSearch(); openProduct('${escapeHTML(product._docId)}', '${escapeHTML(product.title||'').replace(/'/g, "\\'")}', ${price}, '${escapeHTML(product.description||'').replace(/'/g, "\\'")}', '${escapeHTML(product.image||'')}', ${originalPrice}, '${actualCategory}', '${colorsStr}', ${inStock}, '${stockOutVariantsStr}', '${displayId}')" style="background: var(--primary-bg); border: 1px solid var(--border-color); padding: 12px; border-radius: 2px; text-align: center; cursor: pointer;">
-                        <div style="width: 100%; aspect-ratio: 3/4; background: #FAFAFA; overflow: hidden; margin-bottom: 15px; position:relative;">
-                            ${outOfStockBadge}
-                            <img src="${escapeHTML(product.image||'')}" style="position:absolute; top:0; left:0; width: 100%; height: 100%; object-fit: contain; transition: 0.5s; ${imgFilter}">
-                        </div>
-                        <h3 style="font-family: var(--font-serif); font-size: 16px; margin-bottom: 5px; color: var(--dark-text); text-transform: uppercase;">${escapeHTML(product.title||'')}</h3>
-                        ${priceDisplay}
-                    </div>
-                `;
-            }
-        });
-
-        if (productsContainer) productsContainer.innerHTML = resultsHTML;
-
-        const noResMsg = document.getElementById('noResultsMsg');
-        if (noResMsg) {
-            if (matchCount === 0) { 
-                noResMsg.style.display = 'block'; 
-                noResMsg.innerHTML = `No results found for "<strong>${searchTerm}</strong>"`; 
-            } else { 
-                noResMsg.style.display = 'none'; 
-            }
-        }
-    };
+    
+    // This safely sends the typed letters down to the Firebase room!
+    if(searchInput) searchInput.addEventListener('input', (e) => {
+        if(window.filterProducts) window.filterProducts(e.target.value);
+    });
 
     const hamburgerBtn = document.getElementById('hamburgerBtn');
     const navLinks = document.getElementById('navLinks');
@@ -1505,6 +1365,150 @@
     const provider = new GoogleAuthProvider();
     let currentUser = null;
     let currentProductView = {};
+       // --- OMNI-SEARCH LOGIC (ALL-ROUNDER) ---
+    window.cachedStoreProducts = null;
+
+    window.filterProducts = async function(term) {
+        const searchTerm = escapeHTML(term.toLowerCase().trim()).replace('#', '');
+        
+        const noResults = document.getElementById('noResultsMsg') || (typeof noResultsMsg !== 'undefined' ? noResultsMsg : null);
+        const productsContainer = document.getElementById('collection-view');
+        
+        const homeCategories = document.querySelectorAll('.category-card:not(.product-result)'); 
+        const dynamicTitle = document.getElementById('dynamic-main-title'); 
+
+        if (searchTerm === '') {
+            if (productsContainer) { productsContainer.innerHTML = ''; productsContainer.style.display = 'none'; }
+            if (dynamicTitle) dynamicTitle.style.display = 'block';
+            homeCategories.forEach(card => card.style.display = 'flex');
+            if (noResults) noResults.style.display = 'none';
+            return;
+        }
+
+        homeCategories.forEach(card => card.style.display = 'none');
+        if (dynamicTitle) dynamicTitle.style.display = 'none';
+        if (productsContainer) {
+            productsContainer.style.display = 'grid'; 
+            productsContainer.innerHTML = '<p style="text-align: center; width: 100%; color: var(--muted-gray); grid-column: 1 / -1; margin-top: 50px; letter-spacing: 2px; font-size: 11px;">SEARCHING VAULT...</p>';
+        }
+
+        if (!window.cachedStoreProducts) {
+            try {
+                // IT CAN NOW SEE getDocs BECAUSE IT IS IN THE FIREBASE MODULE!
+                const querySnapshot = await getDocs(collection(db, "products"));
+                window.cachedStoreProducts = [];
+                querySnapshot.forEach(docSnap => {
+                    window.cachedStoreProducts.push({ _docId: docSnap.id, ...docSnap.data() });
+                });
+            } catch (e) {
+                console.error("Search Error:", e);
+                return;
+            }
+        }
+
+        let matchCount = 0;
+        let resultsHTML = '';
+
+        // 🌟 1. SMART INTENT CARDS (Customer Care, Policies, Catalogs) 🌟
+        
+        // A. Customer Care / Contact
+        if (['care', 'contact', 'support', 'email', 'phone', 'number', 'help', 'whatsapp'].some(v => searchTerm.includes(v))) {
+            matchCount++;
+            resultsHTML += `
+                <div style="grid-column: 1 / -1; background: #1C1B1A; color: #fff; padding: 40px; text-align: center; border-radius: 2px; margin-bottom: 20px;">
+                    <h3 style="font-family: var(--font-serif); font-size: 28px; margin-bottom: 10px; color: var(--accent-gold); letter-spacing: 2px; text-transform: uppercase;">Concierge Support</h3>
+                    <p style="font-size: 13px; font-weight: 300; letter-spacing: 1px; margin-bottom: 20px; color: #ECEAE6;">We are here to assist you with your modest wardrobe needs.</p>
+                    <p style="font-size: 14px; font-weight: 500; letter-spacing: 1px;">Email: Abayrah.18@gmail.com <br><br> WhatsApp & Phone: +91 7842358753</p>
+                </div>
+            `;
+        }
+
+        // B. Exchange & Returns
+        if (['exchange', 'return', 'refund', 'policy'].some(v => searchTerm.includes(v))) {
+            matchCount++;
+            resultsHTML += `
+                <div style="grid-column: 1 / -1; background: #FAFAFA; border: 1px solid var(--border-color); padding: 40px; text-align: center; border-radius: 2px; margin-bottom: 20px;">
+                    <h3 style="font-family: var(--font-serif); font-size: 24px; margin-bottom: 15px; text-transform: uppercase; letter-spacing: 2px; color: var(--dark-text);">Exchange & Return Policy</h3>
+                    <p style="font-size: 13px; color: var(--muted-gray); line-height: 1.8; max-width: 700px; margin: 0 auto;">We offer a hassle-free 7-day exchange policy. Items must be unworn, unwashed, and retain all original tags. For hygiene and safety reasons, Niqabs and inner caps are non-returnable and non-exchangeable.</p>
+                </div>
+            `;
+        }
+
+        // C. Direct Catalog Links
+        const catalogShortcuts = [
+            { keywords: ['abaya', 'burqa'], title: 'Luxury Abayas', sub: 'The Complete Collection' },
+            { keywords: ['hamper', 'gift'], title: 'Curated Hampers', sub: 'Explore Gifting' },
+            { keywords: ['hijab', 'scarf'], title: 'Essential Hijabs', sub: 'The Complete Collection' },
+            { keywords: ['niqab', 'naqab', 'veil'], title: 'Premium Niqabs', sub: 'The Complete Collection' },
+            { keywords: ['accessory', 'accessories', 'pins', 'hijab pins', 'magnetic pins', 'hijab caps'], title: 'Signature Accessories', sub: 'Explore Finery' }
+        ];
+
+        catalogShortcuts.forEach(cat => {
+            if (cat.keywords.some(v => searchTerm.includes(v))) {
+                matchCount++;
+                resultsHTML += `
+                    <div style="grid-column: 1 / -1; padding: 25px; text-align: center; border: 1px solid var(--accent-gold); background: rgba(197, 168, 128, 0.03); cursor: pointer; margin-bottom: 20px; transition: 0.3s;" onmouseover="this.style.background='rgba(197, 168, 128, 0.1)'" onmouseout="this.style.background='rgba(197, 168, 128, 0.03)'" onclick="closeSearch(); openCategoryStore('${cat.title}', '${cat.sub}');">
+                        <h3 style="font-family: var(--font-serif); font-size: 22px; color: var(--dark-text); text-transform: uppercase; letter-spacing: 3px; margin-bottom: 8px;">View All ${cat.title} &rarr;</h3>
+                        <p style="font-size: 10px; color: var(--muted-gray); text-transform: uppercase; letter-spacing: 2px;">Click to explore the full collection</p>
+                    </div>
+                `;
+            }
+        });
+
+        // 🌟 2. PRODUCT DATABASE SEARCH (SKU, Title, Category) 🌟
+        window.cachedStoreProducts.forEach(product => {
+            let hashVal = 0;
+            for (let i = 0; i < product._docId.length; i++) { hashVal = product._docId.charCodeAt(i) + ((hashVal << 5) - hashVal); }
+            const numericSku = (Math.abs(hashVal) % 900000 + 100000).toString();
+
+            const title = (product.title || '').toLowerCase();
+            const categoryName = Array.isArray(product.category) ? product.category.join(' ').toLowerCase() : (product.category || '').toLowerCase();
+
+            if (title.includes(searchTerm) || numericSku.includes(searchTerm) || categoryName.includes(searchTerm)) {
+                matchCount++;
+                const price = parseFloat(product.price) || 0;
+                const originalPrice = parseFloat(product.originalPrice) || null; 
+                const colorsStr = product.colors ? escapeHTML(product.colors.join(',')) : ''; 
+                const inStock = product.inStock !== false; 
+                const stockOutVariantsStr = product.stockOutVariants ? escapeHTML(product.stockOutVariants.join(',')) : '';
+                
+                let actualCategory = Array.isArray(product.category) ? (product.category.find(c => c !== "Archive Sale") || 'Luxury Abayas') : (product.category || 'Luxury Abayas');
+                let priceDisplay = `<p style="font-size: 11px; color: var(--muted-gray); font-weight: 500;">₹${price.toFixed(2)}</p>`;
+                
+                if (originalPrice && originalPrice > price) {
+                    priceDisplay = `<div style="display: flex; justify-content: center; gap: 6px;"><p style="font-size: 11px; color: var(--muted-gray); text-decoration: line-through;">₹${originalPrice.toFixed(2)}</p><p style="font-size: 11px; color: #CC0C39; font-weight: 600;">₹${price.toFixed(2)}</p></div>`;
+                }
+                
+                const imgFilter = inStock ? "" : "filter: grayscale(100%); opacity: 0.6;";
+                const outOfStockBadge = inStock ? "" : `<div style="position: absolute; top: 50%; left: 50%; transform: translate(-50%, -50%); background: rgba(28,27,26,0.85); color: #fff; padding: 8px 15px; font-size: 10px; letter-spacing: 3px; text-transform: uppercase; z-index: 10;">Sold Out</div>`;
+                const displayId = numericSku;
+
+                resultsHTML += `
+                    <div class="category-card product-result" data-id="${displayId}" onclick="closeSearch(); openProduct('${escapeHTML(product._docId)}', '${escapeHTML(product.title||'').replace(/'/g, "\\'")}', ${price}, '${escapeHTML(product.description||'').replace(/'/g, "\\'")}', '${escapeHTML(product.image||'')}', ${originalPrice}, '${actualCategory}', '${colorsStr}', ${inStock}, '${stockOutVariantsStr}', '${displayId}')" style="background: var(--primary-bg); border: 1px solid var(--border-color); padding: 12px; border-radius: 2px; text-align: center; cursor: pointer;">
+                        <div style="width: 100%; aspect-ratio: 3/4; background: #FAFAFA; overflow: hidden; margin-bottom: 15px; position:relative;">
+                            ${outOfStockBadge}
+                            <img src="${escapeHTML(product.image||'')}" style="position:absolute; top:0; left:0; width: 100%; height: 100%; object-fit: contain; transition: 0.5s; ${imgFilter}">
+                        </div>
+                        <h3 style="font-family: var(--font-serif); font-size: 16px; margin-bottom: 5px; color: var(--dark-text); text-transform: uppercase;">${escapeHTML(product.title||'')}</h3>
+                        ${priceDisplay}
+                    </div>
+                `;
+            }
+        });
+
+        if (productsContainer) productsContainer.innerHTML = resultsHTML;
+
+        const noResMsg = document.getElementById('noResultsMsg');
+        if (noResMsg) {
+            if (matchCount === 0) { 
+                noResMsg.style.display = 'block'; 
+                noResMsg.innerHTML = `No results found for "<strong>${searchTerm}</strong>"`; 
+            } else { 
+                noResMsg.style.display = 'none'; 
+            }
+        }
+    };
+       
 
     // --- Firebase UI Elements ---
     const googleSignInBtn = document.getElementById('googleSignInBtn');
