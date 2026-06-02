@@ -436,7 +436,15 @@
             .form-row { flex-direction: column; gap: 0; }
             #searchInput { font-size: 20px; padding: 10px 0; }
             .search-container { padding: 80px 20px; }
-            .size-btn.out-of-stock-btn { text-decoration: line-through; color: #ccc; border-color: #eee; pointer-events: none; }
+           /* Out of Stock Styling */
+    .size-btn.out-of-stock-btn { 
+        text-decoration: line-through !important; 
+        color: #ccc !important; 
+        border-color: #eee !important; 
+        background-color: #fafafa !important; 
+        pointer-events: none !important; 
+        opacity: 0.6; 
+    }
     .action-btn-disabled { background-color: #f5f5f5 !important; color: #a0a0a0 !important; border-color: #e0e0e0 !important; cursor: not-allowed !important; }
         }
     </style>
@@ -1235,60 +1243,59 @@
         qtyInput.value = newQty;
     };
 
-    // --- Size Selector Logic ---
-    const sizeButtons = document.querySelectorAll('.size-btn');
+// --- Size Selector Logic ---
+    const apparelSizeButtons = document.querySelectorAll('#size-options .size-btn');
     const selectedSizeText = document.getElementById('selected-size-text');
     const customSizeContainer = document.getElementById('custom-size-container');
 
-    if (sizeButtons.length > 0) {
-        sizeButtons.forEach(button => {
+    if (apparelSizeButtons.length > 0) {
+        apparelSizeButtons.forEach(button => {
             button.addEventListener('click', function(e) {
                 e.preventDefault();
-                sizeButtons.forEach(btn => btn.classList.remove('selected'));
+                if(this.classList.contains('out-of-stock-btn')) return; // STOP CLICK IF OUT OF STOCK
+                apparelSizeButtons.forEach(btn => btn.classList.remove('selected'));
                 this.classList.add('selected');
                 const selectedSize = this.getAttribute('data-size');
                 if(selectedSizeText) selectedSizeText.textContent = selectedSize;
-                if (customSizeContainer) {
-                    customSizeContainer.style.display = (selectedSize === 'Custom') ? 'block' : 'none';
-                }
+                if (customSizeContainer) customSizeContainer.style.display = (selectedSize === 'Custom') ? 'block' : 'none';
             });
         });
     }
-        // Add event listeners for the Hamper Size buttons
-const hamperSizeButtons = document.querySelectorAll('.hamper-size-btn');
-const selectedHamperSizeText = document.getElementById('selected-hamper-size-text');
-const customHamperSizeContainer = document.getElementById('custom-hamper-size-container');
 
-if (hamperSizeButtons.length > 0) {
-    hamperSizeButtons.forEach(button => {
-        button.addEventListener('click', function(e) {
-            e.preventDefault();
-            hamperSizeButtons.forEach(btn => btn.classList.remove('selected'));
-            this.classList.add('selected');
-            
-            const selectedSize = this.getAttribute('data-size');
-            if(selectedHamperSizeText) selectedHamperSizeText.textContent = selectedSize;
-            
-            if (customHamperSizeContainer) {
-                customHamperSizeContainer.style.display = (selectedSize === 'Custom Box') ? 'block' : 'none';
-            }
-        });
-    });
-}
-        // Add event listeners for the Niqab Size buttons
-const niqabSizeButtons = document.querySelectorAll('.niqab-size-btn');
-const selectedNiqabSizeText = document.getElementById('selected-niqab-size-text');
+    // Add event listeners for the Hamper Size buttons
+    const hamperSizeButtons = document.querySelectorAll('.hamper-size-btn');
+    const selectedHamperSizeText = document.getElementById('selected-hamper-size-text');
+    const customHamperSizeContainer = document.getElementById('custom-hamper-size-container');
 
-if (niqabSizeButtons.length > 0) {
-    niqabSizeButtons.forEach(button => {
-        button.addEventListener('click', function(e) {
-            e.preventDefault();
-            niqabSizeButtons.forEach(btn => btn.classList.remove('selected'));
-            this.classList.add('selected');
-            if(selectedNiqabSizeText) selectedNiqabSizeText.textContent = this.getAttribute('data-size');
+    if (hamperSizeButtons.length > 0) {
+        hamperSizeButtons.forEach(button => {
+            button.addEventListener('click', function(e) {
+                e.preventDefault();
+                if(this.classList.contains('out-of-stock-btn')) return; // STOP CLICK IF OUT OF STOCK
+                hamperSizeButtons.forEach(btn => btn.classList.remove('selected'));
+                this.classList.add('selected');
+                const selectedSize = this.getAttribute('data-size');
+                if(selectedHamperSizeText) selectedHamperSizeText.textContent = selectedSize;
+                if (customHamperSizeContainer) customHamperSizeContainer.style.display = (selectedSize === 'Custom Box') ? 'block' : 'none';
+            });
         });
-    });
-}   
+    }
+
+    // Add event listeners for the Niqab Size buttons
+    const niqabSizeButtons = document.querySelectorAll('.niqab-size-btn');
+    const selectedNiqabSizeText = document.getElementById('selected-niqab-size-text');
+
+    if (niqabSizeButtons.length > 0) {
+        niqabSizeButtons.forEach(button => {
+            button.addEventListener('click', function(e) {
+                e.preventDefault();
+                if(this.classList.contains('out-of-stock-btn')) return; // STOP CLICK IF OUT OF STOCK
+                niqabSizeButtons.forEach(btn => btn.classList.remove('selected'));
+                this.classList.add('selected');
+                if(selectedNiqabSizeText) selectedNiqabSizeText.textContent = this.getAttribute('data-size');
+            });
+        });
+    } 
         
         // --- ZOOM MAGNIFIER LOGIC (AMAZON STYLE) ---
     const zoomWrapper = document.getElementById('zoom-img-wrapper');
@@ -1875,14 +1882,20 @@ window.closeCheckoutModal = function() {
             }
         });
     }
- window.addCurrentProductToCart = function() {
+window.addCurrentProductToCart = function() {
     const qty = parseInt(document.getElementById('product-quantity').value) || 1;
-    let finalVariant = 'Standard';
+    let finalVariant = '';
+    
+    // Convert the database string back into a clean array to verify against
+    const outVariantsArray = currentProductView.stockOutVariantsStr ? currentProductView.stockOutVariantsStr.split(',').map(s => s.trim()) : [];
 
+    // Route logic based on the product's category and enforce selections
     if (currentProductView.category === 'Curated Hampers') {
         let sizeText = document.getElementById('selected-hamper-size-text').textContent;
-        finalVariant = sizeText !== 'Select a box size' ? `Box: ${sizeText}` : 'Standard Box';
+        if (sizeText === 'Select a box size') { alert("Please select a Box Size before adding to cart."); return; }
+        if (outVariantsArray.includes(sizeText)) { alert("Sorry, this specific box size is currently out of stock."); return; }
         
+        finalVariant = `Box: ${sizeText}`;
         if (sizeText === 'Custom Box') {
             const l = document.getElementById('hamper-length').value || '-';
             const w = document.getElementById('hamper-width').value || '-';
@@ -1894,20 +1907,29 @@ window.closeCheckoutModal = function() {
 
     } else if (currentProductView.category === 'Premium Niqabs') {
         let sizeText = document.getElementById('selected-niqab-size-text').textContent;
-        finalVariant = sizeText !== 'Select length' ? `Length: ${sizeText}` : 'Standard Length';
+        if (sizeText === 'Select length') { alert("Please select a Length before adding to cart."); return; }
+        if (outVariantsArray.includes(sizeText)) { alert("Sorry, this length is currently out of stock."); return; }
+        
+        finalVariant = `Length: ${sizeText}`;
 
     } else if (currentProductView.category === 'Essential Hijabs' || currentProductView.category === 'Signature Accessories') {
-        // If colors exist for this product, grab the color. Otherwise, it stays 'Standard'
         if (currentProductView.colorsStr && currentProductView.colorsStr.length > 0) {
             let colorText = document.getElementById('selected-color-text').textContent;
-            finalVariant = colorText !== 'Select a color' ? `Color: ${colorText}` : 'Standard Color';
+            if (colorText === 'Select a color') { alert("Please select a Color before adding to cart."); return; }
+            if (outVariantsArray.includes(colorText)) { alert("Sorry, this color is currently out of stock."); return; }
+            
+            finalVariant = `Color: ${colorText}`;
+        } else {
+            finalVariant = 'Standard'; // No colors were uploaded by admin, direct buy permitted
         }
 
     } else {
         // Luxury Abayas
         let sizeText = document.getElementById('selected-size-text').textContent;
-        finalVariant = sizeText !== 'Select a size' ? `Size: ${sizeText}` : 'Standard Size';
+        if (sizeText === 'Select a size') { alert("Please select a Size before adding to cart."); return; }
+        if (outVariantsArray.includes(sizeText)) { alert("Sorry, this size is currently out of stock."); return; }
         
+        finalVariant = `Size: ${sizeText}`;
         if (sizeText === 'Custom') {
             const l = document.getElementById('custom-length').value || '-';
             const c = document.getElementById('custom-chest').value || '-';
@@ -1918,6 +1940,7 @@ window.closeCheckoutModal = function() {
         }
     }
     
+    // If it passes all validation checks above, add it to the vault!
     addSecureProductToCart(currentProductView.id, qty, finalVariant);
 };
        // --- ORDER HISTORY LOGIC ---
