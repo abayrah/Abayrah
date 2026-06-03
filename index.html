@@ -2667,6 +2667,7 @@ window.viewItemFromOrder = async function(productId) {
             alert("Failed to cancel the order. Please contact Concierge Support.");
         }
     };
+   // --- OPEN FULL ORDER DETAILS PAGE ---
     window.openOrderDetails = function(orderId) {
         // 1. Find the specific order from our saved list
         const order = window.userOrderHistory.find(o => o.id === orderId);
@@ -2681,7 +2682,7 @@ window.viewItemFromOrder = async function(productId) {
         // 3. Populate Top Headers
         const orderDateObj = new Date(order.date);
         document.getElementById('detail-order-date').textContent = "Ordered on " + orderDateObj.toLocaleDateString('en-IN', { year: 'numeric', month: 'long', day: 'numeric' });
-       const displayOrderId = order.orderNumber ? order.orderNumber : order.id.toUpperCase();
+        const displayOrderId = order.orderNumber ? order.orderNumber : order.id.toUpperCase();
         document.getElementById('detail-order-id').textContent = "Order # " + displayOrderId;
         
         // 4. Populate 3-Column Boxes
@@ -2752,7 +2753,7 @@ window.viewItemFromOrder = async function(productId) {
         window.scrollTo({ top: 0, behavior: 'smooth' });
     };
 
-       // Navigates to the shopping page directly from the details view
+    // Navigates to the shopping page directly from the details view
     window.viewItemFromOrderDetails = async function(productId) {
          document.getElementById('order-details-section').style.display = 'none';
          await window.viewItemFromOrder(productId);
@@ -2801,11 +2802,6 @@ window.viewItemFromOrder = async function(productId) {
         document.getElementById('invoiceModal').classList.add('active');
     };
 
-    (function() {
-        function proxyGoogleDriveImage(img) {
-            const src = img.getAttribute('src');
-
-            
     (function() {
         function proxyGoogleDriveImage(img) {
             const src = img.getAttribute('src');
