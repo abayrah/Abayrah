@@ -2752,11 +2752,6 @@ window.viewItemFromOrder = async function(productId) {
         window.scrollTo({ top: 0, behavior: 'smooth' });
     };
 
-    // Navigates to the shopping page directly from the details view
-    window.viewItemFromOrderDetails = async function(productId) {
-         document.getElementById('order-details-section').style.display = 'none';
-         await window.viewItemFromOrder(productId);
-    };
        // Navigates to the shopping page directly from the details view
     window.viewItemFromOrderDetails = async function(productId) {
          document.getElementById('order-details-section').style.display = 'none';
