@@ -2336,14 +2336,28 @@ window.closeCheckoutModal = function() {
 
 window.downloadInvoicePDF = function() {
     const element = document.getElementById('invoicePrintArea');
+    
+    // Temporarily fix styling so html2canvas doesn't truncate the PDF
+    const originalHeight = element.style.height;
+    element.style.height = 'auto';
+
     const opt = {
-        margin:       0.5,
+        margin:       0.3,
         filename:     'ABAYRAH_Receipt_' + document.getElementById('invoiceOrderId').textContent + '.pdf',
-        image:        { type: 'jpeg', quality: 0.98 },
-        html2canvas:  { scale: 2 },
-        jsPDF:        { unit: 'in', format: 'letter', orientation: 'portrait' }
+        image:        { type: 'jpeg', quality: 1 },
+        html2canvas:  { 
+            scale: 2, 
+            useCORS: true, 
+            scrollY: 0, // Forces capture from the very top
+            logging: false
+        },
+        jsPDF:        { unit: 'in', format: 'a4', orientation: 'portrait' }
     };
-    html2pdf().set(opt).from(element).save();
+
+    html2pdf().set(opt).from(element).save().then(() => {
+        // Restore original styling after download
+        element.style.height = originalHeight;
+    });
 };   
 window.addCurrentProductToCart = function() {
     const qty = parseInt(document.getElementById('product-quantity').value) || 1;
@@ -2568,7 +2582,7 @@ window.viewItemFromOrder = async function(productId) {
                             </div>
                             <div style="text-align: right;">
                                 <div style="margin-bottom: 4px;">Order # ${displayOrderId}</div>
-                                <a href="javascript:void(0)" onclick="openOrderDetails('${order.id}')" style="color: var(--dark-text); font-weight: 500; text-decoration: underline; text-underline-offset: 3px; font-size: 11px;">View order details</a> <span style="margin: 0 8px;">|</span> <a href="#" style="color: var(--dark-text); font-weight: 500; text-decoration: underline; text-underline-offset: 3px; font-size: 11px;">Invoice ▾</a>
+                                <a href="javascript:void(0)" onclick="openOrderDetails('${order.id}')" style="color: var(--dark-text); font-weight: 500; text-decoration: underline; text-underline-offset: 3px; font-size: 11px;">View order details</a> <span style="margin: 0 8px;">|</span> <a href="javascript:void(0)" onclick="openInvoiceFromHistory('${order.id}')" style="color: var(--dark-text); font-weight: 500; text-decoration: underline; text-underline-offset: 3px; font-size: 11px;">Invoice ▾</a>
                             </div>
                         </div>
 
@@ -2743,6 +2757,60 @@ window.viewItemFromOrder = async function(productId) {
          document.getElementById('order-details-section').style.display = 'none';
          await window.viewItemFromOrder(productId);
     };
+       // Navigates to the shopping page directly from the details view
+    window.viewItemFromOrderDetails = async function(productId) {
+         document.getElementById('order-details-section').style.display = 'none';
+         await window.viewItemFromOrder(productId);
+    };
+
+    // --- OPEN INVOICE FROM VAULT HISTORY ---
+    window.openInvoiceFromHistory = function(orderId) {
+        const order = window.userOrderHistory.find(o => o.id === orderId);
+        if (!order) return;
+
+        const s = order.shippingInfo || {};
+        document.getElementById('invoiceCustomerName').textContent = `${s.firstName || 'Guest'} ${s.lastName || ''}`;
+        document.getElementById('invoiceCustomerEmail').textContent = s.email || '';
+        document.getElementById('invoiceCustomerAddress').innerHTML = `${s.houseNo || ''}, ${s.street || ''}<br>${s.city || ''}, ${s.state || ''} ${s.zip || ''}`;
+        
+        const displayOrderId = order.orderNumber ? order.orderNumber : order.id.substring(0,10).toUpperCase();
+        document.getElementById('invoiceOrderId').textContent = displayOrderId;
+        
+        const orderDateObj = new Date(order.date);
+        document.getElementById('invoiceDate').textContent = orderDateObj.toLocaleDateString('en-IN');
+        document.getElementById('invoiceTxn').textContent = order.paymentId || "N/A";
+        
+        let itemsHtml = '';
+        if (order.items && order.items.length > 0) {
+            order.items.forEach(item => {
+                itemsHtml += `
+                    <div style="display: flex; justify-content: space-between; align-items: center; font-size: 13px; color: var(--dark-text);">
+                        <div style="flex: 2;">
+                            <strong>${item.title}</strong>
+                            <div style="font-size: 11px; color: var(--muted-gray); margin-top: 3px;">Size/Variant: ${item.size}</div>
+                        </div>
+                        <div style="flex: 1; text-align: center;">${item.quantity}</div>
+                    </div>
+                `;
+            });
+        } else {
+            itemsHtml = '<div style="font-size: 12px; color: var(--muted-gray);">Item details unavailable for older orders.</div>';
+        }
+        
+        document.getElementById('invoiceItemsList').innerHTML = itemsHtml;
+        document.getElementById('invoiceSubtotal').textContent = `₹${parseFloat(order.amount).toFixed(2)}`;
+        document.getElementById('invoiceTotal').textContent = `₹${parseFloat(order.amount).toFixed(2)}`;
+
+        // Close the vault and open the invoice
+        document.getElementById('ordersModal').classList.remove('active');
+        document.getElementById('invoiceModal').classList.add('active');
+    };
+
+    (function() {
+        function proxyGoogleDriveImage(img) {
+            const src = img.getAttribute('src');
+
+            
     (function() {
         function proxyGoogleDriveImage(img) {
             const src = img.getAttribute('src');
