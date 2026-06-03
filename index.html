@@ -11,6 +11,8 @@
     <link rel="preload" as="image" href="header.png">
     <link rel="preload" as="image" href="images/hero-background.png" media="(min-width: 769px)">
     <link rel="preload" as="image" href="images/mobile-hero-1.png" media="(max-width: 768px)">
+    <link rel="prefetch" as="image" href="images/abaya.png">
+    <link rel="prefetch" as="image" href="images/mobile-abaya.png">
     <script src="https://checkout.razorpay.com/v1/checkout.js"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/html2pdf.js/0.10.1/html2pdf.bundle.min.js"></script>
     <link rel="modulepreload" href="https://www.gstatic.com/firebasejs/10.8.0/firebase-app.js">
@@ -684,7 +686,7 @@
                 
                 <div class="category-card" id="abayas" data-keywords="dress, gown, modest, maxi, burqa" onclick="openCategoryStore('Luxury Abayas', 'The Complete Collection')">
                     <div class="img-wrapper mini-carousel">
-                        <img src="abayas 2.png" alt="Premium Abayas Collection" class="category-img active-mini-slide" loading="lazy" decoding="async">
+                        <img src="abayas 2.png" alt="Premium Abayas Collection" class="category-img active-mini-slide" fetchpriority="high" decoding="async">
                         <img src="abayas 3.png" alt="Premium Abayas Collection Alternative" class="category-img" loading="lazy" decoding="async">
                         <img src="abayas 4.png" alt="Premium Abayas Collection Style" class="category-img" loading="lazy" decoding="async">
                         <img src="abayas 5.png" alt="Premium Abayas Collection Style" class="category-img" loading="lazy" decoding="async">
@@ -697,8 +699,8 @@
                 </div>
 
                 <div class="category-card" id="niqabs" data-keywords="face cover, veil, headpiece" onclick="openCategoryStore('Premium Niqabs', 'The Complete Collection')">
-                    <div class="img-wrapper mini-carousel">
-                        <img src="naqabs 2.png" alt="Elegant Niqabs Collection" class="category-img active-mini-slide" loading="lazy" decoding="async">
+                   <div class="img-wrapper mini-carousel">
+                        <img src="naqabs 2.png" alt="Elegant Niqabs Collection" class="category-img active-mini-slide" fetchpriority="high" decoding="async">
                         <img src="naqabs 3.png" alt="Elegant Niqabs Close-up" class="category-img" loading="lazy" decoding="async">
                         <img src="naqabs 4.png" alt="Elegant Niqabs Flow" class="category-img" loading="lazy" decoding="async">
                          <img src="naqabs 5.png" alt="Elegant Niqabs Flow" class="category-img" loading="lazy" decoding="async">
@@ -712,7 +714,7 @@
 
                 <div class="category-card" id="hijabs" data-keywords="scarf, scarves, wrap, head cover, pashmina" onclick="openCategoryStore('Essential Hijabs', 'The Complete Collection')">
                     <div class="img-wrapper mini-carousel">
-                        <img src="hijabs 2.png" alt="Essential Hijabs Collection" class="category-img active-mini-slide" loading="lazy" decoding="async">
+                        <img src="hijabs 2.png" alt="Essential Hijabs Collection" class="category-img active-mini-slide" fetchpriority="high" decoding="async">
                         <img src="hijabs 3.png" alt="Essential Hijabs Detail" class="category-img" loading="lazy" decoding="async">
                         <img src="hijabs 4.png" alt="Essential Hijabs Drape" class="category-img" loading="lazy" decoding="async">
                         <img src="hijabs 5.png" alt="Essential Hijabs Drape" class="category-img" loading="lazy" decoding="async">
@@ -726,7 +728,7 @@
 
                 <div class="category-card" id="accessories" data-keywords="pins, brooches, jewelry, undercap" onclick="openCategoryStore('Signature Accessories', 'Explore Finery')">
                     <div class="img-wrapper mini-carousel">
-                        <img src="accessiories 2.png" alt="Luxury Accessories Collection" class="category-img active-mini-slide" loading="lazy" decoding="async">
+                        <img src="accessiories 2.png" alt="Luxury Accessories Collection" class="category-img active-mini-slide" fetchpriority="high" decoding="async">
                         <img src="accessiories 3.png" alt="Accessories Highlight" class="category-img" loading="lazy" decoding="async">
                         <img src="accessiories 4.png" alt="Jewelry Detailing" class="category-img" loading="lazy" decoding="async">
                         <img src="accessiories 5.png" alt="Jewelry Detailing" class="category-img" loading="lazy" decoding="async">
@@ -740,7 +742,7 @@
 
                 <div class="category-card" id="hampers" data-keywords="gifts, bundles, sets, presents" onclick="openCategoryStore('Curated Hampers', 'Explore Gifting')">
                     <div class="img-wrapper mini-carousel">
-                        <img src="hampers 2.png" alt="Curated Gift Hampers Collection" class="category-img active-mini-slide" loading="lazy" decoding="async">
+                        <img src="hampers 2.png" alt="Curated Gift Hampers Collection" class="category-img active-mini-slide" fetchpriority="high" decoding="async">
                         <img src="hampers 3.png" alt="Gift Hampers Inside" class="category-img" loading="lazy" decoding="async">
                         <img src="hampers 4.png" alt="Gift Hampers Ribbon" class="category-img" loading="lazy" decoding="async">
                         <img src="hampers 5.png" alt="Gift Hampers Ribbon" class="category-img" loading="lazy" decoding="async">
