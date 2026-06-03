@@ -1740,7 +1740,7 @@
                 if(cartFooter) cartFooter.style.display = 'block';
                 if(cartCountBadge) cartCountBadge.style.display = 'block';
 
-                const cartPromises = snapshot.docs.map(async (cartDoc) => {
+               const cartPromises = snapshot.docs.map(async (cartDoc) => {
                     const item = cartDoc.data();
                     const safeId = escapeHTML(cartDoc.id);
                     try {
@@ -1750,6 +1750,7 @@
                             const prodData = productSnap.data();
                             return { 
                                 id: safeId, 
+                                productId: item.productId, /* 👈 NEW: Grab the raw product ID */
                                 qty: item.quantity || 1, 
                                 size: escapeHTML(item.size || 'Standard'), 
                                 price: parseFloat(prodData.price) || 0, 
@@ -1758,18 +1759,27 @@
                             };
                         }
                     } catch (error) { console.error("Fetch failed"); }
-                    return { id: safeId, qty: item.quantity || 1, size: 'Standard', price: 0, title: "Unavailable", image: "" };
+                    return { id: safeId, productId: item.productId, qty: item.quantity || 1, size: 'Standard', price: 0, title: "Unavailable", image: "" };
                 });
 
                 const resolvedItems = await Promise.all(cartPromises);
                 resolvedItems.forEach((prod) => {
                     if (prod.price > 0) {
                         totalItems += prod.qty; subtotal += (prod.price * prod.qty);
+                        
+                        /* 👇 NEW: Math formula to translate Firebase ID into your 6-digit SKU 👇 */
+                        let hashVal = 0;
+                        const pid = prod.productId || "";
+                        for (let i = 0; i < pid.length; i++) { hashVal = pid.charCodeAt(i) + ((hashVal << 5) - hashVal); }
+                        const displayId = pid ? (Math.abs(hashVal) % 900000 + 100000).toString() : "XXXXXX";
+
                         htmlBuffer += `
                             <div class="cart-item">
                                 <img src="${prod.image}" class="cart-item-img" decoding="async">
                                 <div class="cart-item-details">
                                     <div>
+                                        <!-- 👇 NEW: Added SKU above the title 👇 -->
+                                        <div style="font-size: 9px; color: var(--muted-gray); letter-spacing: 2px; text-transform: uppercase; margin-bottom: 4px;">SKU: #${displayId}</div>
                                         <h4 class="cart-item-title">${prod.title}</h4>
                                         <div class="cart-item-price">₹${prod.price.toFixed(2)}</div>
                                         <div style="font-size: 10px; color: var(--muted-gray); margin-top: 4px; text-transform: uppercase; letter-spacing: 1px;">Size: ${prod.size}</div>
