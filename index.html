@@ -2192,7 +2192,7 @@ window.closeCheckoutModal = function() {
                             }
                         }
 
-                        // 5. TRIGGER BACKEND TO SEND AUTOMATED EMAIL RECEIPT
+                      // 5. TRIGGER BACKEND TO SEND AUTOMATED EMAIL RECEIPT
                         fetch("https://abayrah-backend.onrender.com/send-receipt", {
                             method: "POST",
                             headers: { "Content-Type": "application/json" },
@@ -2200,6 +2200,11 @@ window.closeCheckoutModal = function() {
                                 orderId: numericOrderId,
                                 email: savedShippingData.email,
                                 name: `${savedShippingData.firstName} ${savedShippingData.lastName}`,
+                                
+                                // 👇 ADD THIS ONE LINE RIGHT HERE 👇
+                                phone: savedShippingData.phone,
+                                // 👆 ---------------------------- 👆
+
                                 items: orderItems,
                                 amount: orderAmount,
                                 txnId: paymentResponse.razorpay_payment_id
