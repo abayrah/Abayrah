@@ -12,6 +12,7 @@
     <link rel="preload" as="image" href="images/hero-background.png" media="(min-width: 769px)">
     <link rel="preload" as="image" href="images/mobile-hero-1.png" media="(max-width: 768px)">
     <script src="https://checkout.razorpay.com/v1/checkout.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/html2pdf.js/0.10.1/html2pdf.bundle.min.js"></script>
     <link rel="modulepreload" href="https://www.gstatic.com/firebasejs/10.8.0/firebase-app.js">
     <link rel="modulepreload" href="https://www.gstatic.com/firebasejs/10.8.0/firebase-auth.js">
     <link rel="modulepreload" href="https://www.gstatic.com/firebasejs/10.8.0/firebase-firestore.js">
@@ -2180,6 +2181,7 @@ window.closeCheckoutModal = function() {
                         await Promise.all(deletePromises);
 
                         // 4. NEW: LOCK THE COUPON IN FIREBASE SO IT CAN NEVER BE USED AGAIN
+                    // 4. LOCK THE COUPON IN FIREBASE SO IT CAN NEVER BE USED AGAIN
                         if (window.activeCoupon) {
                             const userRef = doc(db, "users", currentUser.uid);
                             const userSnap = await getDoc(userRef);
@@ -2190,9 +2192,51 @@ window.closeCheckoutModal = function() {
                             }
                         }
 
-                        alert("Payment Successful! Your modest wardrobe statement order has been placed.");
+                        // 5. TRIGGER BACKEND TO SEND AUTOMATED EMAIL RECEIPT
+                        fetch("https://abayrah-backend.onrender.com/send-receipt", {
+                            method: "POST",
+                            headers: { "Content-Type": "application/json" },
+                            body: JSON.stringify({
+                                orderId: numericOrderId,
+                                email: savedShippingData.email,
+                                name: `${savedShippingData.firstName} ${savedShippingData.lastName}`,
+                                items: orderItems,
+                                amount: orderAmount,
+                                txnId: paymentResponse.razorpay_payment_id
+                            })
+                        }).catch(err => console.error("Email trigger failed:", err));
+
+                        // 6. POPULATE AND SHOW THE DIGITAL INVOICE MODAL
                         document.getElementById('checkoutModal').classList.remove('active');
-                        document.getElementById('catalogs').scrollIntoView({behavior: 'smooth'});
+                        
+                        document.getElementById('invoiceCustomerName').textContent = `${savedShippingData.firstName} ${savedShippingData.lastName}`;
+                        document.getElementById('invoiceCustomerEmail').textContent = savedShippingData.email;
+                        document.getElementById('invoiceCustomerAddress').innerHTML = `${savedShippingData.houseNo}, ${savedShippingData.street}<br>${savedShippingData.city}, ${savedShippingData.state} ${savedShippingData.zip}`;
+                        document.getElementById('invoiceOrderId').textContent = numericOrderId;
+                        document.getElementById('invoiceDate').textContent = new Date().toLocaleDateString('en-IN');
+                        document.getElementById('invoiceTxn').textContent = paymentResponse.razorpay_payment_id;
+                        
+                        let itemsHtml = '';
+                        orderItems.forEach(item => {
+                            itemsHtml += `
+                                <div style="display: flex; justify-content: space-between; align-items: center; font-size: 13px; color: var(--dark-text);">
+                                    <div style="flex: 2;">
+                                        <strong>${item.title}</strong>
+                                        <div style="font-size: 11px; color: var(--muted-gray); margin-top: 3px;">Size/Variant: ${item.size}</div>
+                                    </div>
+                                    <div style="flex: 1; text-align: center;">${item.quantity}</div>
+                                </div>
+                            `;
+                        });
+                        document.getElementById('invoiceItemsList').innerHTML = itemsHtml;
+                        document.getElementById('invoiceSubtotal').textContent = `₹${orderAmount.toFixed(2)}`;
+                        document.getElementById('invoiceTotal').textContent = `₹${orderAmount.toFixed(2)}`;
+
+                        document.getElementById('invoiceModal').classList.add('active');
+                        
+                        // Clear the active coupon so it resets for the next purchase
+                        window.activeCoupon = null;
+                        window.cartRawSubtotal = 0;
                         },
                     "prefill": {
                         "name": `${savedShippingData.firstName} ${savedShippingData.lastName}`,
@@ -2216,6 +2260,22 @@ window.closeCheckoutModal = function() {
             }
         });
     }
+       window.closeInvoiceModal = function() {
+    document.getElementById('invoiceModal').classList.remove('active');
+    document.getElementById('catalogs').scrollIntoView({behavior: 'smooth'});
+};
+
+window.downloadInvoicePDF = function() {
+    const element = document.getElementById('invoicePrintArea');
+    const opt = {
+        margin:       0.5,
+        filename:     'ABAYRAH_Receipt_' + document.getElementById('invoiceOrderId').textContent + '.pdf',
+        image:        { type: 'jpeg', quality: 0.98 },
+        html2canvas:  { scale: 2 },
+        jsPDF:        { unit: 'in', format: 'letter', orientation: 'portrait' }
+    };
+    html2pdf().set(opt).from(element).save();
+};   
 window.addCurrentProductToCart = function() {
     const qty = parseInt(document.getElementById('product-quantity').value) || 1;
     let finalVariant = '';
@@ -2817,6 +2877,66 @@ window.viewItemFromOrder = async function(productId) {
             
             <div id="orderHistoryContainer" style="margin-top: 30px; display: flex; flex-direction: column; gap: 15px;">
                 </div>
+        </div>
+    </div>
+    <!-- 🌟 SUCCESS & INVOICE MODAL 🌟 -->
+    <div class="modal-overlay" id="invoiceModal">
+        <div class="modal-content" style="max-width: 650px; text-align: left; background: #FAFAFA;">
+            <button class="modal-close" onclick="closeInvoiceModal()" aria-label="Close">&times;</button>
+            
+            <div id="invoicePrintArea" style="background: #FFFFFF; padding: 40px; border: 1px solid var(--border-color); border-radius: 2px;">
+                <div style="text-align: center; border-bottom: 2px solid var(--accent-gold); padding-bottom: 20px; margin-bottom: 30px;">
+                    <h2 style="font-family: var(--font-serif); font-size: 32px; letter-spacing: 6px; color: var(--dark-text); margin-bottom: 5px;">ABAYRAH</h2>
+                    <p style="font-size: 10px; letter-spacing: 3px; text-transform: uppercase; color: var(--muted-gray);">Official Order Receipt</p>
+                </div>
+                
+                <div style="display: flex; justify-content: space-between; margin-bottom: 30px; font-size: 12px; color: var(--dark-text);">
+                    <div>
+                        <strong style="text-transform: uppercase; letter-spacing: 1px; font-size: 10px; color: var(--muted-gray);">Billed To:</strong><br><br>
+                        <span id="invoiceCustomerName" style="font-weight: 500; font-size: 14px;"></span><br>
+                        <span id="invoiceCustomerEmail"></span><br>
+                        <span id="invoiceCustomerAddress" style="color: var(--muted-gray); line-height: 1.6;"></span>
+                    </div>
+                    <div style="text-align: right;">
+                        <strong style="text-transform: uppercase; letter-spacing: 1px; font-size: 10px; color: var(--muted-gray);">Order Details:</strong><br><br>
+                        Order #: <strong id="invoiceOrderId"></strong><br>
+                        Date: <span id="invoiceDate"></span><br>
+                        Payment TXN: <span id="invoiceTxn" style="font-family: monospace;"></span>
+                    </div>
+                </div>
+
+                <div style="border-top: 1px solid var(--border-color); border-bottom: 1px solid var(--border-color); padding: 15px 0; margin-bottom: 20px;">
+                    <div style="display: flex; justify-content: space-between; font-weight: 500; text-transform: uppercase; font-size: 10px; letter-spacing: 1px; color: var(--muted-gray); margin-bottom: 15px;">
+                        <span style="flex: 2;">Item Description</span>
+                        <span style="flex: 1; text-align: center;">Qty</span>
+                    </div>
+                    <div id="invoiceItemsList" style="display: flex; flex-direction: column; gap: 15px;">
+                        <!-- Items injected here -->
+                    </div>
+                </div>
+
+                <div style="display: flex; justify-content: flex-end; font-size: 14px;">
+                    <div style="width: 250px;">
+                        <div style="display: flex; justify-content: space-between; margin-bottom: 10px; color: var(--muted-gray);">
+                            <span>Subtotal:</span>
+                            <span id="invoiceSubtotal"></span>
+                        </div>
+                        <div style="display: flex; justify-content: space-between; font-weight: 500; font-size: 18px; color: var(--dark-text); border-top: 1px solid var(--border-color); padding-top: 10px;">
+                            <span>Total Paid:</span>
+                            <span id="invoiceTotal"></span>
+                        </div>
+                    </div>
+                </div>
+                
+                <div style="text-align: center; margin-top: 40px; font-size: 11px; color: var(--muted-gray); font-style: italic;">
+                    Thank you for choosing ABAYRAH. An email confirmation has been sent to your inbox.
+                </div>
+            </div>
+
+            <div style="display: flex; gap: 15px; margin-top: 25px;">
+                <button class="submit-btn" style="margin-bottom: 0;" onclick="downloadInvoicePDF()">Download Bill (PDF)</button>
+                <button class="submit-btn" style="margin-bottom: 0; background: #FFFFFF; color: var(--dark-text); border: 1px solid var(--border-color);" onmouseover="this.style.borderColor='var(--dark-text)'" onmouseout="this.style.borderColor='var(--border-color)'" onclick="closeInvoiceModal()">Continue Shopping</button>
+            </div>
         </div>
     </div>
 </body>
