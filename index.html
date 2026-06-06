@@ -1598,7 +1598,7 @@
                 const displayId = numericSku;
 
                 resultsHTML += `
-                    <div class="category-card product-result" data-id="${displayId}" onclick="document.getElementById('searchOverlay').classList.remove('active'); document.getElementById('searchInput').value = ''; document.getElementById('main-storefront').style.display='none'; document.getElementById('dynamic-shopping-section').style.display='block'; openProduct('${escapeHTML(product._docId)}', '${escapeHTML(product.title||'').replace(/'/g, "\\'")}', ${price}, '${escapeHTML(product.description||'').replace(/'/g, "\\'")}', '${escapeHTML(product.image||'')}', ${originalPrice}, '${actualCategory}', '${colorsStr}', ${inStock}, '${stockOutVariantsStr}', '${displayId}')" style="background: var(--primary-bg); border: 1px solid var(--border-color); padding: 12px; border-radius: 2px; text-align: center; cursor: pointer;">
+                    <div class="category-card product-result" data-id="${displayId}" onclick="document.getElementById('searchOverlay').classList.remove('active'); document.getElementById('searchInput').value = ''; document.getElementById('main-storefront').style.display='none'; document.getElementById('dynamic-shopping-section').style.display='block'; openProduct('${escapeForInlineJS(product._docId)}', '${escapeForInlineJS(product.title)}', ${price}, '${escapeForInlineJS(product.description)}', '${escapeForInlineJS(product.image)}', ${originalPrice}, '${escapeForInlineJS(actualCategory)}', '${escapeForInlineJS(colorsStr)}', ${inStock}, '${escapeForInlineJS(stockOutVariantsStr)}', '${displayId}')" style="background: var(--primary-bg); border: 1px solid var(--border-color); padding: 12px; border-radius: 2px; text-align: center; cursor: pointer;">
                         <div style="width: 100%; aspect-ratio: 3/4; background: #FAFAFA; overflow: hidden; margin-bottom: 15px; position:relative;">
                             ${outOfStockBadge}
                             <img src="${escapeHTML(product.image||'')}" style="position:absolute; top:0; left:0; width: 100%; height: 100%; object-fit: contain; transition: 0.5s; ${imgFilter}">
@@ -1642,6 +1642,15 @@
 
     function showError(message) { if(authErrorMsg) { authErrorMsg.textContent = escapeHTML(message); authErrorMsg.style.display = 'block'; } }
     function escapeHTML(str) { return String(str).replace(/[&<>'"]/g, tag => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', "'": '&#39;', '"': '&quot;' }[tag] || tag)); }
+       function escapeForInlineJS(str) {
+    if (!str) return '';
+    return String(str)
+        .replace(/\\/g, '\\\\')  // Escape backslashes first
+        .replace(/'/g, "\\'")    // Escape single quotes for JS
+        .replace(/"/g, "&quot;") // Escape double quotes for the HTML attribute
+        .replace(/\n/g, '\\n')   // Escape physical newlines
+        .replace(/\r/g, '');     // Remove carriage returns
+}   
 
     if (googleSignInBtn) {
         googleSignInBtn.addEventListener('click', () => { signInWithPopup(auth, provider).catch((error) => { if (error.code !== 'auth/popup-closed-by-user') showError("Google login failed."); }); });
@@ -1934,7 +1943,7 @@ window.currentCategoryListener = null;
                     const displayId = (Math.abs(hashVal) % 900000 + 100000).toString();
 
                     productsContainer.insertAdjacentHTML('beforeend', `
-                        <div class="category-card" data-id="${displayId}" onclick="openProduct('${escapeHTML(docSnap.id)}', '${escapeHTML(product.title||'').replace(/'/g, "\\'")}', ${price}, '${escapeHTML(product.description||'').replace(/'/g, "\\'")}', '${escapeHTML(product.image||'')}', ${originalPrice}, '${actualCategory}', '${colorsStr}', ${inStock}, '${stockOutVariantsStr}', '${displayId}')" style="background: var(--primary-bg); border: 1px solid var(--border-color); padding: 12px; border-radius: 2px; text-align: center; cursor: pointer;">
+                        <div class="category-card" data-id="${displayId}" onclick="openProduct('${escapeForInlineJS(docSnap.id)}', '${escapeForInlineJS(product.title)}', ${price}, '${escapeForInlineJS(product.description)}', '${escapeForInlineJS(product.image)}', ${originalPrice}, '${escapeForInlineJS(actualCategory)}', '${escapeForInlineJS(colorsStr)}', ${inStock}, '${escapeForInlineJS(stockOutVariantsStr)}', '${displayId}')" style="background: var(--primary-bg); border: 1px solid var(--border-color); padding: 12px; border-radius: 2px; text-align: center; cursor: pointer;">
                             <div style="width: 100%; aspect-ratio: 3/4; background: #FAFAFA; overflow: hidden; margin-bottom: 15px; position:relative;">
                                 ${outOfStockBadge}
                                 <img src="${escapeHTML(product.image||'')}" style="position:absolute; top:0; left:0; width: 100%; height: 100%; object-fit: contain; transition: 0.5s; ${imgFilter}">
