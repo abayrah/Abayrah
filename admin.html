@@ -618,9 +618,27 @@
     <label>Original Price (₹)</label>
     <input type="number" id="prod-price" step="0.01" required>
 </div>
-<div class="form-group">
-    <label>Discount Percentage (%)</label>
-    <input type="number" id="prod-discount" placeholder="e.g. 20 (Leave 0 for no discount)" value="0" min="0" max="100">
+<div class="form-group" id="hamper-pricing-section" style="display: none; background: #FAFAFA; padding: 15px; border: 1px solid var(--border-color); border-radius: 2px;">
+    <label style="color: var(--accent-gold); font-family: var(--font-serif); font-size: 16px; text-transform: uppercase;">Hamper Box Pricing</label>
+    <p style="font-size: 10px; color: var(--muted-gray); margin-bottom: 15px; text-transform: uppercase;">Standard size automatically uses the main price above.</p>
+    
+    <div style="display: flex; gap: 10px; margin-bottom: 10px;">
+        <div style="flex: 1;">
+            <label>Large Box (Price) ₹</label>
+            <input type="number" id="variant-large-price" placeholder="e.g. 2000">
+        </div>
+        <div style="flex: 1;">
+            <label>Large Box (Original Price) ₹</label>
+            <input type="number" id="variant-large-original" placeholder="e.g. 2500">
+        </div>
+    </div>
+
+    <div style="display: flex; gap: 10px;">
+        <div style="flex: 1;">
+            <label>Custom Box (Base Price) ₹</label>
+            <input type="number" id="variant-custom-price" placeholder="e.g. 2500">
+        </div>
+    </div>
 </div>
 
 <div class="form-group" id="color-inputs-container" style="display: none; background: #FAFAFA; padding: 15px; border: 1px solid var(--border-color); border-radius: 2px;">
@@ -1209,16 +1227,24 @@
             list.appendChild(newRow);
         };
 
-        // Show Color inputs ONLY when Hijabs or Accessories are selected
+       // Show Color inputs or Hamper Pricing depending on category
         categoryInput.addEventListener('change', (e) => {
             const cat = e.target.value;
             previewCategory.textContent = e.target.options[e.target.selectedIndex].text;
             
             const colorContainer = document.getElementById('color-inputs-container');
+            const hamperPricingContainer = document.getElementById('hamper-pricing-section');
+            
             if (cat === 'Essential Hijabs' || cat === 'Signature Accessories') {
                 colorContainer.style.display = 'block';
             } else {
                 colorContainer.style.display = 'none';
+            }
+
+            if (cat === 'Curated Hampers') {
+                hamperPricingContainer.style.display = 'block';
+            } else {
+                hamperPricingContainer.style.display = 'none';
             }
         });
    // --- UPLOAD PRODUCT ---
@@ -1245,12 +1271,34 @@
 
             submitBtn.disabled = true; submitBtn.innerText = "Pushing to Vault...";
 
-            try {
-                let finalPrice = basePrice; let originalPriceToSave = null; let categories = [category]; 
+          try {
+                let finalPrice = basePrice; 
+                let originalPriceToSave = null; 
+                let categories = [category]; 
+                
                 if (discountPercent > 0) {
                     finalPrice = basePrice - (basePrice * (discountPercent / 100));
                     originalPriceToSave = basePrice;
                     if (discountPercent >= 50) categories.push("Archive Sale"); 
+                }
+
+                // --- NEW: Build the variant pricing for Hampers ---
+                let variantPricesPayload = null;
+                if (category === "Curated Hampers") {
+                    variantPricesPayload = {
+                        "Standard (10x8x4)": { 
+                            price: finalPrice, 
+                            originalPrice: originalPriceToSave 
+                        },
+                        "Large (12x10x6)": { 
+                            price: parseFloat(document.getElementById('variant-large-price').value) || finalPrice, 
+                            originalPrice: parseFloat(document.getElementById('variant-large-original').value) || originalPriceToSave 
+                        },
+                        "Custom Box": { 
+                            price: parseFloat(document.getElementById('variant-custom-price').value) || finalPrice, 
+                            originalPrice: null 
+                        }
+                    };
                 }
 
                 await addDoc(collection(db, "products"), {
@@ -1258,20 +1306,29 @@
                     title: title,
                     price: finalPrice,
                     originalPrice: originalPriceToSave,
+                    variantPrices: variantPricesPayload, // Saves dynamic prices!
                     image: convertDriveLink(rawImageUrl), 
                     description: desc,
-                    colors: colorsArray, // Save colors to DB!
-                    inStock: true, // Whole product is in stock initially
-                    stockOutVariants: [], // No variants out of stock initially
+                    colors: colorsArray, 
+                    inStock: true, 
+                    stockOutVariants: [], 
                     createdAt: new Date().toISOString()
                 });
                 
                 successMsg.style.display = 'block'; submitBtn.disabled = false; submitBtn.innerText = "Push to Live Store";
+                
                 // Reset form
                 categoryInput.value = ''; titleInput.value = ''; priceInput.value = ''; 
                 document.getElementById('prod-discount').value = '0';
                 imageInput.value = ''; document.getElementById('prod-desc').value = '';
                 document.getElementById('color-inputs-container').style.display = 'none';
+                
+                // Clear hamper fields
+                document.getElementById('variant-large-price').value = '';
+                document.getElementById('variant-large-original').value = '';
+                document.getElementById('variant-custom-price').value = '';
+                document.getElementById('hamper-pricing-section').style.display = 'none';
+
                 document.getElementById('dynamic-color-list').innerHTML = `<div class="color-row" style="display: flex; gap: 10px; margin-bottom: 10px;"><input type="text" class="color-input" placeholder="e.g. Dusty Rose" style="flex: 1;"><button type="button" class="action-btn" onclick="addAnotherColor()">+ Add Color</button></div>`;
                 previewCategory.textContent = 'Select Catalog'; previewTitle.textContent = 'Product Title'; previewPrice.textContent = '₹0.00';
                 previewImage.src = ''; previewImage.style.display = 'none'; previewImgText.style.display = 'block';
@@ -1279,7 +1336,6 @@
             } catch (error) {
                 alert("Error adding product."); submitBtn.disabled = false; submitBtn.innerText = "Push to Live Store";
             }
-        };
   window.allProductsData = {}; 
 
         window.loadInventory = async function() {
