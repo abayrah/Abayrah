@@ -455,30 +455,32 @@
             list.appendChild(newRow);
         };
 
-        // Show Color inputs or Hamper Pricing depending on category
+        // Show Color inputs or Hamper Pricing depending on category (BULLETPROOF FIX)
         categoryInput.addEventListener('change', (e) => {
-            const cat = e.target.value;
+            const cat = e.target.value || "";
             previewCategory.textContent = e.target.options[e.target.selectedIndex].text;
             
             const colorContainer = document.getElementById('color-inputs-container');
             const hamperPricingContainer = document.getElementById('hamper-pricing-section');
             
-            if (cat === 'Essential Hijabs' || cat === 'Signature Accessories') {
+            if (cat.includes('Hijab') || cat.includes('Accessories')) {
                 colorContainer.style.display = 'block';
             } else {
                 colorContainer.style.display = 'none';
             }
 
-            if (cat === 'Curated Hampers') {
+            // Fix: Triggers on ANY category containing the word "Hamper"
+            if (cat.includes('Hamper')) {
                 hamperPricingContainer.style.display = 'block';
             } else {
                 hamperPricingContainer.style.display = 'none';
             }
         });
 
-        // Toggle hamper inputs inside Edit Modal
+        // Toggle hamper inputs inside Edit Modal (BULLETPROOF FIX)
         document.getElementById('edit-category').addEventListener('change', (e) => {
-            if (e.target.value === 'Curated Hampers') {
+            const cat = e.target.value || "";
+            if (cat.includes('Hamper')) {
                 document.getElementById('edit-hamper-pricing-section').style.display = 'block';
             } else {
                 document.getElementById('edit-hamper-pricing-section').style.display = 'none';
@@ -522,7 +524,7 @@
 
                 // --- Build the variant pricing for Hampers ---
                 let variantPricesPayload = null;
-                if (category === "Curated Hampers") {
+                if (category.includes("Hamper")) {
                     variantPricesPayload = {
                         "Standard (10x8x4)": { 
                             price: finalPrice, 
@@ -612,7 +614,6 @@
 
                     itemsFound++;
                     
-                    // 👇 NEW: Math formula to translate Firebase ID into a 6-digit number! 👇
                     let hashVal = 0;
                     for (let i = 0; i < id.length; i++) { hashVal = id.charCodeAt(i) + ((hashVal << 5) - hashVal); }
                     const displayId = (Math.abs(hashVal) % 900000 + 100000).toString();
@@ -663,7 +664,6 @@
                 const title = item.querySelector('.inv-title').textContent.toLowerCase();
                 const pid = item.getAttribute('data-id').toLowerCase();
                 
-                // If it matches the title OR the SKU, show it!
                 if(title.includes(term) || pid.includes(term)) {
                     item.style.display = 'flex';
                 } else {
@@ -714,7 +714,7 @@
             document.getElementById('edit-desc').value = product.description || '';
 
             // Populate Hamper Variant Prices if they exist
-            if (primaryCategory === 'Curated Hampers') {
+            if (primaryCategory.includes('Hamper')) {
                 document.getElementById('edit-hamper-pricing-section').style.display = 'block';
                 if (product.variantPrices) {
                     document.getElementById('edit-variant-large-price').value = product.variantPrices["Large (12x10x6)"]?.price || '';
@@ -734,10 +734,10 @@
             variantContainer.innerHTML = '';
             let availableVariants = [];
 
-            if (primaryCategory === 'Luxury Abayas') availableVariants = ['52', '54', '56', '58', '60', 'Custom'];
-            else if (primaryCategory === 'Curated Hampers') availableVariants = ['Standard (10x8x4)', 'Large (12x10x6)', 'Custom Box'];
-            else if (primaryCategory === 'Premium Niqabs') availableVariants = ['5 inches', '7 inches', '9 inches', '12 inches', '24 inches'];
-            else if (primaryCategory === 'Essential Hijabs' || primaryCategory === 'Signature Accessories') {
+            if (primaryCategory.includes('Abaya')) availableVariants = ['52', '54', '56', '58', '60', 'Custom'];
+            else if (primaryCategory.includes('Hamper')) availableVariants = ['Standard (10x8x4)', 'Large (12x10x6)', 'Custom Box'];
+            else if (primaryCategory.includes('Niqab')) availableVariants = ['5 inches', '7 inches', '9 inches', '12 inches', '24 inches'];
+            else if (primaryCategory.includes('Hijab') || primaryCategory.includes('Accessories')) {
                 availableVariants = product.colors || [];
             }
 
@@ -762,7 +762,7 @@
         window.saveEditedProduct = async function(event) {
             const id = document.getElementById('edit-doc-id').value;
             const btn = event.target;
-            const category = document.getElementById('edit-category').value;
+            const category = document.getElementById('edit-category').value || "";
             const title = document.getElementById('edit-title').value.trim();
             const basePrice = parseFloat(document.getElementById('edit-price').value);
             const discountPercent = parseFloat(document.getElementById('edit-discount').value) || 0; 
@@ -786,7 +786,7 @@
 
                 // Handle variant pricing for existing products being edited
                 let variantPricesPayload = window.allProductsData[id].variantPrices || null;
-                if (category === "Curated Hampers") {
+                if (category.includes("Hamper")) {
                     variantPricesPayload = {
                         "Standard (10x8x4)": { price: finalPrice, originalPrice: originalPriceToSave },
                         "Large (12x10x6)": { 
