@@ -1738,19 +1738,38 @@
 
         if(subtotalEl) subtotalEl.textContent = `₹${window.cartRawSubtotal.toFixed(2)}`;
 
-        // If coupon is active, calculate 10% off
-        if (window.activeCoupon === 'WELCOME10' && window.cartRawSubtotal > 0) {
-            const discount = window.cartRawSubtotal * 0.10;
-            const finalTotal = window.cartRawSubtotal - discount;
+        let currentTotal = window.cartRawSubtotal;
+
+        // 1. Calculate Discount
+        if (window.activeCoupon === 'WELCOME10' && currentTotal > 0) {
+            const discount = currentTotal * 0.10;
+            currentTotal = currentTotal - discount;
             
             if(discountRow) discountRow.style.display = 'flex';
             if(discountAmountEl) discountAmountEl.textContent = `-₹${discount.toFixed(2)}`;
-            
-            if(grandTotalRow) grandTotalRow.style.display = 'flex';
-            if(grandTotalAmountEl) grandTotalAmountEl.textContent = `₹${finalTotal.toFixed(2)}`;
         } else {
             if(discountRow) discountRow.style.display = 'none';
-            if(grandTotalRow) grandTotalRow.style.display = 'none';
+        }
+
+        // 2. Calculate the 2.36% Razorpay Fee
+        const platformFee = currentTotal * 0.0236;
+        const finalGrandTotal = currentTotal + platformFee;
+
+        // Update the UI to show the fee
+        if(grandTotalRow) {
+            grandTotalRow.style.display = 'flex';
+            grandTotalRow.innerHTML = `
+                <div style="width: 100%;">
+                    <div style="display: flex; justify-content: space-between; font-size: 12px; color: var(--muted-gray); margin-bottom: 10px; font-weight: normal;">
+                        <span>Platform Handling Fee (2.36%)</span>
+                        <span>₹${platformFee.toFixed(2)}</span>
+                    </div>
+                    <div style="display: flex; justify-content: space-between; font-size: 16px; border-top: 1px solid var(--border-color); padding-top: 10px;">
+                        <span>Grand Total</span>
+                        <span class="subtotal-amount">₹${finalGrandTotal.toFixed(2)}</span>
+                    </div>
+                </div>
+            `;
         }
     };
 
@@ -2136,30 +2155,28 @@ window.currentProductListener = null;
             isFirstLoad = false;
         });
     };
-// 1. Function to open the checkout modal
 window.openCheckoutModal = function() {
     if (!currentUser) {
-        document.getElementById('loginModal').classList.add('active');
-        document.getElementById('modalTitle').textContent = "Sign In to Checkout";
-        return;
+        // ... (keep the login modal code)
     }
     
-    // 1. Force the cart to close immediately
     document.getElementById('cartDrawer').classList.remove('active');
     document.getElementById('cartOverlay').classList.remove('active');
     
-    // 2. Set the price
+    // Set the price with the exact same 2.36% math
     let finalAmount = window.cartRawSubtotal;
     if (window.activeCoupon === 'WELCOME10') {
-        finalAmount = window.cartRawSubtotal * 0.90; 
+        finalAmount = finalAmount * 0.90; 
     }
+    
+    // Add the Razorpay fee
+    const platformFee = finalAmount * 0.0236;
+    finalAmount = finalAmount + platformFee;
+
     document.getElementById('checkoutTotalDisplay').textContent = `₹${finalAmount.toFixed(2)}`;
     
-    // 3. Add a tiny delay (100ms) before opening checkout. 
-    // This gives the browser time to "clear" the previous drawer animation.
     setTimeout(() => {
         document.getElementById('checkoutModal').classList.add('active');
-        // Force the body to scroll properly
         document.body.style.overflow = 'auto';
     }, 100);
 };
