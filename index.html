@@ -579,17 +579,17 @@
     border: 1px solid rgba(197, 168, 128, 0.14);
     pointer-events: none;
 }
-
 .launch-star {
-    width: 64px;
-    height: 64px;
-    margin: 0 auto 14px auto;
+    width: 96px;
+    height: 96px;
+    margin: 0 auto -8px auto;
     display: block;
     object-fit: contain;
     border-radius: 50%;
     border: 1px solid rgba(197, 168, 128, 0.5);
-padding: 4px;
-    /* No brightness(0) filter—keeps your actual logo visible */
+    padding: 4px;
+    position: relative;
+    z-index: 2;
     animation: launchStarPulse 4s ease-in-out infinite;
 }
 
@@ -603,12 +603,13 @@ padding: 4px;
     height: 185px;
     width: auto;
     max-width: 90%;
-    margin: -22px auto -18px auto;
+    margin: -38px auto -22px auto;
     display: block;
     object-fit: contain;
     filter: brightness(0) invert(1);
+    position: relative;
+    z-index: 1;
 }
-
 .launch-kicker {
     font-family: var(--font-sans);
     font-size: 10px;
@@ -718,11 +719,9 @@ padding: 4px;
 }
 
 /* Tablets & iPads */
-@media (max-width: 1024px) {
-    .launch-frame { max-width: 680px; padding: 36px 28px; }
-    .launch-logo { height: 165px; margin: -18px auto -14px auto; }
-}
-
+@media (max-width: 640px) {
+    .launch-star { width: 78px; height: 78px; margin: 0 auto -6px auto; }
+    .launch-logo { height: 145px; margin: -30px auto -16px auto; }
 /* Mobile Screens */
 @media (max-width: 640px) {
     #launch-countdown-gate { padding: 14px 12px; }
