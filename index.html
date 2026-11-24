@@ -3764,40 +3764,48 @@ window.viewItemFromOrder = async function(productId) {
             </div>
         </div>
     </div>
-   <script>
+  <script>
     (function () {
         const LAUNCH_CONFIG = {
-            // Official Launch: Tuesday, 2 February 2027 at 1:00 PM IST (Asia/Kolkata)
-            targetTimestamp: '2026-02-02T13:00:00+05:30',
+            // Change back to '2027-02-02T13:00:00+05:30' after you finish testing!
+            targetTimestamp: '2027-02-02T13:00:00+05:30',
             displayDate: '02 Feb 2027 at 1:00 PM',
             isLaunchedOverride: false, // Set to true to unlock the store immediately
             previewKey: 'abayrah',     // Visit ?preview=abayrah to test the store before launch
             socials: {
                 instagram: 'https://www.instagram.com/abayrah.in?igsh=eDE0NjF3aWtudmpy&utm_source=ig_contact_invite',
                 whatsapp: 'https://wa.me/917842358753?text=Hi%20ABAYRAH!%20Please%20notify%20me%20when%20the%20website%20launches.',
-                youtube: '',  // Paste your YouTube channel URL here
-                linkedin: ''  // Paste your LinkedIn page URL here
+                youtube: '',
+                linkedin: ''
             }
         };
 
         const gate = document.getElementById('launch-countdown-gate');
         if (!gate) return;
 
-        // Owner preview bypass
+        const launchMs = new Date(LAUNCH_CONFIG.targetTimestamp).getTime();
         const params = new URLSearchParams(window.location.search);
-        if (params.get('preview') === LAUNCH_CONFIG.previewKey) {
+
+        // If already past launch time, override is on, or preview link is used -> remove gate instantly
+        if (
+            params.get('preview') === LAUNCH_CONFIG.previewKey ||
+            LAUNCH_CONFIG.isLaunchedOverride ||
+            Date.now() >= launchMs
+        ) {
+            document.documentElement.style.overflow = '';
+            document.body.style.overflow = '';
             gate.remove();
             return;
         }
 
-        const launchMs = new Date(LAUNCH_CONFIG.targetTimestamp).getTime();
+        // Lock storefront scroll while countdown is active
+        document.documentElement.style.overflow = 'hidden';
+        document.body.style.overflow = 'hidden';
+
         const daysEl = document.getElementById('cd-days');
         const hoursEl = document.getElementById('cd-hours');
         const minutesEl = document.getElementById('cd-minutes');
         const secondsEl = document.getElementById('cd-seconds');
-        const cdGrid = document.getElementById('archCountdownGrid');
-        const liveBox = document.getElementById('archLiveBox');
-        const exploreBtn = document.getElementById('exploreAbayrahBtn');
         const dateLabel = document.getElementById('launchDateLabel');
         const saveCalBtn = document.getElementById('saveCalendarBtn');
         const toastEl = document.getElementById('archToast');
@@ -3811,7 +3819,7 @@ window.viewItemFromOrder = async function(productId) {
             setTimeout(() => toastEl.classList.remove('show'), 2800);
         }
 
-        // Generate lightweight floating gold particles
+        // Floating gold dust particles
         const particleHost = document.getElementById('archParticles');
         if (particleHost) {
             for (let i = 0; i < 18; i++) {
@@ -3824,7 +3832,7 @@ window.viewItemFromOrder = async function(productId) {
             }
         }
 
-        // Wire up social buttons
+        // Wire up social links
         Object.entries(LAUNCH_CONFIG.socials).forEach(([key, url]) => {
             const link = document.getElementById('social-' + key);
             if (!link) return;
@@ -3840,7 +3848,7 @@ window.viewItemFromOrder = async function(productId) {
             }
         });
 
-        // Functional Calendar Reminder (.ics download)
+        // Calendar reminder (.ics download)
         if (saveCalBtn) {
             saveCalBtn.addEventListener('click', () => {
                 const ics = [
@@ -3868,27 +3876,25 @@ window.viewItemFromOrder = async function(productId) {
             });
         }
 
+        let timer = null;
+
         function unlockStorefront() {
+            if (timer) clearInterval(timer);
+            daysEl.textContent = '00';
+            hoursEl.textContent = '00';
+            minutesEl.textContent = '00';
+            secondsEl.textContent = '00';
+
             gate.classList.add('unlocked');
             document.documentElement.style.overflow = '';
             document.body.style.overflow = '';
             setTimeout(() => gate.remove(), 950);
         }
 
-        if (exploreBtn) {
-            exploreBtn.addEventListener('click', unlockStorefront);
-        }
-
-        function showLiveState() {
-            if (cdGrid) cdGrid.style.display = 'none';
-            if (liveBox) liveBox.style.display = 'flex';
-        }
-
         function updateCountdown() {
             const remaining = launchMs - Date.now();
-            if (LAUNCH_CONFIG.isLaunchedOverride || remaining <= 0) {
-                clearInterval(timer);
-                showLiveState();
+            if (remaining <= 0) {
+                unlockStorefront();
                 return;
             }
 
@@ -3903,14 +3909,8 @@ window.viewItemFromOrder = async function(productId) {
             secondsEl.textContent = String(seconds).padStart(2, '0');
         }
 
-        // Lock storefront scroll until launch
-        if (!LAUNCH_CONFIG.isLaunchedOverride && Date.now() < launchMs) {
-            document.documentElement.style.overflow = 'hidden';
-            document.body.style.overflow = 'hidden';
-        }
-
         updateCountdown();
-        const timer = setInterval(updateCountdown, 1000);
+        timer = setInterval(updateCountdown, 1000);
     })();
 </script>
 </body>
